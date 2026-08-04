@@ -800,7 +800,7 @@
                 <label>Tipo de Entrega</label>
                 <select id="tipo-entrega" onchange="actualizarCalculoTotal()">
                     <option value="tienda">Recoger en Tienda (Esquipulas) - Gratis</option>
-                    <option value="domicilio">Envío a Domicilio (+Q25.00)</option>
+                    <option value="domicilio">Envío a Domicilio (+Q60.00)</option>
                 </select>
             </div>
 
@@ -1074,7 +1074,7 @@
             carrito.forEach(item => { subtotal += item.price * item.quantity; });
 
             const tipoEntrega = document.getElementById('tipo-entrega').value;
-            let costoEnvio = tipoEntrega === 'domicilio' ? 25.00 : 0.00;
+            let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00;
 
             document.getElementById('pago-modal-envio').innerText = `Q${costoEnvio.toFixed(2)}`;
             document.getElementById('pago-modal-total').innerText = `Q${(subtotal + costoEnvio).toFixed(2)}`;
@@ -1140,7 +1140,7 @@
             try {
                 let subtotal = 0;
                 carrito.forEach(item => { subtotal += item.price * item.quantity; });
-                let totalGeneral = subtotal + (tipoEntrega === 'domicilio' ? 25.00 : 0.00);
+                let totalGeneral = subtotal + (tipoEntrega === 'domicilio' ? 60.00 : 0.00);
 
                 await fetch(`${API_BACKEND}/create-payment-intent`, {
                     method: 'POST',
