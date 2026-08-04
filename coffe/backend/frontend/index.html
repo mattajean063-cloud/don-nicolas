@@ -893,7 +893,7 @@
                 const rutaRelativa = img.getAttribute('data-src');
                 if (rutaRelativa) {
                     let rutaLimpia = rutaRelativa.replace('/static', '');
-                    img.src = `${HOST_STATIC}${rutaLimpia}`;
+                    img.src = `${HOST_STATIC}/imagenes${rutaLimpia.replace('/imagenes', '')}`;
                 }
             });
             cargarDatosSistema();
@@ -931,7 +931,7 @@
             contInicio.innerHTML = '';
             contTienda.innerHTML = '';
 
-            const productosTienda = cacheProductos.filter(p => p.price > 0);
+            const productosTienda = cacheProductos;
 
             if (productosTienda.length === 0) {
                 const msg = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No hay productos en la tienda.</p>';
@@ -948,7 +948,8 @@
                 if (!imagenSrc || imagenSrc.trim() === "") {
                     imagenSrc = 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400';
                 } else if (imagenSrc.startsWith('/')) {
-                    imagenSrc = `${HOST_STATIC}${imagenSrc}`;
+                    let rutaLimpia = imagenSrc.replace('/static', '');
+                    imagenSrc = `${HOST_STATIC}/imagenes${rutaLimpia.replace('/imagenes', '')}`;
                 }
 
                 const tarjetaHTML = `
@@ -1184,7 +1185,7 @@
             e.preventDefault();
             const nombre = document.getElementById('envio-nombre').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
-            const nit = document.getElementById('envio-nit').value.trim();
+            const nit = document.getElementById('envio-nit'].value.trim();
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim();
             const direccion = document.getElementById('envio-direccion').value.trim();
             const tipoEntrega = document.getElementById('tipo-entrega').value;
