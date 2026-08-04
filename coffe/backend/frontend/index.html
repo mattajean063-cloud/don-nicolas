@@ -506,6 +506,92 @@
             cursor: pointer;
         }
 
+        /* MODAL DE DETALLES DE PRODUCTO */
+        .producto-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(44, 29, 17, 0.7);
+            z-index: 4000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .producto-modal-overlay.activo {
+            display: flex;
+        }
+
+        .producto-modal-contenido {
+            background: #faf6ef;
+            border: 2px solid var(--accent-gold);
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .producto-modal-contenido {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .molienda-selector {
+            display: flex;
+            gap: 8px;
+            margin: 0.8rem 0 1.2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .molienda-opcion {
+            border: 1px solid #e3dbcc;
+            background: #fff;
+            padding: 0.5rem 0.8rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .molienda-opcion.seleccionado {
+            background: var(--primary-dark);
+            color: #f4efe6;
+            border-color: var(--primary-dark);
+        }
+
+        .cantidad-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .cantidad-control button {
+            background: #fff;
+            border: 1px solid #e3dbcc;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cantidad-control input {
+            width: 45px;
+            text-align: center;
+            border: 1px solid #e3dbcc;
+            padding: 5px;
+        }
+
         /* MEDIA QUERIES PARA PANTALLAS ESCRITORIO (TABLETS Y PC) */
         @media (min-width: 768px) {
             header {
@@ -775,6 +861,45 @@
         </div>
     </div>
 
+    <!-- MODAL DETALLE DE PRODUCTO -->
+    <div id="modal-detalle-producto" class="producto-modal-overlay">
+        <div class="producto-modal-contenido">
+            <button class="btn-cerrar" style="position: absolute; top: 1rem; right: 1rem;" onclick="cerrarDetalleProducto()">&times;</button>
+            
+            <!-- Columna Izquierda: Imagen -->
+            <div>
+                <img id="detalle-img" src="" alt="Producto" style="width: 100%; height: 320px; object-fit: cover; border: 1px solid #e3dbcc; background: #fff;">
+            </div>
+
+            <!-- Columna Derecha: Información y Opciones -->
+            <div>
+                <span id="detalle-categoria" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-gold); font-family: 'Cinzel', serif;"></span>
+                <h2 id="detalle-nombre" style="font-family: 'Cinzel', serif; color: var(--primary-dark); margin: 0.3rem 0; font-size: 1.5rem;"></h2>
+                <div id="detalle-precio" style="font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 1rem;"></div>
+
+                <label style="font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--primary-dark); display: block;">SELECCIONA TU MOLIENDA</label>
+                <div class="molienda-selector">
+                    <div class="molienda-opcion seleccionado" onclick="seleccionarMolienda(this)">GRANO</div>
+                    <div class="molienda-opcion" onclick="seleccionarMolienda(this)">FINA</div>
+                    <div class="molienda-opcion" onclick="seleccionarMolienda(this)">MEDIA</div>
+                    <div class="molienda-opcion" onclick="seleccionarMolienda(this)">GRUESA</div>
+                </div>
+
+                <label style="font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--primary-dark); display: block;">DESCRIPCIÓN</label>
+                <p id="detalle-descripcion" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;"></p>
+
+                <label style="font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--primary-dark); display: block;">CANTIDAD</label>
+                <div class="cantidad-control">
+                    <button onclick="cambiarCantidadModal(-1)">-</button>
+                    <input type="text" id="modal-input-cantidad" value="1" readonly>
+                    <button onclick="cambiarCantidadModal(1)">+</button>
+                </div>
+
+                <button id="btn-modal-agregar" class="btn-checkout" style="margin-top: 1rem; background: var(--primary-dark); color: #f4efe6;">Añadir al Carrito</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MENÚ DE PAGO Y ENVÍO -->
     <div id="pago-overlay" class="pago-overlay">
         <div class="pago-modal-contenido">
@@ -901,6 +1026,7 @@
 
         let carrito = [];
         let cacheProductos = [];
+        let productoActualModal = null;
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarDatosSistema();
@@ -959,7 +1085,7 @@
                 }
 
                 const tarjetaHTML = `
-                    <div class="producto-card">
+                    <div class="producto-card" style="cursor: pointer;" onclick='abrirDetalleProducto(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
                         <div>
                             <img src="${imagenSrc}" alt="${p.name}" class="producto-img" onerror="this.src='https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400'">
                             <div class="producto-info">
@@ -968,7 +1094,7 @@
                                 <p>${descLimpia}</p>
                             </div>
                         </div>
-                        <div class="producto-footer">
+                        <div class="producto-footer" onclick="event.stopPropagation();">
                             <span class="producto-precio">Q${p.price.toFixed(2)}</span>
                             <button class="btn-comprar" onclick="agregarAlCarrito(${p.id}, '${p.name}', ${p.price})">Añadir</button>
                         </div>
@@ -979,13 +1105,60 @@
             });
         }
 
+        function abrirDetalleProducto(p) {
+            productoActualModal = p;
+            let imagenSrc = p.image_url;
+            if (!imagenSrc || imagenSrc.trim() === "") {
+                imagenSrc = 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400';
+            } else if (imagenSrc.startsWith('/')) {
+                let rutaLimpia = imagenSrc.replace('/static', '');
+                imagenSrc = `${HOST_STATIC}/imagenes${rutaLimpia.replace('/imagenes', '')}`;
+            }
+
+            document.getElementById('detalle-img').src = imagenSrc;
+            document.getElementById('detalle-categoria').innerText = limpiarTexto(p.category, 'Café en Grano');
+            document.getElementById('detalle-nombre').innerText = p.name;
+            document.getElementById('detalle-precio').innerText = `Q${p.price.toFixed(2)}`;
+            document.getElementById('detalle-descripcion').innerText = limpiarTexto(p.description, 'Café artesanal de estricta altura.');
+            document.getElementById('modal-input-cantidad').value = 1;
+
+            document.getElementById('btn-modal-agregar').onclick = function() {
+                const cantidad = parseInt(document.getElementById('modal-input-cantidad').value);
+                const moliendaSeleccionada = document.querySelector('.molienda-opcion.seleccionado').innerText;
+                
+                for(let i = 0; i < cantidad; i++) {
+                    agregarAlCarrito(p.id, `${p.name} (${moliendaSeleccionada})`, p.price);
+                }
+                cerrarDetalleProducto();
+            };
+
+            document.getElementById('modal-detalle-producto').classList.add('activo');
+        }
+
+        function cerrarDetalleProducto() {
+            document.getElementById('modal-detalle-producto').classList.remove('activo');
+        }
+
+        function seleccionarMolienda(elemento) {
+            document.querySelectorAll('.molienda-opcion').forEach(el => el.classList.remove('seleccionado'));
+            elemento.classList.add('seleccionado');
+        }
+
+        function cambiarCantidadModal(cambio) {
+            const input = document.getElementById('modal-input-cantidad');
+            let valor = parseInt(input.value) + cambio;
+            if (valor < 1) valor = 1;
+            if (valor > 20) valor = 20;
+            input.value = valor;
+        }
+
         function toggleCarrito() {
             document.getElementById('carrito-modal').classList.toggle('abierto');
         }
 
         function agregarAlCarrito(id, name, price) {
             let totalBolsasActuales = carrito.reduce((sum, item) => sum + item.quantity, 0);
-            let itemExistente = carrito.find(item => item.id === id);
+            let itemExistente = carrito.find(item => item.name === name);
             let cantidadAGregar = 1;
 
             if (totalBolsasActuales + cantidadAGregar > 20) {
@@ -1226,7 +1399,7 @@
                     body: formData
                 });
 
-                if (!resPedido.ok) throw new Error("Error al registrar estricto pedido.");
+                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
 
                 alert(`¡Pedido registrado, ${nombre}! Comprobante enviado para verificación.`);
                 carrito = [];
