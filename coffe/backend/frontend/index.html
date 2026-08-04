@@ -880,16 +880,15 @@
     </div>
 
     <script>
-        const HOST_IP = window.location.hostname || '127.0.0.1';
-        const API_URL = `http://${HOST_IP}:8000/api/admin`;
-        const API_BACKEND = `http://${HOST_IP}:8000/api`;
-        const HOST_STATIC = `http://${HOST_IP}:8000`;
+        // CORREGIDO: Uso de rutas relativas limpias para evitar errores de Mixed Content en HTTPS (Render)
+        const API_URL = `/api/admin`;
+        const API_BACKEND = `/api`;
+        const HOST_STATIC = ``;
 
         let carrito = [];
         let cacheProductos = [];
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Se han colocado las rutas absolutas directamente en el HTML para evitar fallas de carga por JavaScript.
             cargarDatosSistema();
         });
 
