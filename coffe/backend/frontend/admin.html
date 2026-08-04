@@ -278,7 +278,7 @@
             background: #faf6ef;
             padding: 2rem;
             border: 1px solid #e3dbcc;
-            max-width: 650px;
+            max-width: 700px;
             margin-bottom: 2rem;
         }
 
@@ -306,7 +306,7 @@
             box-sizing: border-box;
         }
 
-        /* SECCIÓN ESPECIFICACIONES / ICONOS EDITABLES */
+        /* SECCIÓN ESPECIFICACIONES / ICONOS EDITABLES CON CARGA DE ARCHIVO */
         .specs-admin-container {
             border: 1px dashed var(--accent-gold);
             padding: 1rem;
@@ -316,15 +316,49 @@
 
         .spec-row-admin {
             display: grid;
-            grid-template-columns: 1fr 2fr auto;
-            gap: 8px;
-            margin-bottom: 8px;
+            grid-template-columns: 140px 1fr 2fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
             align-items: center;
+            border-bottom: 1px solid #f2ebd9;
+            padding-bottom: 8px;
         }
 
-        .spec-row-admin input {
+        .spec-row-admin input[type="text"] {
             padding: 0.5rem;
             font-size: 0.8rem;
+        }
+
+        .spec-file-label {
+            background: var(--primary-dark);
+            color: #f4efe6;
+            padding: 6px 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 2px;
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .spec-file-label:hover {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+        .spec-row-admin input[type="file"] {
+            display: none;
+        }
+
+        .spec-mini-preview {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #dcd3c1;
+            object-fit: contain;
+            background: #faf6ef;
         }
 
         .btn-eliminar-spec {
@@ -633,9 +667,9 @@
                             <textarea id="prod-desc" rows="2"></textarea>
                         </div>
 
-                        <!-- SECCIÓN DINÁMICA DE ESPECIFICACIONES / ICONOS CIRCULARES -->
+                        <!-- SECCIÓN DINÁMICA DE ESPECIFICACIONES / ICONOS CON SELECCIÓN DE ARCHIVOS -->
                         <div class="form-group">
-                            <label>Especificaciones / Iconos Redondos (Ej. Maragogype, Tueste, Proceso, Altura...)</label>
+                            <label>Especificaciones / Iconos Redondos (Sube archivo o escribe URL)</label>
                             <div id="specs-admin-container" class="specs-admin-container">
                                 <!-- Filas dinámicas generadas por JS -->
                             </div>
@@ -1077,7 +1111,7 @@
             document.getElementById('lista-pagos-container').style.display = 'block';
         }
 
-        /* GESTIÓN DE ESPECIFICACIONES / ICONOS EN EL FORMULARIO */
+        /* GESTIÓN DE ESPECIFICACIONES / ICONOS CON CARGA DE ARCHIVO LOCAL Y URL */
         function renderizarSpecsAdmin(specsArray = []) {
             const container = document.getElementById('specs-admin-container');
             container.innerHTML = '';
@@ -1090,8 +1124,15 @@
             specsArray.forEach((spec, index) => {
                 const row = document.createElement('div');
                 row.className = 'spec-row-admin';
+                const iconVal = spec.icon_url || '';
+                
                 row.innerHTML = `
-                    <input type="text" placeholder="URL del Icono (ej. /static/imagenes/icon.png)" value="${spec.icon_url || ''}" class="spec-input-icon">
+                    <label class="spec-file-label">
+                        📁 Subir Icono
+                        <input type="file" accept="image/*" onchange="actualizarSpecConArchivo(this)">
+                    </label>
+                    <img src="${iconVal}" class="spec-mini-preview" onerror="this.style.display='none'">
+                    <input type="text" placeholder="URL o Base64 del icono" value="${iconVal}" class="spec-input-icon">
                     <input type="text" placeholder="Texto (ej. MARAGOGYPE)" value="${spec.label || ''}" class="spec-input-label">
                     <button type="button" class="btn-eliminar-spec" onclick="this.parentElement.remove()">X</button>
                 `;
@@ -1101,18 +1142,39 @@
 
         function agregarFilaSpec() {
             const container = document.getElementById('specs-admin-container');
-            // Si estaba el mensaje de vacío, limpiarlo
             if (container.querySelector('p')) {
                 container.innerHTML = '';
             }
             const row = document.createElement('div');
             row.className = 'spec-row-admin';
             row.innerHTML = `
-                <input type="text" placeholder="URL del Icono (ej. /static/imagenes/icon.png)" value="" class="spec-input-icon">
+                <label class="spec-file-label">
+                    📁 Subir Icono
+                    <input type="file" accept="image/*" onchange="actualizarSpecConArchivo(this)">
+                </label>
+                <img src="" class="spec-mini-preview" style="display:none;" onerror="this.style.display='none'">
+                <input type="text" placeholder="URL o Base64 del icono" value="" class="spec-input-icon">
                 <input type="text" placeholder="Texto (ej. MARAGOGYPE)" value="" class="spec-input-label">
                 <button type="button" class="btn-eliminar-spec" onclick="this.parentElement.remove()">X</button>
             `;
             container.appendChild(row);
+        }
+
+        function actualizarSpecConArchivo(inputElement) {
+            const archivo = inputElement.files[0];
+            if (archivo) {
+                const row = inputElement.closest('.spec-row-admin');
+                const textInput = row.querySelector('.spec-input-icon');
+                const miniPreview = row.querySelector('.spec-mini-preview');
+
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    textInput.value = e.target.result;
+                    miniPreview.src = e.target.result;
+                    miniPreview.style.display = 'block';
+                }
+                lector.readAsDataURL(archivo);
+            }
         }
 
         function recolectarSpecsFormulario() {
@@ -1165,7 +1227,6 @@
             
             imagenBase64Actual = p.image_url || ''; 
 
-            // Cargar specs/iconos existentes del producto si los tiene
             let specsData = [];
             if (p.specs) {
                 try {
