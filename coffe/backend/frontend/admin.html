@@ -77,12 +77,11 @@
             display: none;
         }
 
-        /* APP LAYOUT PRINCIPAL (Oculto hasta autenticarse) */
+        /* APP LAYOUT PRINCIPAL */
         #app-container {
             display: none;
             width: 100vw;
             height: 100vh;
-            display: none; /* Se cambia a flex mediante JS al loguearse */
         }
 
         aside {
@@ -432,7 +431,7 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DEL PANEL (Protegido por login) -->
+    <!-- CONTENEDOR PRINCIPAL DEL PANEL -->
     <div id="app-container" style="display: none; width: 100vw; height: 100vh;">
         <aside>
             <div class="admin-logo">
@@ -679,7 +678,8 @@
     </div>
 
     <script>
-        const API_URL = 'http://127.0.0.1:8000/api/admin';
+        // Uso de ruta relativa dinámica para funcionar tanto en local como en Render
+        const API_URL = '/api/admin';
         let cachePedidos = [];
         let cachePagos = [];
         let cacheProductos = []; 
@@ -904,17 +904,6 @@
                 let nitLimpio = 'C/F';
                 if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
                     nitLimpio = String(rawNit).trim();
-                } else {
-                    for (let key in pago) {
-                        if (typeof pago[key] === 'object' && pago[key] !== null) {
-                            const subObj = pago[key];
-                            const subNit = subObj.nit || subObj.invoice_nit || subObj.tax_id || subObj.cedula || subObj.numero_nit;
-                            if (subNit && String(subNit).trim() !== '') {
-                                nitLimpio = String(subNit).trim();
-                                break;
-                            }
-                        }
-                    }
                 }
 
                 const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
@@ -930,7 +919,7 @@
                 const imgUrl = pago.receipt_url || pago.receipt || pago.image_url;
 
                 if (imgUrl) {
-                    imgElement.src = imgUrl.startsWith('http') ? imgUrl : `http://127.0.0.1:8000${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+                    imgElement.src = imgUrl.startsWith('http') ? imgUrl : imgUrl;
                     imgElement.style.display = 'block';
                     sinFotoElement.style.display = 'none';
                 } else {
@@ -989,7 +978,7 @@
             const placeholder = document.getElementById('preview-placeholder');
 
             if (imagenBase64Actual) {
-                imgPreview.src = imagenBase64Actual.startsWith('http') ? imagenBase64Actual : `http://127.0.0.1:8000${imagenBase64Actual.startsWith('/') ? '' : '/'}${imagenBase64Actual}`;
+                imgPreview.src = imagenBase64Actual.startsWith('http') ? imagenBase64Actual : imagenBase64Actual;
                 imgPreview.style.display = 'block';
                 placeholder.style.display = 'none';
                 document.getElementById('nombre-archivo-txt').innerText = 'Imagen actual cargada';
