@@ -278,7 +278,7 @@
             background: #faf6ef;
             padding: 2rem;
             border: 1px solid #e3dbcc;
-            max-width: 600px;
+            max-width: 650px;
             margin-bottom: 2rem;
         }
 
@@ -304,6 +304,48 @@
             font-family: 'Lora', serif;
             font-size: 0.9rem;
             box-sizing: border-box;
+        }
+
+        /* SECCIÓN ESPECIFICACIONES / ICONOS EDITABLES */
+        .specs-admin-container {
+            border: 1px dashed var(--accent-gold);
+            padding: 1rem;
+            background: #fff;
+            margin-top: 0.5rem;
+        }
+
+        .spec-row-admin {
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .spec-row-admin input {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-eliminar-spec {
+            background: #a93226;
+            color: #fff;
+            border: none;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-agregar-spec {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+            border: none;
+            padding: 6px 12px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 5px;
+            font-weight: 600;
         }
 
         .img-preview-container {
@@ -576,7 +618,7 @@
                         </div>
                         <div class="form-group">
                             <label>Categoría</label>
-                            <input type="text" id="prod-categoria" value="Clásicos" required>
+                            <input type="text" id="prod-categoria" value="Café en Grano" required>
                         </div>
                         <div class="form-group">
                             <label>Precio (Q)</label>
@@ -590,6 +632,16 @@
                             <label>Descripción</label>
                             <textarea id="prod-desc" rows="2"></textarea>
                         </div>
+
+                        <!-- SECCIÓN DINÁMICA DE ESPECIFICACIONES / ICONOS CIRCULARES -->
+                        <div class="form-group">
+                            <label>Especificaciones / Iconos Redondos (Ej. Maragogype, Tueste, Proceso, Altura...)</label>
+                            <div id="specs-admin-container" class="specs-admin-container">
+                                <!-- Filas dinámicas generadas por JS -->
+                            </div>
+                            <button type="button" class="btn-agregar-spec" onclick="agregarFilaSpec()">+ Agregar Icono / Especificación</button>
+                        </div>
+
                         <div class="form-group">
                             <label>Fotografía del Producto</label>
                             <input type="file" id="prod-archivo-img" accept="image/*" onchange="previsualizarImagen(event)">
@@ -809,7 +861,6 @@
             document.getElementById('seccion-' + seccionId).classList.add('activa');
             if(elemento) elemento.classList.add('activo');
 
-            // Cerrar menú automático en celulares al hacer clic en una opción
             if (window.innerWidth <= 768) {
                 document.getElementById('app-sidebar').classList.remove('abierto');
             }
@@ -1026,17 +1077,70 @@
             document.getElementById('lista-pagos-container').style.display = 'block';
         }
 
+        /* GESTIÓN DE ESPECIFICACIONES / ICONOS EN EL FORMULARIO */
+        function renderizarSpecsAdmin(specsArray = []) {
+            const container = document.getElementById('specs-admin-container');
+            container.innerHTML = '';
+            
+            if (!specsArray || specsArray.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 8px 0;">No hay iconos agregados. Haz clic abajo para añadir.</p>`;
+                return;
+            }
+
+            specsArray.forEach((spec, index) => {
+                const row = document.createElement('div');
+                row.className = 'spec-row-admin';
+                row.innerHTML = `
+                    <input type="text" placeholder="URL del Icono (ej. /static/imagenes/icon.png)" value="${spec.icon_url || ''}" class="spec-input-icon">
+                    <input type="text" placeholder="Texto (ej. MARAGOGYPE)" value="${spec.label || ''}" class="spec-input-label">
+                    <button type="button" class="btn-eliminar-spec" onclick="this.parentElement.remove()">X</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function agregarFilaSpec() {
+            const container = document.getElementById('specs-admin-container');
+            // Si estaba el mensaje de vacío, limpiarlo
+            if (container.querySelector('p')) {
+                container.innerHTML = '';
+            }
+            const row = document.createElement('div');
+            row.className = 'spec-row-admin';
+            row.innerHTML = `
+                <input type="text" placeholder="URL del Icono (ej. /static/imagenes/icon.png)" value="" class="spec-input-icon">
+                <input type="text" placeholder="Texto (ej. MARAGOGYPE)" value="" class="spec-input-label">
+                <button type="button" class="btn-eliminar-spec" onclick="this.parentElement.remove()">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function recolectarSpecsFormulario() {
+            const rows = document.querySelectorAll('.spec-row-admin');
+            let specs = [];
+            rows.forEach(row => {
+                const iconUrl = row.querySelector('.spec-input-icon').value.trim();
+                const label = row.querySelector('.spec-input-label').value.trim();
+                if (label !== '') {
+                    specs.push({ icon_url: iconUrl, label: label });
+                }
+            });
+            return specs;
+        }
+
         function abrirFormularioNuevo() {
             document.getElementById('form-titulo').innerText = "Agregar Nuevo Producto";
             document.getElementById('prod-id').value = "";
             document.getElementById('prod-nombre').value = "";
-            document.getElementById('prod-categoria').value = "Clásicos";
+            document.getElementById('prod-categoria').value = "Café en Grano";
             document.getElementById('prod-precio').value = "";
             document.getElementById('prod-stock').value = "";
             document.getElementById('prod-desc').value = "";
             document.getElementById('prod-archivo-img').value = "";
             imagenBase64Actual = '';
             
+            renderizarSpecsAdmin([]);
+
             document.getElementById('img-preview').style.display = 'none';
             document.getElementById('preview-placeholder').style.display = 'block';
             document.getElementById('nombre-archivo-txt').innerText = 'Ningún archivo seleccionado';
@@ -1053,13 +1157,22 @@
             document.getElementById('form-titulo').innerText = "Editar Producto #" + p.id;
             document.getElementById('prod-id').value = p.id;
             document.getElementById('prod-nombre').value = p.name || '';
-            document.getElementById('prod-categoria').value = p.category || 'Clásicos';
+            document.getElementById('prod-categoria').value = p.category || 'Café en Grano';
             document.getElementById('prod-precio').value = p.price || 0;
             document.getElementById('prod-stock').value = p.stock || 0;
             document.getElementById('prod-desc').value = p.description || '';
             document.getElementById('prod-archivo-img').value = "";
             
             imagenBase64Actual = p.image_url || ''; 
+
+            // Cargar specs/iconos existentes del producto si los tiene
+            let specsData = [];
+            if (p.specs) {
+                try {
+                    specsData = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
+                } catch(e) { specsData = []; }
+            }
+            renderizarSpecsAdmin(specsData);
 
             const imgPreview = document.getElementById('img-preview');
             const placeholder = document.getElementById('preview-placeholder');
@@ -1108,6 +1221,7 @@
             const stockStr = document.getElementById('prod-stock').value;
             const desc = document.getElementById('prod-desc').value;
             const archivoInput = document.getElementById('prod-archivo-img');
+            const specsArray = recolectarSpecsFormulario();
 
             if (!nombre || !categoria || precioStr === '' || stockStr === '') {
                 alert('Por favor, completa todos los campos obligatorios.');
@@ -1120,6 +1234,7 @@
             formData.append('price', precioStr);
             formData.append('stock', stockStr);
             formData.append('description', desc);
+            formData.append('specs', JSON.stringify(specsArray));
 
             if (archivoInput.files && archivoInput.files[0]) {
                 formData.append('image', archivoInput.files[0]);
