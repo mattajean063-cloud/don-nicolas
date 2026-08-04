@@ -278,7 +278,7 @@
             background: #faf6ef;
             padding: 2rem;
             border: 1px solid #e3dbcc;
-            max-width: 700px;
+            max-width: 600px;
             margin-bottom: 2rem;
         }
 
@@ -304,82 +304,6 @@
             font-family: 'Lora', serif;
             font-size: 0.9rem;
             box-sizing: border-box;
-        }
-
-        /* SECCIÓN ESPECIFICACIONES / ICONOS EDITABLES CON CARGA DE ARCHIVO */
-        .specs-admin-container {
-            border: 1px dashed var(--accent-gold);
-            padding: 1rem;
-            background: #fff;
-            margin-top: 0.5rem;
-        }
-
-        .spec-row-admin {
-            display: grid;
-            grid-template-columns: 140px 1fr 2fr auto;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-            border-bottom: 1px solid #f2ebd9;
-            padding-bottom: 8px;
-        }
-
-        .spec-row-admin input[type="text"] {
-            padding: 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .spec-file-label {
-            background: var(--primary-dark);
-            color: #f4efe6;
-            padding: 6px 10px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.65rem;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 2px;
-            display: inline-block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .spec-file-label:hover {
-            background: var(--accent-gold);
-            color: var(--primary-dark);
-        }
-
-        .spec-row-admin input[type="file"] {
-            display: none;
-        }
-
-        .spec-mini-preview {
-            width: 32px;
-            height: 32px;
-            border: 1px solid #dcd3c1;
-            object-fit: contain;
-            background: #faf6ef;
-        }
-
-        .btn-eliminar-spec {
-            background: #a93226;
-            color: #fff;
-            border: none;
-            padding: 6px 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-agregar-spec {
-            background: var(--accent-gold);
-            color: var(--primary-dark);
-            border: none;
-            padding: 6px 12px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            cursor: pointer;
-            margin-top: 5px;
-            font-weight: 600;
         }
 
         .img-preview-container {
@@ -582,8 +506,7 @@
             <ul class="admin-menu">
                 <li><a class="activo" onclick="cambiarSeccion('estadisticas', this)">Estadísticas</a></li>
                 <li><a onclick="cambiarSeccion('productos', this)">Gestión de Productos</a></li>
-                <li><a onclick="cambiarSeccion('pedidos', this)">Ver Pedidos</a></li>
-                <li><a onclick="cambiarSeccion('pagos', this)">Ver Pagos</a></li>
+                <li><a onclick="cambiarSeccion('pedidos-pagos', this)">Pedidos y Pagos</a></li>
                 <li><a onclick="cerrarSesion()" style="color: #e74c3c; margin-top: 2rem;">Cerrar Sesión</a></li>
             </ul>
         </aside>
@@ -652,7 +575,7 @@
                         </div>
                         <div class="form-group">
                             <label>Categoría</label>
-                            <input type="text" id="prod-categoria" value="Café en Grano" required>
+                            <input type="text" id="prod-categoria" value="Clásicos" required>
                         </div>
                         <div class="form-group">
                             <label>Precio (Q)</label>
@@ -666,16 +589,6 @@
                             <label>Descripción</label>
                             <textarea id="prod-desc" rows="2"></textarea>
                         </div>
-
-                        <!-- SECCIÓN DINÁMICA DE ESPECIFICACIONES / ICONOS CON SELECCIÓN DE ARCHIVOS -->
-                        <div class="form-group">
-                            <label>Especificaciones / Iconos Redondos (Sube archivo o escribe URL)</label>
-                            <div id="specs-admin-container" class="specs-admin-container">
-                                <!-- Filas dinámicas generadas por JS -->
-                            </div>
-                            <button type="button" class="btn-agregar-spec" onclick="agregarFilaSpec()">+ Agregar Icono / Especificación</button>
-                        </div>
-
                         <div class="form-group">
                             <label>Fotografía del Producto</label>
                             <input type="file" id="prod-archivo-img" accept="image/*" onchange="previsualizarImagen(event)">
@@ -707,131 +620,123 @@
                 </div>
             </div>
 
-            <!-- 3. PEDIDOS -->
-            <div id="seccion-pedidos" class="seccion-panel">
+            <!-- 3. PEDIDOS Y PAGOS (UNIFICADO) -->
+            <div id="seccion-pedidos-pagos" class="seccion-panel">
                 <div class="panel-header">
                     <div style="display: flex; align-items: center;">
                         <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-                        <h1>Pedidos</h1>
+                        <h1>Gestión de Transacciones y Órdenes</h1>
                     </div>
                 </div>
 
                 <div class="contenido-bloque-principal">
-                    <div class="logo-bloque-superior">
-                        <div class="logo-mini-circulo">DN</div>
-                        <div class="logo-textos">
-                            <h3>Don Nicolás</h3>
-                            <span>Control de Órdenes</span>
+                    <div class="logo-bloque-superior" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="logo-mini-circulo">DN</div>
+                            <div class="logo-textos">
+                                <h3>Don Nicolás</h3>
+                                <span id="subtitulo-vista-unificada">Listado de Órdenes y Pedidos</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-tab-pedidos" class="btn-accion btn-editar" onclick="cambiarSubpestana('pedidos')">Ver Pedido</button>
+                            <button id="btn-tab-pagos" class="btn-accion" style="background:#736257; color:#fff;" onclick="cambiarSubpestana('pagos')">Ver Pago</button>
                         </div>
                     </div>
 
-                    <div id="lista-pedidos-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Pedido ID</th>
-                                    <th>Cliente</th>
-                                    <th>Total</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-pedidos-body"></tbody>
-                        </table>
-                    </div>
-
-                    <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
-                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
-                        <h2 id="det-id-pedido" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);"></h2>
-                        
-                        <div class="detalle-grid">
-                            <div class="info-box">
-                                <h4>Información de Contacto</h4>
-                                <p><strong>Cliente:</strong> <span id="det-cliente"></span></p>
-                                <p><strong>Teléfono:</strong> <span id="det-telefono"></span></p>
-                                <p><strong>Correo:</strong> <span id="det-correo"></span></p>
-                            </div>
-                            <div class="info-box">
-                                <h4>Dirección de Envío</h4>
-                                <p><span id="det-direccion"></span></p>
-                            </div>
+                    <!-- VISTA INTERNA: PEDIDOS -->
+                    <div id="subvista-pedidos">
+                        <div id="lista-pedidos-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Pedido ID</th>
+                                        <th>Cliente</th>
+                                        <th>Total</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-pedidos-body"></tbody>
+                            </table>
                         </div>
 
-                        <h4>Productos Solicitados</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Unitario</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-detalle-items"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. PAGOS -->
-            <div id="seccion-pagos" class="seccion-panel">
-                <div class="panel-header">
-                    <div style="display: flex; align-items: center;">
-                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-                        <h1>Pagos</h1>
-                    </div>
-                </div>
-
-                <div class="contenido-bloque-principal">
-                    <div class="logo-bloque-superior">
-                        <div class="logo-mini-circulo">DN</div>
-                        <div class="logo-textos">
-                            <h3>Don Nicolás</h3>
-                            <span>Transacciones y Facturación</span>
-                        </div>
-                    </div>
-
-                    <div id="lista-pagos-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Cliente</th>
-                                    <th>Método</th>
-                                    <th>Monto</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-pagos-body"></tbody>
-                        </table>
-                    </div>
-
-                    <div id="detalle-pago-container" class="detalle-card" style="display: none;">
-                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
-                        <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción</h2>
-                        
-                        <div class="detalle-grid-3">
-                            <div class="info-box">
-                                <h4>Información</h4>
-                                <p><strong>ID:</strong> <span id="det-pago-id"></span></p>
-                                <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
-                                <p><strong>Método:</strong> <span id="det-pago-metodo"></span></p>
-                                <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
-                                <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
-                                <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
-                            </div>
+                        <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
+                            <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
+                            <h2 id="det-id-pedido" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);"></h2>
                             
-                            <div class="info-box">
-                                <h4>Factura</h4>
-                                <p><strong>Nombre:</strong> <span id="det-factura-nombre"></span></p>
-                                <p><strong>NIT:</strong> <span id="det-factura-nit"></span></p>
-                                <p><strong>No.:</strong> <span id="det-factura-numero"></span></p>
-                                <p><strong>Dirección:</strong> <span id="det-factura-direccion"></span></p>
+                            <div class="detalle-grid">
+                                <div class="info-box">
+                                    <h4>Información de Contacto</h4>
+                                    <p><strong>Cliente:</strong> <span id="det-cliente"></span></p>
+                                    <p><strong>Teléfono:</strong> <span id="det-telefono"></span></p>
+                                    <p><strong>Correo:</strong> <span id="det-correo"></span></p>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Dirección de Envío</h4>
+                                    <p><span id="det-direccion"></span></p>
+                                </div>
                             </div>
 
-                            <div class="info-box">
-                                <h4>Comprobante</h4>
-                                <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
-                                <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
+                            <h4>Productos Solicitados</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Unitario</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-detalle-items"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- VISTA INTERNA: PAGOS -->
+                    <div id="subvista-pagos" style="display: none;">
+                        <div id="lista-pagos-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Método</th>
+                                        <th>Monto</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-pagos-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div id="detalle-pago-container" class="detalle-card" style="display: none;">
+                            <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
+                            <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción</h2>
+                            
+                            <div class="detalle-grid-3">
+                                <div class="info-box">
+                                    <h4>Información</h4>
+                                    <p><strong>ID:</strong> <span id="det-pago-id"></span></p>
+                                    <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
+                                    <p><strong>Método:</strong> <span id="det-pago-metodo"></span></p>
+                                    <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
+                                    <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
+                                    <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
+                                </div>
+                                
+                                <div class="info-box">
+                                    <h4>Factura</h4>
+                                    <p><strong>Nombre:</strong> <span id="det-factura-nombre"></span></p>
+                                    <p><strong>NIT:</strong> <span id="det-factura-nit"></span></p>
+                                    <p><strong>No.:</strong> <span id="det-factura-numero"></span></p>
+                                    <p><strong>Dirección:</strong> <span id="det-factura-direccion"></span></p>
+                                </div>
+
+                                <div class="info-box">
+                                    <h4>Comprobante</h4>
+                                    <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
+                                    <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -895,17 +800,41 @@
             document.getElementById('seccion-' + seccionId).classList.add('activa');
             if(elemento) elemento.classList.add('activo');
 
+            // Cerrar menú automático en celulares al hacer clic en una opción
             if (window.innerWidth <= 768) {
                 document.getElementById('app-sidebar').classList.remove('abierto');
             }
 
             if (seccionId === 'estadisticas') cargarEstadisticas();
             if (seccionId === 'productos') cargarProductos();
-            if (seccionId === 'pedidos') {
+            if (seccionId === 'pedidos-pagos') {
+                cambiarSubpestana('pedidos');
+            }
+        }
+
+        function cambiarSubpestana(sub) {
+            const btnPedidos = document.getElementById('btn-tab-pedidos');
+            const btnPagos = document.getElementById('btn-tab-pagos');
+            const subvistaPedidos = document.getElementById('subvista-pedidos');
+            const subvistaPagos = document.getElementById('subvista-pagos');
+            const subtitulo = document.getElementById('subtitulo-vista-unificada');
+
+            if (sub === 'pedidos') {
+                btnPedidos.className = 'btn-accion btn-editar';
+                btnPagos.className = 'btn-accion';
+                btnPagos.style.background = '#736257';
+                subvistaPedidos.style.display = 'block';
+                subvistaPagos.style.display = 'none';
+                subtitulo.innerText = 'Listado de Órdenes y Pedidos';
                 volverAListaPedidos();
                 cargarPedidos();
-            }
-            if (seccionId === 'pagos') {
+            } else {
+                btnPagos.className = 'btn-accion btn-editar';
+                btnPedidos.className = 'btn-accion';
+                btnPedidos.style.background = '#736257';
+                subvistaPagos.style.display = 'block';
+                subvistaPedidos.style.display = 'none';
+                subtitulo.innerText = 'Listado de Transacciones y Pagos';
                 volverAListaPagos();
                 cargarPagos();
             }
@@ -1111,98 +1040,17 @@
             document.getElementById('lista-pagos-container').style.display = 'block';
         }
 
-        /* GESTIÓN DE ESPECIFICACIONES / ICONOS CON CARGA DE ARCHIVO LOCAL Y URL */
-        function renderizarSpecsAdmin(specsArray = []) {
-            const container = document.getElementById('specs-admin-container');
-            container.innerHTML = '';
-            
-            if (!specsArray || specsArray.length === 0) {
-                container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 8px 0;">No hay iconos agregados. Haz clic abajo para añadir.</p>`;
-                return;
-            }
-
-            specsArray.forEach((spec, index) => {
-                const row = document.createElement('div');
-                row.className = 'spec-row-admin';
-                const iconVal = spec.icon_url || '';
-                
-                row.innerHTML = `
-                    <label class="spec-file-label">
-                        📁 Subir Icono
-                        <input type="file" accept="image/*" onchange="actualizarSpecConArchivo(this)">
-                    </label>
-                    <img src="${iconVal}" class="spec-mini-preview" onerror="this.style.display='none'">
-                    <input type="text" placeholder="URL o Base64 del icono" value="${iconVal}" class="spec-input-icon">
-                    <input type="text" placeholder="Texto (ej. MARAGOGYPE)" value="${spec.label || ''}" class="spec-input-label">
-                    <button type="button" class="btn-eliminar-spec" onclick="this.parentElement.remove()">X</button>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function agregarFilaSpec() {
-            const container = document.getElementById('specs-admin-container');
-            if (container.querySelector('p')) {
-                container.innerHTML = '';
-            }
-            const row = document.createElement('div');
-            row.className = 'spec-row-admin';
-            row.innerHTML = `
-                <label class="spec-file-label">
-                    📁 Subir Icono
-                    <input type="file" accept="image/*" onchange="actualizarSpecConArchivo(this)">
-                </label>
-                <img src="" class="spec-mini-preview" style="display:none;" onerror="this.style.display='none'">
-                <input type="text" placeholder="URL o Base64 del icono" value="" class="spec-input-icon">
-                <input type="text" placeholder="Texto (ej. MARAGOGYPE)" value="" class="spec-input-label">
-                <button type="button" class="btn-eliminar-spec" onclick="this.parentElement.remove()">X</button>
-            `;
-            container.appendChild(row);
-        }
-
-        function actualizarSpecConArchivo(inputElement) {
-            const archivo = inputElement.files[0];
-            if (archivo) {
-                const row = inputElement.closest('.spec-row-admin');
-                const textInput = row.querySelector('.spec-input-icon');
-                const miniPreview = row.querySelector('.spec-mini-preview');
-
-                const lector = new FileReader();
-                lector.onload = function(e) {
-                    textInput.value = e.target.result;
-                    miniPreview.src = e.target.result;
-                    miniPreview.style.display = 'block';
-                }
-                lector.readAsDataURL(archivo);
-            }
-        }
-
-        function recolectarSpecsFormulario() {
-            const rows = document.querySelectorAll('.spec-row-admin');
-            let specs = [];
-            rows.forEach(row => {
-                const iconUrl = row.querySelector('.spec-input-icon').value.trim();
-                const label = row.querySelector('.spec-input-label').value.trim();
-                if (label !== '') {
-                    specs.push({ icon_url: iconUrl, label: label });
-                }
-            });
-            return specs;
-        }
-
         function abrirFormularioNuevo() {
             document.getElementById('form-titulo').innerText = "Agregar Nuevo Producto";
             document.getElementById('prod-id').value = "";
             document.getElementById('prod-nombre').value = "";
-            document.getElementById('prod-categoria').value = "Café en Grano";
+            document.getElementById('prod-categoria').value = "Clásicos";
             document.getElementById('prod-precio').value = "";
             document.getElementById('prod-stock').value = "";
             document.getElementById('prod-desc').value = "";
             document.getElementById('prod-archivo-img').value = "";
             imagenBase64Actual = '';
             
-            renderizarSpecsAdmin([]);
-
             document.getElementById('img-preview').style.display = 'none';
             document.getElementById('preview-placeholder').style.display = 'block';
             document.getElementById('nombre-archivo-txt').innerText = 'Ningún archivo seleccionado';
@@ -1219,21 +1067,13 @@
             document.getElementById('form-titulo').innerText = "Editar Producto #" + p.id;
             document.getElementById('prod-id').value = p.id;
             document.getElementById('prod-nombre').value = p.name || '';
-            document.getElementById('prod-categoria').value = p.category || 'Café en Grano';
+            document.getElementById('prod-categoria').value = p.category || 'Clásicos';
             document.getElementById('prod-precio').value = p.price || 0;
             document.getElementById('prod-stock').value = p.stock || 0;
             document.getElementById('prod-desc').value = p.description || '';
             document.getElementById('prod-archivo-img').value = "";
             
             imagenBase64Actual = p.image_url || ''; 
-
-            let specsData = [];
-            if (p.specs) {
-                try {
-                    specsData = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
-                } catch(e) { specsData = []; }
-            }
-            renderizarSpecsAdmin(specsData);
 
             const imgPreview = document.getElementById('img-preview');
             const placeholder = document.getElementById('preview-placeholder');
@@ -1282,7 +1122,6 @@
             const stockStr = document.getElementById('prod-stock').value;
             const desc = document.getElementById('prod-desc').value;
             const archivoInput = document.getElementById('prod-archivo-img');
-            const specsArray = recolectarSpecsFormulario();
 
             if (!nombre || !categoria || precioStr === '' || stockStr === '') {
                 alert('Por favor, completa todos los campos obligatorios.');
@@ -1295,7 +1134,6 @@
             formData.append('price', precioStr);
             formData.append('stock', stockStr);
             formData.append('description', desc);
-            formData.append('specs', JSON.stringify(specsArray));
 
             if (archivoInput.files && archivoInput.files[0]) {
                 formData.append('image', archivoInput.files[0]);
