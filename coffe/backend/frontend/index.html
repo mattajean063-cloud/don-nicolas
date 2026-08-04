@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Don Nicolás | Café Histórico y Tradición</title>
+    <!-- Favicon de la página -->
+    <link rel="icon" href="/static/imagenes/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -504,6 +506,7 @@
             cursor: pointer;
         }
 
+        /* MEDIA QUERIES PARA PANTALLAS ESCRITORIO (TABLETS Y PC) */
         @media (min-width: 768px) {
             header {
                 flex-direction: row;
@@ -568,14 +571,8 @@
 
     <header>
         <div class="header-top">
-            <!-- LOGO INCURSTADO EN BASE64 -->
-            <svg class="logo-img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #b38b4d; height: 45px; width: 45px;">
-                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                <line x1="6" y1="1" x2="6" y2="4"></line>
-                <line x1="10" y1="1" x2="10" y2="4"></line>
-                <line x1="14" y1="1" x2="14" y2="4"></line>
-            </svg>
+            <!-- LOGO COLOCADO CORRECTAMENTE AQUÍ -->
+            <img src="/static/imagenes/logo.png" alt="Logo Don Nicolás" class="logo-img" onerror="this.style.display='none'">
             <div class="logo-container">
                 <h1>Don Nicolás</h1>
                 <span>Café Histórico y Tradición</span>
@@ -622,9 +619,52 @@
         <h2 class="titulo-seccion">Nuestra Finca</h2>
         <div class="finca-grid">
             <div class="finca-card">
-                <div class="finca-card-content" style="padding-top: 0.5rem;">
+                <img src="/static/imagenes/CHep0kQUYAAn_6v.jpg" alt="lugar de gran altura">
+                <div class="finca-card-content">
                     <h3>Lugar de belleza natural</h3>
                     <p>Un espacio diseñado para contemplar los hermosos paisajes y atardeceres que rodean nuestra región.</p>
+                </div>
+            </div>
+            <div class="finca-card">
+                <img src="/static/imagenes/molienda-don-nicolas-2.jpg" alt="un lugar de religion">
+                <div class="finca-card-content">
+                    <h3>Un lugar donde los recuerdos viven</h3>
+                    <p>Descubre un espacio lleno de tradición, donde cada rincón cuenta una historia y cada visita se convierte en un recuerdo especial.</p>
+                </div>
+            </div>
+            <div class="finca-card">
+                <img src="/static/imagenes/images1.jpg" alt="Tradición y Cosecha Manual">
+                <div class="finca-card-content">
+                    <h3>Raíces y Tradición</h3>
+                    <p>Descubre un rincón lleno de historia y serenidad, donde la tradición y la naturaleza se encuentran para ofrecer una experiencia inolvidable.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: NUESTRAS INSTALACIONES -->
+    <div id="vista-mirador" class="seccion-sitio">
+        <h2 class="titulo-seccion">Nuestras Instalaciones</h2>
+        <div class="finca-grid">
+            <div class="finca-card">
+                <img src="/static/imagenes/coffeshop.jpg" alt="Vista panorámica">
+                <div class="finca-card-content">
+                    <h3>Sabores que Enamoran</h3>
+                    <p>Un espacio diseñado para contemplar los hermosos paisajes y atardeceres que rodean nuestra región.</p>
+                </div>
+            </div>
+            <div class="finca-card">
+                <img src="/static/imagenes/02.jpg" alt="Punto de Paz">
+                <div class="finca-card-content">
+                    <h3>Café con Vista</h3>
+                    <p>Déjate cautivar por impresionantes paisajes mientras saboreas nuestras especialidades, creando una experiencia que deleita todos los sentidos.</p>
+                </div>
+            </div>
+            <div class="finca-card">
+                <img src="/static/imagenes/001.jpg" alt="Café con Vista">
+                <div class="finca-card-content">
+                    <h3>Coffee Shop</h3>
+                    <p>El rincón perfecto para relajarte, disfrutar de una taza de café recién preparado y conectar con la tranquilidad que ofrece la naturaleza.</p>
                 </div>
             </div>
         </div>
@@ -635,9 +675,49 @@
         <h2 class="titulo-seccion">Nuestras Bebidas</h2>
         <div class="productos-grid">
             <div class="producto-card">
+                <img src="/static/imagenes/americano.jpg" alt="Café Americano Clásico" class="producto-img">
                 <div class="producto-info">
                     <h3>Café Americano Clásico</h3>
                     <p>Shot de espresso equilibrado con agua caliente, resaltando notas dulces y cuerpo limpio.</p>
+                </div>
+            </div>
+            <div class="producto-card">
+                <img src="/static/imagenes/flawhit.jpg" alt="Latte Don Nicolás" class="producto-img">
+                <div class="producto-info">
+                    <h3>Flat White</h3>
+                    <p>Un espresso doble combinado con leche microespumada de textura sedosa, logrando un sabor intenso, equilibrado y una experiencia suave en cada sorbo.</p>
+                </div>
+            </div>
+            <div class="producto-card">
+                <img src="/static/imagenes/coold.jpg" alt="Café Frío Cold Brew" class="producto-img">
+                <div class="producto-info">
+                    <h3>Café Frío Cold Brew</h3>
+                    <p>Extracción en frío durante 14 horas, ofreciendo una bebida refrescante con baja acidez.</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="titulo-seccion" style="margin-top: 30px;">Nuestros Alimentos</h2>
+        <div class="productos-grid">
+            <div class="producto-card">
+                <img src="/static/imagenes/image.png" alt="Panini Artesanal de Pollo" class="producto-img">
+                <div class="producto-info">
+                    <h3>Brownie con Helado</h3>
+                    <p>Delicioso brownie de chocolate recién horneado, acompañado de una cremosa bola de helado de vainilla que crea la combinación perfecta entre lo cálido y lo frío.</p>
+                </div>
+            </div>
+            <div class="producto-card">
+                <img src="/static/imagenes/image copy.png" alt="Croissant de Mantequilla" class="producto-img">
+                <div class="producto-info">
+                    <h3>Galletas</h3>
+                    <p>Galletas horneadas diariamente con ingredientes de alta calidad, de textura suave por dentro y ligeramente crujientes por fuera, ideales para acompañar un buen café.</p>
+                </div>
+            </div>
+            <div class="producto-card">
+                <img src="/static/imagenes/image copy 2.png" alt="Pay de Queso con Café" class="producto-img">
+                <div class="producto-info">
+                    <h3>French Toast</h3>
+                    <p>Rebanadas de pan doradas a la perfección, preparadas con una mezcla de huevo, leche y vainilla, servidas con miel de maple y acompañamientos de temporada.</p>
                 </div>
             </div>
         </div>
@@ -670,6 +750,8 @@
                     <a href="https://wa.me/50254332402" target="_blank" class="btn-contacto-red">💬 WhatsApp: +502 5433-2402</a>
                     <a href="tel:+50254332402" class="btn-contacto-red">📞 Teléfono: +502 5433-2402</a>
                     <a href="mailto:coffeeshopdonnicolas@gmail.com" class="btn-contacto-red">✉️ Correo: coffeeshopdonnicolas@gmail.com</a>
+                    <a href="https://www.facebook.com/DonNicolaspanaderiaycoffeeshop?locale=es_LA" target="_blank" class="btn-contacto-red">📘 Facebook: /Don Nicolás Coffee Shop</a>
+                    <a href="https://www.instagram.com/donnicolascoffeeshop?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="btn-contacto-red">📸 Instagram: @donnicolascoffeeshop</a>
                 </div>
             </div>
         </div>
@@ -693,8 +775,130 @@
         </div>
     </div>
 
+    <!-- MENÚ DE PAGO Y ENVÍO -->
+    <div id="pago-overlay" class="pago-overlay">
+        <div class="pago-modal-contenido">
+            <button class="btn-cerrar" style="position: absolute; top: 1rem; right: 1rem;" onclick="cerrarMenuPago()">&times;</button>
+            <h2 style="font-family: 'Cinzel', serif; color: var(--primary-dark); margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #e3dbcc; padding-bottom: 0.6rem;">Checkout / Finalizar Pedido</h2>
+            
+            <div class="resumen-compra-box">
+                <h4 style="font-family: 'Cinzel', serif; margin: 0 0 0.4rem 0; color: var(--primary-dark); font-size: 0.85rem;">Resumen de tu Compra</h4>
+                <div id="pago-resumen-items" style="max-height: 90px; overflow-y: auto; margin-bottom: 0.4rem;"></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; color: var(--text-muted);">
+                    <span>Costo de Envío:</span>
+                    <span id="pago-modal-envio">Q0.00</span>
+                </div>
+                <div style="border-top: 1px solid #e3dbcc; padding-top: 0.4rem; display: flex; justify-content: space-between; font-family: 'Cinzel', serif; font-weight: 700; color: var(--primary-dark); font-size: 1rem;">
+                    <span>Total a Pagar:</span>
+                    <span id="pago-modal-total">Q0.00</span>
+                </div>
+            </div>
+
+            <h4 style="font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--primary-dark); margin: 0 0 0.6rem 0; border-bottom: 1px solid #e3dbcc; padding-bottom: 4px;">1. Información y Método de Entrega</h4>
+            
+            <div class="form-group">
+                <label>Nombre Completo</label>
+                <input type="text" id="envio-nombre" required placeholder="Ej. Juan Pérez">
+            </div>
+            <div class="form-group">
+                <label>Teléfono de Contacto</label>
+                <input type="text" id="envio-telefono" required placeholder="Ej. +502 5512-3456">
+            </div>
+            <div class="form-group">
+                <label>NIT / Datos de Facturación (o CF)</label>
+                <input type="text" id="envio-nit" required placeholder="Ej. 1234567-8 o CF">
+            </div>
+            <div class="form-group">
+                <label>Nombre para Factura</label>
+                <input type="text" id="envio-nombre-factura" required placeholder="Ej. Juan Pérez">
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de Entrega</label>
+                <select id="tipo-entrega" onchange="actualizarCalculoTotal()">
+                    <option value="tienda">Recoger en Tienda (Esquipulas) - Gratis</option>
+                    <option value="domicilio">Envío a Domicilio (+Q25.00)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Dirección de Envío / Referencias</label>
+                <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 50px;"></textarea>
+            </div>
+
+            <h4 style="font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--primary-dark); margin: 1rem 0 0.6rem 0; border-bottom: 1px solid #e3dbcc; padding-bottom: 4px;">2. Selecciona tu Método de Pago</h4>
+            
+            <div class="metodos-pago-selector">
+                <div id="selector-tarjeta" class="metodo-opcion seleccionado" onclick="seleccionarMetodo('tarjeta')">💳 QPayPro (Tarjeta)</div>
+                <div id="selector-transferencia" class="metodo-opcion" onclick="seleccionarMetodo('transferencia')">🏦 Transferencia</div>
+            </div>
+
+            <!-- FORMULARIO QPAYPRO -->
+            <div id="form-tarjeta" class="formulario-metodo activo">
+                <form id="qpaypro-form" onsubmit="procesarPagoQPayPro(event)">
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" id="qpay-card-number" required placeholder="4000 1234 5678 9010" maxlength="19">
+                    </div>
+                    <div class="form-group">
+                        <label>Expiración (MM/AA)</label>
+                        <input type="text" id="qpay-card-exp" required placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" id="qpay-card-cvv" required placeholder="123" maxlength="4">
+                    </div>
+                    <button type="submit" class="btn-enviar-mensaje" id="btn-pagar-tarjeta">Pagar con QPayPro</button>
+                </form>
+            </div>
+
+            <!-- FORMULARIO TRANSFERENCIA BANCARIA -->
+            <div id="form-transferencia" class="formulario-metodo">
+                <form onsubmit="procesarPagoTransferencia(event)">
+                    <div class="cuentas-banco-box">
+                        <strong>BANCO INDUSTRIAL (Monetaria)</strong><br>
+                        Cuenta: 123-456789-0<br><br>
+                        <strong>BANCO G&T CONTINENTAL (Monetaria)</strong><br>
+                        Cuenta: 987-654321-0<br><br>
+                        <strong>BAC CREDOMATIC (Monetaria)</strong><br>
+                        Cuenta: 456-123789-9
+                    </div>
+                    <div class="form-group">
+                        <label>Banco de Origen</label>
+                        <select id="trans-banco" required>
+                            <option value="">Selecciona el banco...</option>
+                            <option value="BI">Banco Industrial</option>
+                            <option value="GYT">Banco G&T Continental</option>
+                            <option value="BANRURAL">Banrural</option>
+                            <option value="BAC">BAC Credomatic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Boleta o Referencia</label>
+                        <input type="text" id="trans-referencia" required placeholder="Ej. REF-9876543">
+                    </div>
+                    <div class="form-group">
+                        <label>Comprobante de Transferencia (Imagen)</label>
+                        <input type="file" id="trans-archivo-img" accept="image/*" required onchange="previsualizarComprobante(event)">
+                        <div style="margin-top: 0.6rem; display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 60px; height: 60px; border: 1px solid #dcd3c1; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <img id="img-preview-comprobante" src="" alt="Vista previa" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <span id="preview-placeholder-comprobante" style="font-size: 0.6rem; color: var(--text-muted); text-align: center;">Sin imagen</span>
+                            </div>
+                            <span id="nombre-archivo-comprobante-txt" style="font-size: 0.75rem; color: var(--text-muted); word-break: break-all;">Ningún archivo seleccionado</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-enviar-mensaje">Finalizar Pedido</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = `/api/admin`;
+        const API_BACKEND = `/api`;
+        const HOST_STATIC = ``;
+
         let carrito = [];
         let cacheProductos = [];
 
@@ -720,19 +924,321 @@
             }
         }
 
+        function limpiarTexto(texto, respaldo) {
+            if (!texto || texto === "undefined" || texto === "null") return respaldo;
+            if (texto.trim().length <= 3 && !isNaN(texto.trim())) return respaldo;
+            if (texto.trim().toLowerCase() === "c") return respaldo;
+            return texto;
+        }
+
         function renderizarInicioYTienda() {
             const contInicio = document.getElementById('catalogo-inicio');
             const contTienda = document.getElementById('catalogo-tienda');
-            contInicio.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Sin productos configurados.</p>';
-            contTienda.innerHTML = contInicio.innerHTML;
+            
+            contInicio.innerHTML = '';
+            contTienda.innerHTML = '';
+
+            const productosTienda = cacheProductos.filter(p => p.price > 0);
+
+            if (productosTienda.length === 0) {
+                const msg = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No hay productos en la tienda.</p>';
+                contInicio.innerHTML = msg;
+                contTienda.innerHTML = msg;
+                return;
+            }
+
+            productosTienda.forEach((p, index) => {
+                const descLimpia = limpiarTexto(p.description, 'Café artesanal de estricta altura.');
+                const catLimpia = limpiarTexto(p.category, 'Café en Grano');
+                
+                let imagenSrc = p.image_url;
+                if (!imagenSrc || imagenSrc.trim() === "") {
+                    imagenSrc = 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400';
+                } else if (imagenSrc.startsWith('/')) {
+                    imagenSrc = `${HOST_STATIC}${imagenSrc}`;
+                }
+
+                const tarjetaHTML = `
+                    <div class="producto-card">
+                        <div>
+                            <img src="${imagenSrc}" alt="${p.name}" class="producto-img" onerror="this.src='https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400'">
+                            <div class="producto-info">
+                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-gold); font-family: 'Cinzel', serif;">${catLimpia}</span>
+                                <h3>${p.name}</h3>
+                                <p>${descLimpia}</p>
+                            </div>
+                        </div>
+                        <div class="producto-footer">
+                            <span class="producto-precio">Q${p.price.toFixed(2)}</span>
+                            <button class="btn-comprar" onclick="agregarAlCarrito(${p.id}, '${p.name}', ${p.price})">Añadir</button>
+                        </div>
+                    </div>
+                `;
+                contTienda.innerHTML += tarjetaHTML;
+                if (index < 3) contInicio.innerHTML += tarjetaHTML;
+            });
         }
 
         function toggleCarrito() {
             document.getElementById('carrito-modal').classList.toggle('abierto');
         }
 
+        function agregarAlCarrito(id, name, price) {
+            let totalBolsasActuales = carrito.reduce((sum, item) => sum + item.quantity, 0);
+            let itemExistente = carrito.find(item => item.id === id);
+            let cantidadAGregar = 1;
+
+            if (totalBolsasActuales + cantidadAGregar > 20) {
+                alert('Has superado el límite de 20 bolsas permitidas. Comunícate a nuestro WhatsApp (+502 5433-2402).');
+                window.open('https://wa.me/50254332402?text=Hola,%20deseo%20hacer%20un%20pedido%20mayor%20a%2020%20bolsas', '_blank');
+                return;
+            }
+
+            if (itemExistente) {
+                itemExistente.quantity += 1;
+            } else {
+                carrito.push({ id, name, price, quantity: 1 });
+            }
+            actualizarCarritoUI();
+            toggleCarrito();
+        }
+
+        function actualizarCarritoUI() {
+            const contenedorItems = document.getElementById('carrito-items-container');
+            const contador = document.getElementById('contador-carrito');
+            const totalSpan = document.getElementById('carrito-total');
+
+            contenedorItems.innerHTML = '';
+            let total = 0;
+            let totalItemsCount = 0;
+
+            if (carrito.length === 0) {
+                contenedorItems.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Tu carrito está vacío.</p>';
+                contador.innerText = '0';
+                totalSpan.innerText = 'Q0.00';
+                return;
+            }
+
+            carrito.forEach((item, index) => {
+                total += item.price * item.quantity;
+                totalItemsCount += item.quantity;
+                contenedorItems.innerHTML += `
+                    <div class="carrito-item-row">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small style="color: var(--text-muted);">Q${item.price.toFixed(2)} x ${item.quantity}</small>
+                        </div>
+                        <div>
+                            <span>Q${(item.price * item.quantity).toFixed(2)}</span>
+                            <button onclick="eliminarDelCarrito(${index})" style="background:none; border:none; color:#a93226; cursor:pointer; margin-left: 8px; font-weight:bold; font-size: 1.1rem;">&times;</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            contador.innerText = totalItemsCount;
+            totalSpan.innerText = `Q${total.toFixed(2)}`;
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarritoUI();
+        }
+
         function abrirMenuPago() {
-            alert('Por favor selecciona productos para continuar.');
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío.');
+                return;
+            }
+
+            let totalBolsas = carrito.reduce((sum, item) => sum + item.quantity, 0);
+            if (totalBolsas > 20) {
+                alert('Tu pedido supera las 20 bolsas. Comunícate a nuestro WhatsApp.');
+                window.open('https://wa.me/50254332402', '_blank');
+                return;
+            }
+            
+            const resumenContainer = document.getElementById('pago-resumen-items');
+            resumenContainer.innerHTML = '';
+            
+            carrito.forEach(item => {
+                resumenContainer.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                        <span>${item.name} (x${item.quantity})</span>
+                        <span>Q${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('tipo-entrega').value = 'tienda';
+            actualizarCalculoTotal();
+
+            toggleCarrito(); 
+            document.getElementById('pago-overlay').classList.add('activo');
+        }
+
+        function actualizarCalculoTotal() {
+            let subtotal = 0;
+            carrito.forEach(item => { subtotal += item.price * item.quantity; });
+
+            const tipoEntrega = document.getElementById('tipo-entrega').value;
+            let costoEnvio = tipoEntrega === 'domicilio' ? 25.00 : 0.00;
+
+            document.getElementById('pago-modal-envio').innerText = `Q${costoEnvio.toFixed(2)}`;
+            document.getElementById('pago-modal-total').innerText = `Q${(subtotal + costoEnvio).toFixed(2)}`;
+        }
+
+        function cerrarMenuPago() {
+            document.getElementById('pago-overlay').classList.remove('activo');
+        }
+
+        function seleccionarMetodo(metodo) {
+            document.getElementById('selector-tarjeta').classList.remove('seleccionado');
+            document.getElementById('selector-transferencia').classList.remove('seleccionado');
+            
+            document.getElementById('form-tarjeta').classList.remove('activo');
+            document.getElementById('form-transferencia').classList.remove('activo');
+
+            if (metodo === 'tarjeta') {
+                document.getElementById('selector-tarjeta').classList.add('seleccionado');
+                document.getElementById('form-tarjeta').classList.add('activo');
+            } else if (metodo === 'transferencia') {
+                document.getElementById('selector-transferencia').classList.add('seleccionado');
+                document.getElementById('form-transferencia').classList.add('activo');
+            }
+        }
+
+        function previsualizarComprobante(event) {
+            const archivo = event.target.files[0];
+            const imgPreview = document.getElementById('img-preview-comprobante');
+            const placeholder = document.getElementById('preview-placeholder-comprobante');
+            const textoArchivo = document.getElementById('nombre-archivo-comprobante-txt');
+
+            if (archivo) {
+                textoArchivo.innerText = archivo.name;
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                lector.readAsDataURL(archivo);
+            }
+        }
+
+        async function procesarPagoQPayPro(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('envio-nombre').value.trim();
+            const telefono = document.getElementById('envio-telefono').value.trim();
+            const nit = document.getElementById('envio-nit').value.trim();
+            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim();
+            const direccion = document.getElementById('envio-direccion').value.trim();
+            const tipoEntrega = document.getElementById('tipo-entrega').value;
+            const tarjeta = document.getElementById('qpay-card-number').value.trim();
+
+            if (!nombre || !telefono || !nit || !nombreFactura || (tipoEntrega === 'domicilio' && !direccion)) {
+                alert('Por favor complete los campos obligatorios de información y envío.');
+                return;
+            }
+
+            const btnPagar = document.getElementById('btn-pagar-tarjeta');
+            btnPagar.disabled = true;
+            btnPagar.innerText = "Procesando...";
+
+            try {
+                let subtotal = 0;
+                carrito.forEach(item => { subtotal += item.price * item.quantity; });
+                let totalGeneral = subtotal + (tipoEntrega === 'domicilio' ? 25.00 : 0.00);
+
+                await fetch(`${API_BACKEND}/create-payment-intent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: totalGeneral, card_number: tarjeta })
+                });
+
+                const formData = new FormData();
+                formData.append("customer", nombre);
+                formData.append("phone", telefono);
+                formData.append("email", "");
+                formData.append("invoice_nit", nit);
+                formData.append("invoice_name", nombreFactura);
+                formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
+                formData.append("total", totalGeneral);
+                formData.append("items", JSON.stringify(carrito));
+                formData.append("payment_method_type", "Tarjeta (QPayPro)");
+
+                const resPedido = await fetch(`${API_BACKEND}/orders`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
+
+                alert(`¡Pago exitoso, ${nombre}! Pedido confirmado.`);
+                carrito = [];
+                actualizarCarritoUI();
+                cerrarMenuPago();
+                document.getElementById('qpaypro-form').reset();
+            } catch (error) {
+                alert("Error en el pago: " + error.message);
+            } finally {
+                btnPagar.disabled = false;
+                btnPagar.innerText = "Pagar con QPayPro";
+            }
+        }
+
+        async function procesarPagoTransferencia(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('envio-nombre').value.trim();
+            const telefono = document.getElementById('envio-telefono').value.trim();
+            const nit = document.getElementById('envio-nit').value.trim();
+            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim();
+            const direccion = document.getElementById('envio-direccion').value.trim();
+            const tipoEntrega = document.getElementById('tipo-entrega').value;
+            const banco = document.getElementById('trans-banco').value;
+            const referencia = document.getElementById('trans-referencia').value.trim();
+            const archivoInput = document.getElementById('trans-archivo-img');
+
+            if (!nombre || !telefono || !nit || !nombreFactura || (tipoEntrega === 'domicilio' && !direccion) || !archivoInput.files[0]) {
+                alert('Complete todos los campos requeridos y adjunte su comprobante.');
+                return;
+            }
+
+            let subtotal = 0;
+            carrito.forEach(item => { subtotal += item.price * item.quantity; });
+            let totalGeneral = subtotal + (tipoEntrega === 'domicilio' ? 25.00 : 0.00);
+
+            const formData = new FormData();
+            formData.append("customer", nombre);
+            formData.append("phone", telefono);
+            formData.append("email", "");
+            formData.append("invoice_nit", nit);
+            formData.append("invoice_name", nombreFactura);
+            formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
+            formData.append("total", totalGeneral);
+            formData.append("items", JSON.stringify(carrito));
+            formData.append("payment_method_type", `Transferencia (${banco} - Ref: ${referencia})`);
+            formData.append("receipt", archivoInput.files[0]);
+
+            try {
+                const resPedido = await fetch(`${API_BACKEND}/orders`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!resPedido.ok) throw new Error("Error al registrar estricto pedido.");
+
+                alert(`¡Pedido registrado, ${nombre}! Comprobante enviado para verificación.`);
+                carrito = [];
+                archivoInput.value = '';
+                document.getElementById('img-preview-comprobante').style.display = 'none';
+                document.getElementById('preview-placeholder-comprobante').style.display = 'block';
+                document.getElementById('nombre-archivo-comprobante-txt').innerText = 'Ningún archivo seleccionado';
+                actualizarCarritoUI();
+                cerrarMenuPago();
+            } catch (error) {
+                alert("Hubo un error al conectar con el servidor backend.");
+            }
         }
     </script>
 </body>
