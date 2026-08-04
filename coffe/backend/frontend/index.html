@@ -232,6 +232,58 @@
             cursor: pointer;
         }
 
+        /* ESTILOS PARA LOS ICONOS DE CARACTERÍSTICAS (ESPECIFICACIONES) */
+        .caracteristicas-cafe-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0 2.5rem 0;
+            padding: 1rem;
+            background: #faf6ef;
+            border: 1px solid #e3dbcc;
+            border-radius: 4px;
+        }
+
+        .caracteristica-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 95px;
+        }
+
+        .caracteristica-circulo {
+            width: 75px;
+            height: 75px;
+            border: 1px solid var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 5px rgba(44,29,17,0.05);
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .caracteristica-circulo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .caracteristica-texto {
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
         .ubicacion-container, .contacto-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -387,6 +439,92 @@
             text-transform: uppercase;
         }
 
+        /* MODAL DETALLE DE PRODUCTO */
+        .producto-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(44, 29, 17, 0.7);
+            z-index: 4000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .producto-modal-overlay.activo {
+            display: flex;
+        }
+
+        .producto-modal-contenido {
+            background: #faf6ef;
+            border: 2px solid var(--accent-gold);
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .producto-modal-contenido {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .molienda-selector {
+            display: flex;
+            gap: 8px;
+            margin: 0.8rem 0 1.2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .molienda-opcion {
+            border: 1px solid #e3dbcc;
+            background: #fff;
+            padding: 0.5rem 0.8rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .molienda-opcion.seleccionado {
+            background: var(--primary-dark);
+            color: #f4efe6;
+            border-color: var(--primary-dark);
+        }
+
+        .cantidad-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .cantidad-control button {
+            background: #fff;
+            border: 1px solid #e3dbcc;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cantidad-control input {
+            width: 45px;
+            text-align: center;
+            border: 1px solid #e3dbcc;
+            padding: 5px;
+        }
+
         /* MODAL PAGO */
         .pago-overlay {
             position: fixed;
@@ -504,92 +642,6 @@
             font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
-        }
-
-        /* MODAL DE DETALLES DE PRODUCTO */
-        .producto-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(44, 29, 17, 0.7);
-            z-index: 4000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .producto-modal-overlay.activo {
-            display: flex;
-        }
-
-        .producto-modal-contenido {
-            background: #faf6ef;
-            border: 2px solid var(--accent-gold);
-            width: 100%;
-            max-width: 900px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 2rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            position: relative;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
-        @media (min-width: 768px) {
-            .producto-modal-contenido {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .molienda-selector {
-            display: flex;
-            gap: 8px;
-            margin: 0.8rem 0 1.2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .molienda-opcion {
-            border: 1px solid #e3dbcc;
-            background: #fff;
-            padding: 0.5rem 0.8rem;
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-        .molienda-opcion.seleccionado {
-            background: var(--primary-dark);
-            color: #f4efe6;
-            border-color: var(--primary-dark);
-        }
-
-        .cantidad-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 1rem 0;
-        }
-
-        .cantidad-control button {
-            background: #fff;
-            border: 1px solid #e3dbcc;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .cantidad-control input {
-            width: 45px;
-            text-align: center;
-            border: 1px solid #e3dbcc;
-            padding: 5px;
         }
 
         /* MEDIA QUERIES PARA PANTALLAS ESCRITORIO (TABLETS Y PC) */
@@ -877,6 +929,9 @@
                 <h2 id="detalle-nombre" style="font-family: 'Cinzel', serif; color: var(--primary-dark); margin: 0.3rem 0; font-size: 1.5rem;"></h2>
                 <div id="detalle-precio" style="font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 1rem;"></div>
 
+                <!-- CONTENEDOR DINÁMICO DE ICONOS / CARACTERÍSTICAS (ADMINISTRABLE) -->
+                <div id="detalle-caracteristicas-container" class="caracteristicas-cafe-container" style="display: none; margin: 1rem 0;"></div>
+
                 <label style="font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--primary-dark); display: block;">SELECCIONA TU MOLIENDA</label>
                 <div class="molienda-selector">
                     <div class="molienda-opcion seleccionado" onclick="seleccionarMolienda(this)">GRANO</div>
@@ -1121,6 +1176,30 @@
             document.getElementById('detalle-precio').innerText = `Q${p.price.toFixed(2)}`;
             document.getElementById('detalle-descripcion').innerText = limpiarTexto(p.description, 'Café artesanal de estricta altura.');
             document.getElementById('modal-input-cantidad').value = 1;
+
+            // RENDERIZAR CARACTERÍSTICAS / ICONOS DINÁMICOS DESDE EL BACKEND
+            const contenedorCaracteristicas = document.getElementById('detalle-caracteristicas-container');
+            contenedorCaracteristicas.innerHTML = '';
+            
+            if (p.specs && Array.isArray(p.specs) && p.specs.length > 0) {
+                contenedorCaracteristicas.style.display = 'flex';
+                p.specs.forEach(spec => {
+                    let iconoSrc = spec.icon_url || '';
+                    if (iconoSrc.startsWith('/')) {
+                        iconoSrc = `${HOST_STATIC}${iconoSrc}`;
+                    }
+                    contenedorCaracteristicas.innerHTML += `
+                        <div class="caracteristica-item">
+                            <div class="caracteristica-circulo">
+                                <img src="${iconoSrc}" alt="${spec.label}" onerror="this.style.display='none'">
+                            </div>
+                            <span class="caracteristica-texto">${spec.label}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                contenedorCaracteristicas.style.display = 'none';
+            }
 
             document.getElementById('btn-modal-agregar').onclick = function() {
                 const cantidad = parseInt(document.getElementById('modal-input-cantidad').value);
@@ -1395,6 +1474,7 @@
 
             try {
                 const resPedido = await fetch(`${API_BACKEND}/orders`, {
+                    post: true,
                     method: 'POST',
                     body: formData
                 });
