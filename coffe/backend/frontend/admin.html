@@ -77,11 +77,12 @@
             display: none;
         }
 
-        /* APP LAYOUT PRINCIPAL (Oculto hasta autenticarse) */
+        /* APP LAYOUT PRINCIPAL */
         #app-container {
             display: none;
             width: 100vw;
             height: 100vh;
+            position: relative;
         }
 
         aside {
@@ -92,6 +93,8 @@
             flex-direction: column;
             border-right: 2px solid var(--accent-gold);
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 100;
         }
 
         .admin-logo {
@@ -240,6 +243,7 @@
             border: none;
             transition: background 0.3s ease;
             margin-right: 5px;
+            margin-bottom: 4px;
         }
 
         .btn-editar {
@@ -409,6 +413,67 @@
             color: var(--text-muted);
             text-transform: uppercase;
         }
+
+        /* BOTÓN MENÚ MÓVIL (HAMBURGUESA) */
+        #menu-toggle-btn {
+            display: none;
+            background: var(--primary-dark);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            border-radius: 4px;
+        }
+
+        /* MEDIA QUERIES PARA CELULARES Y TABLETS */
+        @media (max-width: 768px) {
+            aside {
+                position: absolute;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+
+            aside.abierto {
+                transform: translateX(0);
+                box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            }
+
+            #menu-toggle-btn {
+                display: inline-block;
+            }
+
+            main {
+                padding: 1.2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .detalle-grid, .detalle-grid-3 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .panel-header h1 {
+                font-size: 1.4rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th, td {
+                padding: 0.7rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -431,9 +496,9 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DEL PANEL (Protegido por login) -->
+    <!-- CONTENEDOR PRINCIPAL DEL PANEL -->
     <div id="app-container">
-        <aside>
+        <aside id="app-sidebar">
             <div class="admin-logo">
                 <h2>Don Nicolás</h2>
                 <span>Panel de Control</span>
@@ -451,7 +516,10 @@
             <!-- 1. ESTADÍSTICAS -->
             <div id="seccion-estadisticas" class="seccion-panel activa">
                 <div class="panel-header">
-                    <h1>Panel de Estadísticas</h1>
+                    <div style="display: flex; align-items: center;">
+                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                        <h1>Estadísticas</h1>
+                    </div>
                 </div>
                 
                 <div class="contenido-bloque-principal">
@@ -483,8 +551,11 @@
             <!-- 2. PRODUCTOS -->
             <div id="seccion-productos" class="seccion-panel">
                 <div class="panel-header">
-                    <h1>Catálogo de Productos</h1>
-                    <button class="btn-nuevo" onclick="abrirFormularioNuevo()">+ Nuevo Producto</button>
+                    <div style="display: flex; align-items: center;">
+                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                        <h1>Catálogo</h1>
+                    </div>
+                    <button class="btn-nuevo" onclick="abrirFormularioNuevo()" style="margin-bottom:0;">+ Nuevo</button>
                 </div>
 
                 <div class="contenido-bloque-principal">
@@ -553,7 +624,10 @@
             <!-- 3. PEDIDOS -->
             <div id="seccion-pedidos" class="seccion-panel">
                 <div class="panel-header">
-                    <h1>Gestión de Pedidos</h1>
+                    <div style="display: flex; align-items: center;">
+                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                        <h1>Pedidos</h1>
+                    </div>
                 </div>
 
                 <div class="contenido-bloque-principal">
@@ -614,7 +688,10 @@
             <!-- 4. PAGOS -->
             <div id="seccion-pagos" class="seccion-panel">
                 <div class="panel-header">
-                    <h1>Control de Pagos</h1>
+                    <div style="display: flex; align-items: center;">
+                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                        <h1>Pagos</h1>
+                    </div>
                 </div>
 
                 <div class="contenido-bloque-principal">
@@ -630,7 +707,7 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID Transacción</th>
+                                    <th>ID</th>
                                     <th>Cliente</th>
                                     <th>Método</th>
                                     <th>Monto</th>
@@ -644,31 +721,31 @@
 
                     <div id="detalle-pago-container" class="detalle-card" style="display: none;">
                         <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
-                        <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción y Facturación</h2>
+                        <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción</h2>
                         
                         <div class="detalle-grid-3">
                             <div class="info-box">
-                                <h4>Información de Transacción</h4>
-                                <p><strong>ID Transacción:</strong> <span id="det-pago-id"></span></p>
+                                <h4>Información</h4>
+                                <p><strong>ID:</strong> <span id="det-pago-id"></span></p>
                                 <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
-                                <p><strong>Método de Pago:</strong> <span id="det-pago-metodo"></span></p>
+                                <p><strong>Método:</strong> <span id="det-pago-metodo"></span></p>
                                 <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
                                 <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
                                 <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
                             </div>
                             
                             <div class="info-box">
-                                <h4>Datos de la Factura</h4>
-                                <p><strong>Nombre Factura:</strong> <span id="det-factura-nombre"></span></p>
-                                <p><strong>NIT / Cédula:</strong> <span id="det-factura-nit"></span></p>
-                                <p><strong>No. de Factura:</strong> <span id="det-factura-numero"></span></p>
-                                <p><strong>Dirección Fiscal:</strong> <span id="det-factura-direccion"></span></p>
+                                <h4>Factura</h4>
+                                <p><strong>Nombre:</strong> <span id="det-factura-nombre"></span></p>
+                                <p><strong>NIT:</strong> <span id="det-factura-nit"></span></p>
+                                <p><strong>No.:</strong> <span id="det-factura-numero"></span></p>
+                                <p><strong>Dirección:</strong> <span id="det-factura-direccion"></span></p>
                             </div>
 
                             <div class="info-box">
-                                <h4>Comprobante / Captura</h4>
-                                <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante adjunto.</p>
-                                <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante de Transferencia" onclick="window.open(this.src, '_blank')">
+                                <h4>Comprobante</h4>
+                                <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
+                                <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
                             </div>
                         </div>
                     </div>
@@ -678,13 +755,17 @@
     </div>
 
     <script>
-        // Uso de ruta relativa para que funcione automáticamente tanto en local como en Render
         const API_URL = '/api/admin';
         
         let cachePedidos = [];
         let cachePagos = [];
         let cacheProductos = []; 
         let imagenBase64Actual = ''; 
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('app-sidebar');
+            sidebar.classList.toggle('abierto');
+        }
 
         async function realizarLogin() {
             const usernameInput = document.getElementById('login-user').value.trim();
@@ -727,6 +808,11 @@
             
             document.getElementById('seccion-' + seccionId).classList.add('activa');
             if(elemento) elemento.classList.add('activo');
+
+            // Cerrar menú automático en celulares al hacer clic en una opción
+            if (window.innerWidth <= 768) {
+                document.getElementById('app-sidebar').classList.remove('abierto');
+            }
 
             if (seccionId === 'estadisticas') cargarEstadisticas();
             if (seccionId === 'productos') cargarProductos();
@@ -905,17 +991,6 @@
                 let nitLimpio = 'C/F';
                 if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
                     nitLimpio = String(rawNit).trim();
-                } else {
-                    for (let key in pago) {
-                        if (typeof pago[key] === 'object' && pago[key] !== null) {
-                            const subObj = pago[key];
-                            const subNit = subObj.nit || subObj.invoice_nit || subObj.tax_id || subObj.cedula || subObj.numero_nit;
-                            if (subNit && String(subNit).trim() !== '') {
-                                nitLimpio = String(subNit).trim();
-                                break;
-                            }
-                        }
-                    }
                 }
 
                 const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
@@ -931,7 +1006,7 @@
                 const imgUrl = pago.receipt_url || pago.receipt || pago.image_url;
 
                 if (imgUrl) {
-                    imgElement.src = imgUrl.startsWith('http') ? imgUrl : imgUrl;
+                    imgElement.src = imgUrl;
                     imgElement.style.display = 'block';
                     sinFotoElement.style.display = 'none';
                 } else {
@@ -990,7 +1065,7 @@
             const placeholder = document.getElementById('preview-placeholder');
 
             if (imagenBase64Actual) {
-                imgPreview.src = imagenBase64Actual.startsWith('http') ? imagenBase64Actual : imagenBase64Actual;
+                imgPreview.src = imagenBase64Actual;
                 imgPreview.style.display = 'block';
                 placeholder.style.display = 'none';
                 document.getElementById('nombre-archivo-txt').innerText = 'Imagen actual cargada';
@@ -1035,7 +1110,7 @@
             const archivoInput = document.getElementById('prod-archivo-img');
 
             if (!nombre || !categoria || precioStr === '' || stockStr === '') {
-                alert('Por favor, completa todos los campos obligatorios del producto.');
+                alert('Por favor, completa todos los campos obligatorios.');
                 return;
             }
 
@@ -1066,7 +1141,7 @@
                     cargarEstadisticas();
                 } else {
                     const errData = await res.json().catch(() => ({}));
-                    alert('Error al guardar el producto: ' + (errData.detail || 'Error desconocido'));
+                    alert('Error: ' + (errData.detail || 'Error desconocido'));
                 }
             } catch (err) { 
                 alert('No se pudo conectar con el servidor.');
