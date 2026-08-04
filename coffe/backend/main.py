@@ -58,10 +58,10 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==========================================
-# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS
+# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y RUTAS
 # ==========================================
 
-# 1. Montar la carpeta 'imagenes' externa (al mismo nivel que backend)
+# 1. Montar la carpeta 'imagenes' externa (al mismo nivel que backend, dentro de coffe)
 imagenes_dir = os.path.join(BASE_DIR, "..", "imagenes")
 if os.path.exists(imagenes_dir):
     app.mount("/imagenes", StaticFiles(directory=imagenes_dir), name="imagenes")
@@ -85,6 +85,18 @@ def leer_index():
         return FileResponse(index_raiz)
         
     return {"mensaje": f"Error: No se encontró index.html en {index_path}"}
+
+@app.get("/admin")
+def leer_admin():
+    admin_path = os.path.join(BASE_DIR, "frontend", "admin.html")
+    if os.path.exists(admin_path):
+        return FileResponse(admin_path)
+    
+    admin_raiz = os.path.join(BASE_DIR, "..", "frontend", "admin.html")
+    if os.path.exists(admin_raiz):
+        return FileResponse(admin_raiz)
+        
+    return {"mensaje": "Error: No se encontró el archivo admin.html"}
 
 app.add_middleware(
     CORSMiddleware,
