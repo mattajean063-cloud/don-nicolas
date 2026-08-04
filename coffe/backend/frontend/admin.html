@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo | Don Nicolás</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-colonial: #f4efe6;
+            --primary-dark: #2c1d11;
+            --accent-gold: #b38b4d;
+            --text-main: #3b2f2f;
+            --text-muted: #736257;
+            --sidebar-bg: #1a120b;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-colonial);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* LOGIN OVERLAY */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-colonial);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background: #faf6ef;
+            padding: 2.5rem;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 8px 20px rgba(44,29,17,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-card h2 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+        }
+
+        .login-card span {
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-error {
+            color: #a93226;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* APP LAYOUT PRINCIPAL (Oculto hasta autenticarse) */
+        #app-container {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            display: none; /* Se cambia a flex mediante JS al loguearse */
+        }
+
+        aside {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: #f4efe6;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid var(--accent-gold);
+            flex-shrink: 0;
+        }
+
+        .admin-logo {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(179, 139, 77, 0.3);
+        }
+
+        .admin-logo h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+        }
+
+        .admin-logo span {
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+        }
+
+        .admin-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .admin-menu li a {
+            display: block;
+            padding: 1.2rem 1.5rem;
+            color: #dcd6cd;
+            text-decoration: none;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .admin-menu li a:hover, .admin-menu li a.activo {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            background-color: var(--bg-colonial);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #dcd3c1;
+            padding-bottom: 1rem;
+        }
+
+        .panel-header h1 {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        .seccion-panel {
+            display: none;
+        }
+
+        .seccion-panel.activa {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: #faf6ef;
+            padding: 2rem;
+            border: 1px solid #e3dbcc;
+            box-shadow: 0 4px 10px rgba(44,29,17,0.02);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            color: var(--primary-dark);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #faf6ef;
+            border: 1px solid #e3dbcc;
+            box-shadow: 0 4px 10px rgba(44,29,17,0.02);
+            margin-bottom: 2rem;
+        }
+
+        th, td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid #e3dbcc;
+            font-size: 0.95rem;
+        }
+
+        th {
+            font-family: 'Cinzel', serif;
+            background-color: #2c1d11;
+            color: #f4efe6;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background-color: #f2ebd9;
+        }
+
+        .btn-accion {
+            padding: 6px 12px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .btn-editar {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+        .btn-eliminar {
+            background: #a93226;
+            color: #fff;
+        }
+
+        .btn-ver {
+            background: var(--primary-dark);
+            color: var(--bg-colonial);
+        }
+
+        .btn-nuevo {
+            background: var(--primary-dark);
+            color: var(--bg-colonial);
+            padding: 10px 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-container {
+            background: #faf6ef;
+            padding: 2rem;
+            border: 1px solid #e3dbcc;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+            font-family: 'Cinzel', serif;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #dcd3c1;
+            background: #ffffff;
+            font-family: 'Lora', serif;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .img-preview-container {
+            margin-top: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .preview-box {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #dcd3c1;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detalle-card {
+            background: #faf6ef;
+            border: 1px solid #e3dbcc;
+            padding: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .detalle-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detalle-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box h4 {
+            font-family: 'Cinzel', serif;
+            color: var(--primary-dark);
+            border-bottom: 1px solid #dcd3c1;
+            padding-bottom: 0.4rem;
+            margin-top: 0;
+        }
+
+        .comprobante-preview {
+            max-width: 100%;
+            max-height: 350px;
+            border: 1px solid #dcd3c1;
+            background: #fff;
+            padding: 5px;
+            margin-top: 0.5rem;
+            display: block;
+            cursor: pointer;
+        }
+
+        .contenido-bloque-principal {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .logo-bloque-superior {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: #faf6ef;
+            border: 1px solid #e3dbcc;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-bloque-superior .logo-mini-circulo {
+            width: 45px;
+            height: 45px;
+            background: var(--primary-dark);
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 1px solid var(--accent-gold);
+        }
+
+        .logo-bloque-superior .logo-textos h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            letter-spacing: 1px;
+        }
+
+        .logo-bloque-superior .logo-textos span {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA DE LOGIN ADMINISTRATIVO -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Don Nicolás</h2>
+            <span>Acceso Administrativo</span>
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="login-user" placeholder="Ingrese usuario" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="login-pass" placeholder="Ingrese contraseña">
+            </div>
+            <button class="btn-nuevo" style="width: 100%; margin-top: 1rem;" onclick="realizarLogin()">Ingresar</button>
+            <div id="login-error-msg" class="login-error">Usuario o contraseña incorrectos.</div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DEL PANEL (Protegido por login) -->
+    <div id="app-container" style="display: none; width: 100vw; height: 100vh;">
+        <aside>
+            <div class="admin-logo">
+                <h2>Don Nicolás</h2>
+                <span>Panel de Control</span>
+            </div>
+            <ul class="admin-menu">
+                <li><a class="activo" onclick="cambiarSeccion('estadisticas', this)">Estadísticas</a></li>
+                <li><a onclick="cambiarSeccion('productos', this)">Gestión de Productos</a></li>
+                <li><a onclick="cambiarSeccion('pedidos', this)">Ver Pedidos</a></li>
+                <li><a onclick="cambiarSeccion('pagos', this)">Ver Pagos</a></li>
+                <li><a onclick="cerrarSesion()" style="color: #e74c3c; margin-top: 2rem;">Cerrar Sesión</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            <!-- 1. ESTADÍSTICAS -->
+            <div id="seccion-estadisticas" class="seccion-panel activa">
+                <div class="panel-header">
+                    <h1>Panel de Estadísticas</h1>
+                </div>
+                
+                <div class="contenido-bloque-principal">
+                    <div class="logo-bloque-superior">
+                        <div class="logo-mini-circulo">DN</div>
+                        <div class="logo-textos">
+                            <h3>Don Nicolás</h3>
+                            <span>Café Tradicional Colonial</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Productos</h3>
+                            <p id="stat-productos">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Pedidos Registrados</h3>
+                            <p id="stat-pedidos">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Ingresos Totales</h3>
+                            <p id="stat-ingresos">Q0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. PRODUCTOS -->
+            <div id="seccion-productos" class="seccion-panel">
+                <div class="panel-header">
+                    <h1>Catálogo de Productos</h1>
+                    <button class="btn-nuevo" onclick="abrirFormularioNuevo()">+ Nuevo Producto</button>
+                </div>
+
+                <div class="contenido-bloque-principal">
+                    <div class="logo-bloque-superior">
+                        <div class="logo-mini-circulo">DN</div>
+                        <div class="logo-textos">
+                            <h3>Don Nicolás</h3>
+                            <span>Inventario y Catálogo</span>
+                        </div>
+                    </div>
+
+                    <div id="form-producto-container" class="form-container" style="display: none;">
+                        <h3 id="form-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Agregar Producto</h3>
+                        <input type="hidden" id="prod-id">
+                        <div class="form-group">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="prod-nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <input type="text" id="prod-categoria" value="Clásicos" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Precio (Q)</label>
+                            <input type="number" step="0.01" id="prod-precio" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <input type="number" id="prod-stock" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="prod-desc" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Fotografía del Producto</label>
+                            <input type="file" id="prod-archivo-img" accept="image/*" onchange="previsualizarImagen(event)">
+                            <div class="img-preview-container">
+                                <div class="preview-box">
+                                    <img id="img-preview" src="" alt="Vista previa" style="display: none;">
+                                    <span id="preview-placeholder" style="font-size: 0.7rem; color: var(--text-muted); text-align: center;">Sin imagen</span>
+                                </div>
+                                <span id="nombre-archivo-txt" style="font-size: 0.85rem; color: var(--text-muted);">Ningún archivo seleccionado</span>
+                            </div>
+                        </div>
+                        <button class="btn-nuevo" onclick="guardarProducto()">Guardar Producto</button>
+                        <button class="btn-accion" style="background:#736257; color:#fff;" onclick="ocultarFormulario()">Cancelar</button>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. PEDIDOS -->
+            <div id="seccion-pedidos" class="seccion-panel">
+                <div class="panel-header">
+                    <h1>Gestión de Pedidos</h1>
+                </div>
+
+                <div class="contenido-bloque-principal">
+                    <div class="logo-bloque-superior">
+                        <div class="logo-mini-circulo">DN</div>
+                        <div class="logo-textos">
+                            <h3>Don Nicolás</h3>
+                            <span>Control de Órdenes</span>
+                        </div>
+                    </div>
+
+                    <div id="lista-pedidos-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pedido ID</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-pedidos-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
+                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
+                        <h2 id="det-id-pedido" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);"></h2>
+                        
+                        <div class="detalle-grid">
+                            <div class="info-box">
+                                <h4>Información de Contacto</h4>
+                                <p><strong>Cliente:</strong> <span id="det-cliente"></span></p>
+                                <p><strong>Teléfono:</strong> <span id="det-telefono"></span></p>
+                                <p><strong>Correo:</strong> <span id="det-correo"></span></p>
+                            </div>
+                            <div class="info-box">
+                                <h4>Dirección de Envío</h4>
+                                <p><span id="det-direccion"></span></p>
+                            </div>
+                        </div>
+
+                        <h4>Productos Solicitados</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-detalle-items"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. PAGOS -->
+            <div id="seccion-pagos" class="seccion-panel">
+                <div class="panel-header">
+                    <h1>Control de Pagos</h1>
+                </div>
+
+                <div class="contenido-bloque-principal">
+                    <div class="logo-bloque-superior">
+                        <div class="logo-mini-circulo">DN</div>
+                        <div class="logo-textos">
+                            <h3>Don Nicolás</h3>
+                            <span>Transacciones y Facturación</span>
+                        </div>
+                    </div>
+
+                    <div id="lista-pagos-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID Transacción</th>
+                                    <th>Cliente</th>
+                                    <th>Método</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-pagos-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="detalle-pago-container" class="detalle-card" style="display: none;">
+                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
+                        <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción y Facturación</h2>
+                        
+                        <div class="detalle-grid-3">
+                            <div class="info-box">
+                                <h4>Información de Transacción</h4>
+                                <p><strong>ID Transacción:</strong> <span id="det-pago-id"></span></p>
+                                <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
+                                <p><strong>Método de Pago:</strong> <span id="det-pago-metodo"></span></p>
+                                <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
+                                <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
+                                <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
+                            </div>
+                            
+                            <div class="info-box">
+                                <h4>Datos de la Factura</h4>
+                                <p><strong>Nombre Factura:</strong> <span id="det-factura-nombre"></span></p>
+                                <p><strong>NIT / Cédula:</strong> <span id="det-factura-nit"></span></p>
+                                <p><strong>No. de Factura:</strong> <span id="det-factura-numero"></span></p>
+                                <p><strong>Dirección Fiscal:</strong> <span id="det-factura-direccion"></span></p>
+                            </div>
+
+                            <div class="info-box">
+                                <h4>Comprobante / Captura</h4>
+                                <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante adjunto.</p>
+                                <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante de Transferencia" onclick="window.open(this.src, '_blank')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api/admin';
+        let cachePedidos = [];
+        let cachePagos = [];
+        let cacheProductos = []; 
+        let imagenBase64Actual = ''; 
+
+        async function realizarLogin() {
+            const usernameInput = document.getElementById('login-user').value.trim();
+            const passwordInput = document.getElementById('login-pass').value.trim();
+            const errorMsg = document.getElementById('login-error-msg');
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'flex';
+                    cargarEstadisticas();
+                } else {
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                errorMsg.innerText = "Error de conexión con el servidor.";
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function cerrarSesion() {
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
+            document.getElementById('login-error-msg').style.display = 'none';
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+
+        function cambiarSeccion(seccionId, elemento) {
+            document.querySelectorAll('.seccion-panel').forEach(sec => sec.classList.remove('activa'));
+            document.querySelectorAll('.admin-menu a').forEach(menu => menu.classList.remove('activo'));
+            
+            document.getElementById('seccion-' + seccionId).classList.add('activa');
+            if(elemento) elemento.classList.add('activo');
+
+            if (seccionId === 'estadisticas') cargarEstadisticas();
+            if (seccionId === 'productos') cargarProductos();
+            if (seccionId === 'pedidos') {
+                volverAListaPedidos();
+                cargarPedidos();
+            }
+            if (seccionId === 'pagos') {
+                volverAListaPagos();
+                cargarPagos();
+            }
+        }
+
+        async function cargarEstadisticas() {
+            try {
+                const res = await fetch(`${API_URL}/stats`);
+                const data = await res.json();
+                document.getElementById('stat-productos').innerText = data.total_productos;
+                document.getElementById('stat-pedidos').innerText = data.total_pedidos;
+                document.getElementById('stat-ingresos').innerText = `Q${data.ingresos_totales.toFixed(2)}`;
+            } catch (err) { console.error(err); }
+        }
+
+        async function cargarProductos() {
+            try {
+                const res = await fetch(`${API_URL}/products`);
+                const productos = await res.json();
+                cacheProductos = productos; 
+                const tbody = document.getElementById('tabla-productos-body');
+                tbody.innerHTML = '';
+                productos.forEach(p => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>#${p.id}</td>
+                            <td>${p.name}</td>
+                            <td>${p.category}</td>
+                            <td>Q${p.price.toFixed(2)}</td>
+                            <td>${p.stock}</td>
+                            <td>
+                                <button class="btn-accion btn-editar" onclick="abrirFormularioEditar(${p.id})">Editar</button>
+                                <button class="btn-accion btn-eliminar" onclick="eliminarProducto(${p.id})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function cargarPedidos() {
+            try {
+                const res = await fetch(`${API_URL}/orders`);
+                const pedidos = await res.json();
+                cachePedidos = pedidos;
+                const tbody = document.getElementById('tabla-pedidos-body');
+                tbody.innerHTML = '';
+                
+                if (pedidos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No hay pedidos registrados.</td></tr>`;
+                    return;
+                }
+
+                pedidos.forEach(o => {
+                    const idLimpio = String(o.id).replace('#', '');
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>#${o.id}</td>
+                            <td>${o.customer || 'Cliente General'}</td>
+                            <td>Q${Number(o.total).toFixed(2)}</td>
+                            <td>
+                                <button class="btn-accion btn-ver" onclick="verDetallePedido('${idLimpio}')">Ver Detalle</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function verDetallePedido(pedidoId) {
+            let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
+
+            if (pedido) {
+                document.getElementById('det-id-pedido').innerText = `Detalle del Pedido: #${pedido.id}`;
+                document.getElementById('det-cliente').innerText = pedido.customer || 'No especificado';
+                document.getElementById('det-telefono').innerText = pedido.phone || 'No especificado';
+                document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
+                document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
+
+                const tbodyItems = document.getElementById('tabla-detalle-items');
+                tbodyItems.innerHTML = '';
+                
+                if (pedido.items) {
+                    let itemsArray = [];
+                    try {
+                        itemsArray = typeof pedido.items === 'string' ? JSON.parse(pedido.items) : pedido.items;
+                    } catch(e) { itemsArray = []; }
+
+                    if (Array.isArray(itemsArray) && itemsArray.length > 0) {
+                        itemsArray.forEach(item => {
+                            tbodyItems.innerHTML += `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>Q${Number(item.price).toFixed(2)}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
+                    }
+                } else {
+                    tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
+                }
+
+                document.getElementById('lista-pedidos-container').style.display = 'none';
+                document.getElementById('detalle-pedido-container').style.display = 'block';
+            } else {
+                alert('No se pudieron encontrar los detalles de este pedido.');
+            }
+        }
+
+        function volverAListaPedidos() {
+            document.getElementById('detalle-pedido-container').style.display = 'none';
+            document.getElementById('lista-pedidos-container').style.display = 'block';
+        }
+
+        async function cargarPagos() {
+            try {
+                const res = await fetch(`${API_URL}/payments`);
+                const pagos = await res.json();
+                cachePagos = pagos;
+                const tbody = document.getElementById('tabla-pagos-body');
+                tbody.innerHTML = '';
+                
+                if (pagos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No hay pagos registrados.</td></tr>`;
+                    return;
+                }
+
+                pagos.forEach(pay => {
+                    const idLimpio = String(pay.id).replace('#', '');
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>#${pay.id}</td>
+                            <td>${pay.client || pay.customer || 'Cliente General'}</td>
+                            <td>${pay.method || 'Efectivo'}</td>
+                            <td>Q${Number(pay.amount).toFixed(2)}</td>
+                            <td>${pay.status || 'Completado'}</td>
+                            <td>
+                                <button class="btn-accion btn-ver" onclick="verDetallePago('${idLimpio}')">Ver Detalle</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function verDetallePago(pagoId) {
+            let pago = cachePagos.find(p => String(p.id).replace('#', '') === String(pagoId));
+
+            if (pago) {
+                document.getElementById('det-pago-id').innerText = `#${pago.id}`;
+                const nombreCliente = pago.client || pago.customer || 'Cliente General';
+                document.getElementById('det-pago-cliente').innerText = nombreCliente;
+                document.getElementById('det-pago-metodo').innerText = pago.method || 'Efectivo';
+                document.getElementById('det-pago-monto').innerText = `Q${Number(pago.amount).toFixed(2)}`;
+                document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
+                document.getElementById('det-pago-fecha').innerText = pago.created_at || pago.date || 'No especificada';
+
+                const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pago.numero_nit || pago.nit_factura || pago.documento_nit || pago.nit_cliente;
+                const rawNombre = pago.invoice_name || pago.billing_name || pago.nombre_factura || pago.factura_nombre || pago.client_nit_name;
+                const rawNumero = pago.invoice_number || pago.factura_no || pago.numero_factura || pago.num_factura || pago.factura_id;
+                const rawDireccion = pago.invoice_address || pago.billing_address || pago.direccion_fiscal || pago.address || pago.fiscal_address;
+
+                const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null' && rawNombre !== undefined) ? rawNombre : nombreCliente;
+                
+                let nitLimpio = 'C/F';
+                if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
+                    nitLimpio = String(rawNit).trim();
+                } else {
+                    for (let key in pago) {
+                        if (typeof pago[key] === 'object' && pago[key] !== null) {
+                            const subObj = pago[key];
+                            const subNit = subObj.nit || subObj.invoice_nit || subObj.tax_id || subObj.cedula || subObj.numero_nit;
+                            if (subNit && String(subNit).trim() !== '') {
+                                nitLimpio = String(subNit).trim();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
+                const direccionFiscalLimpio = (rawDireccion && rawDireccion !== '' && rawDireccion !== 'null' && rawDireccion !== undefined) ? rawDireccion : 'No especificada';
+
+                document.getElementById('det-factura-nombre').innerText = nombreFacturaLimpio;
+                document.getElementById('det-factura-nit').innerText = nitLimpio;
+                document.getElementById('det-factura-numero').innerText = numeroFacturaLimpio;
+                document.getElementById('det-factura-direccion').innerText = direccionFiscalLimpio;
+
+                const imgElement = document.getElementById('det-pago-imagen');
+                const sinFotoElement = document.getElementById('det-pago-sin-foto');
+                const imgUrl = pago.receipt_url || pago.receipt || pago.image_url;
+
+                if (imgUrl) {
+                    imgElement.src = imgUrl.startsWith('http') ? imgUrl : `http://127.0.0.1:8000${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+                    imgElement.style.display = 'block';
+                    sinFotoElement.style.display = 'none';
+                } else {
+                    imgElement.style.display = 'none';
+                    sinFotoElement.style.display = 'block';
+                }
+
+                document.getElementById('lista-pagos-container').style.display = 'none';
+                document.getElementById('detalle-pago-container').style.display = 'block';
+            } else {
+                alert('No se pudieron encontrar los detalles de este pago.');
+            }
+        }
+
+        function volverAListaPagos() {
+            document.getElementById('detalle-pago-container').style.display = 'none';
+            document.getElementById('lista-pagos-container').style.display = 'block';
+        }
+
+        function abrirFormularioNuevo() {
+            document.getElementById('form-titulo').innerText = "Agregar Nuevo Producto";
+            document.getElementById('prod-id').value = "";
+            document.getElementById('prod-nombre').value = "";
+            document.getElementById('prod-categoria').value = "Clásicos";
+            document.getElementById('prod-precio').value = "";
+            document.getElementById('prod-stock').value = "";
+            document.getElementById('prod-desc').value = "";
+            document.getElementById('prod-archivo-img').value = "";
+            imagenBase64Actual = '';
+            
+            document.getElementById('img-preview').style.display = 'none';
+            document.getElementById('preview-placeholder').style.display = 'block';
+            document.getElementById('nombre-archivo-txt').innerText = 'Ningún archivo seleccionado';
+            document.getElementById('form-producto-container').style.display = "block";
+        }
+
+        function abrirFormularioEditar(id) {
+            const p = cacheProductos.find(item => Number(item.id) === Number(id));
+            if (!p) {
+                alert('No se encontró el producto.');
+                return;
+            }
+
+            document.getElementById('form-titulo').innerText = "Editar Producto #" + p.id;
+            document.getElementById('prod-id').value = p.id;
+            document.getElementById('prod-nombre').value = p.name || '';
+            document.getElementById('prod-categoria').value = p.category || 'Clásicos';
+            document.getElementById('prod-precio').value = p.price || 0;
+            document.getElementById('prod-stock').value = p.stock || 0;
+            document.getElementById('prod-desc').value = p.description || '';
+            document.getElementById('prod-archivo-img').value = "";
+            
+            imagenBase64Actual = p.image_url || ''; 
+
+            const imgPreview = document.getElementById('img-preview');
+            const placeholder = document.getElementById('preview-placeholder');
+
+            if (imagenBase64Actual) {
+                imgPreview.src = imagenBase64Actual.startsWith('http') ? imagenBase64Actual : `http://127.0.0.1:8000${imagenBase64Actual.startsWith('/') ? '' : '/'}${imagenBase64Actual}`;
+                imgPreview.style.display = 'block';
+                placeholder.style.display = 'none';
+                document.getElementById('nombre-archivo-txt').innerText = 'Imagen actual cargada';
+            } else {
+                imgPreview.style.display = 'none';
+                placeholder.style.display = 'block';
+                document.getElementById('nombre-archivo-txt').innerText = 'Ningún archivo seleccionado';
+            }
+
+            document.getElementById('form-producto-container').style.display = "block";
+        }
+
+        function previsualizarImagen(event) {
+            const archivo = event.target.files[0];
+            const imgPreview = document.getElementById('img-preview');
+            const placeholder = document.getElementById('preview-placeholder');
+            const textoArchivo = document.getElementById('nombre-archivo-txt');
+
+            if (archivo) {
+                textoArchivo.innerText = archivo.name;
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                lector.readAsDataURL(archivo);
+            }
+        }
+
+        function ocultarFormulario() {
+            document.getElementById('form-producto-container').style.display = "none";
+        }
+
+        async function guardarProducto() {
+            const id = document.getElementById('prod-id').value;
+            const nombre = document.getElementById('prod-nombre').value.trim();
+            const categoria = document.getElementById('prod-categoria').value.trim();
+            const precioStr = document.getElementById('prod-precio').value;
+            const stockStr = document.getElementById('prod-stock').value;
+            const desc = document.getElementById('prod-desc').value;
+            const archivoInput = document.getElementById('prod-archivo-img');
+
+            if (!nombre || !categoria || precioStr === '' || stockStr === '') {
+                alert('Por favor, completa todos los campos obligatorios del producto.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', nombre);
+            formData.append('category', categoria);
+            formData.append('price', precioStr);
+            formData.append('stock', stockStr);
+            formData.append('description', desc);
+
+            if (archivoInput.files && archivoInput.files[0]) {
+                formData.append('image', archivoInput.files[0]);
+            }
+
+            const url = id ? `${API_URL}/products/${id}` : `${API_URL}/products`;
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+
+                if (res.ok) {
+                    alert('¡Operación realizada con éxito!');
+                    ocultarFormulario();
+                    cargarProductos();
+                    cargarEstadisticas();
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    alert('Error al guardar el producto: ' + (errData.detail || 'Error desconocido'));
+                }
+            } catch (err) { 
+                alert('No se pudo conectar con el servidor.');
+            }
+        }
+
+        async function eliminarProducto(id) {
+            if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+
+            try {
+                const res = await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert('Producto eliminado');
+                    cargarProductos();
+                    cargarEstadisticas();
+                }
+            } catch (err) { console.error(err); }
+        }
+    </script>
+</body>
+</html>
