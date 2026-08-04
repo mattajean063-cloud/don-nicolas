@@ -61,15 +61,15 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
 # CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y RUTAS
 # ==========================================
 
-# 1. Montar la carpeta 'imagenes' externa (al mismo nivel que backend, dentro de coffe)
+# 1. Montar la carpeta 'imagenes' externa para que responda a /static/imagenes
 imagenes_dir = os.path.join(BASE_DIR, "..", "imagenes")
 if os.path.exists(imagenes_dir):
-    app.mount("/imagenes", StaticFiles(directory=imagenes_dir), name="imagenes")
+    app.mount("/static/imagenes", StaticFiles(directory=imagenes_dir), name="imagenes_externas")
 
 # 2. Montar la carpeta 'uploads' interna
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
-# 3. Montar el frontend
+# 3. Montar el frontend (si aplica)
 frontend_dir = os.path.join(BASE_DIR, "frontend")
 if os.path.exists(frontend_dir):
     app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
