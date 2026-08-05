@@ -513,6 +513,25 @@
             object-position: center;
         }
 
+        /* NUEVA DECORACIÓN BONITA DEBAJO DE LA IMAGEN EN DETALLES */
+        .decoracion-detalles {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 1.2rem 0;
+        }
+        .decoracion-detalles hr {
+            flex-grow: 1;
+            border: none;
+            height: 1px;
+            background-color: var(--accent-gold);
+        }
+        .decoracion-detalles span {
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+        }
+
         .modal-info h2 {
             color: var(--primary-dark);
             margin-top: 0;
@@ -909,6 +928,23 @@
             opacity: 0.92;
         }
 
+        /* PIE DE PÁGINA / DERECHOS RESERVADOS */
+        footer {
+            background-color: var(--sidebar-bg);
+            color: #d8cebc;
+            text-align: center;
+            padding: 2rem;
+            border-top: 2px solid var(--accent-gold);
+            margin-top: 4rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
         /* MEDIA QUERIES */
         @media (min-width: 768px) {
             header {
@@ -1176,6 +1212,12 @@
                 <div class="modal-img-grande">
                     <img id="modal-img" src="" alt="Producto">
                 </div>
+                <!-- Decoración bonita debajo de la imagen -->
+                <div class="decoracion-detalles">
+                    <hr>
+                    <span>☕</span>
+                    <hr>
+                </div>
             </div>
             <div class="modal-info">
                 <span id="modal-cat" class="cat">Categoría</span>
@@ -1322,7 +1364,7 @@
                 <button type="button" class="btn-enviar-mensaje" onclick="procesarPagoEfectivo()">Confirmar Pedido en Efectivo</button>
             </div>
 
-            <!-- FORMULARIO QPAYPRO (TARJETA - DESACTIVADO POR DEFECTO) -->
+            <!-- FORMULARIO QPAYPRO (TARJETA) -->
             <div id="form-tarjeta" class="formulario-metodo">
                 <p id="mensaje-tarjeta-estado" style="color: #a93226; font-weight: 600; text-align: center; font-size: 0.9rem;">Próximamente pago con tarjeta. Este método se encuentra desactivado temporalmente.</p>
                 <form id="qpaypro-form" onsubmit="procesarPagoQPayPro(event)">
@@ -1394,6 +1436,11 @@
         </div>
     </div>
 
+    <!-- DERECHOS RESERVADOS AL FINAL DE LA PÁGINA -->
+    <footer>
+        <p>&copy; 2026 Don Nicolás Coffee Shop. Todos los derechos reservados. | Esquipulas, Chiquimula, Guatemala.</p>
+    </footer>
+
     <script>
         const API_URL = `/api/admin`;
         const API_BACKEND = `/api`;
@@ -1413,8 +1460,13 @@
 
         async function verificarEstadoTarjetaAdmin() {
             try {
-                const res = await fetch(`${API_URL}/products`);
-                actualizarEstadoUIpagoTarjeta(false);
+                const res = await fetch(`${API_BACKEND}/shop/config`);
+                if (res.ok) {
+                    const data = await res.json();
+                    actualizarEstadoUIpagoTarjeta(data.card_payment_enabled);
+                } else {
+                    actualizarEstadoUIpagoTarjeta(false);
+                }
             } catch(e) {
                 actualizarEstadoUIpagoTarjeta(false);
             }
