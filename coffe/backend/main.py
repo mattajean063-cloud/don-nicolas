@@ -384,7 +384,7 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        # Envío de correo en segundo plano (No congela la página web)[cite: 3]
+        # Envío de correo en segundo plano para evitar errores 502 o bloqueos
         threading.Thread(
             target=enviar_alerta_correo,
             args=(pedido_id, customer, total, phone, address)
