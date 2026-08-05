@@ -10,6 +10,16 @@ import urllib.parse
 import threading
 from typing import Optional, Any
 
+# Intentamos importar libsql si está disponible para la nube (Turso)
+try:
+    import libsql_experimental as libsql
+    USING_TURSO = True
+except ImportError:
+    USING_TURSO = False
+
+LIBSQL_DATABASE_URL = os.getenv("libsql://don-nicolasdb-mattajean063-cloud.aws-us-west-2.turso.io")
+LIBSQL_AUTH_TOKEN = os.getenv("eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU5NDE0MzAsImlkIjoiMDE5ZmQyNjMtZDkwMS03NjQ4LWEwNjktNDdhMmFiM2ExNjcwIiwia2lkIjoiUVdJREtKTlc3QzhiVlV2N0stTzdPeDAxYkdnWEpuM1hmTWg5bWkzVkhOOCIsInJpZCI6IjkyMWJlM2FmLTkwZGQtNGNhMy04MmY4LTVkMTcwNTdhM2VmNiJ9.pCTY9PA87-cTs81mfQDLYj8XAnZlrGXRZf2OyvLillgrDW69zCUbOUPfZ9Et6BuQDN7CkV_JOg0rcfVkpnaOAg")
+
 app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -163,9 +173,19 @@ class LoginRequest(BaseModel):
     password: str
 
 def get_db_connection():
-    conn = sqlite3.connect("tienda.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+    if USING_TURSO and LIBSQL_DATABASE_URL:
+        conn = libsql.connect(
+            database="tienda.db",
+            sync_url=LIBSQL_DATABASE_URL,
+            auth_token=LIBSQL_AUTH_TOKEN
+        )
+        conn.row_factory = sqlite3.Row
+        return conn
+    else:
+        db_path = os.path.join(BASE_DIR, "tienda.db")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
 
 def inicializar_base_datos():
     conn = get_db_connection()
@@ -185,7 +205,7 @@ def inicializar_base_datos():
     try:
         cursor.execute("ALTER TABLE products ADD COLUMN specs TEXT")
         conn.commit()
-    except sqlite3.OperationalError:
+    except Exception:
         pass
 
     cursor.execute("""
@@ -197,6 +217,7 @@ def inicializar_base_datos():
             phone TEXT,
             email TEXT,
             address TEXT,
+            status TEXT DEFAULT 'pendiente',
             invoice_name TEXT DEFAULT 'C/F',
             invoice_nit TEXT DEFAULT 'C/F',
             invoice_number TEXT DEFAULT 'Pendiente',
@@ -204,6 +225,11 @@ def inicializar_base_datos():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'pendiente'")
+        conn.commit()
+    except Exception:
+        pass
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS payments (
@@ -387,8 +413,8 @@ async def crear_pedido_cliente(
 
         cursor.execute(
             """INSERT INTO orders 
-               (customer, total, items, phone, email, address, invoice_name, invoice_nit, invoice_number, invoice_address) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               (customer, total, items, phone, email, address, status, invoice_name, invoice_nit, invoice_number, invoice_address) 
+               VALUES (?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)""",
             (customer, total, items, phone, email, address, invoice_name, nit_final, invoice_number, invoice_address)
         )
         conn.commit()
@@ -415,6 +441,24 @@ async def crear_pedido_cliente(
     conn.close()
     return {"message": "Pedido y comprobante de pago registrado con éxito", "id": pedido_id, "receipt_url": receipt_url}
 
+class OrderStatusUpdate(BaseModel):
+    status: str
+
+@app.patch("/api/admin/orders/{pedido_id}/status")
+def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (data.status, pedido_id))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"success": True, "message": "Estado del pedido actualizado correctamente"}
+
 @app.get("/api/admin/orders")
 def listar_pedidos():
     inicializar_base_datos()
@@ -426,6 +470,7 @@ def listar_pedidos():
         pedidos = []
         for row in filas:
             pedido_dict = dict(row)
+            pedido_dict["status"] = row["status"] if "status" in row.keys() and row["status"] else "pendiente"
             pedido_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
             pedido_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
             pedido_dict["invoice_number"] = row["invoice_number"] if "invoice_number" in row.keys() and row["invoice_number"] else "Pendiente"
