@@ -688,6 +688,7 @@
                                     <th>Producto</th>
                                     <th>Cantidad</th>
                                     <th>Precio Unitario</th>
+                                    <th>Detalles / Molienda</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-detalle-items"></tbody>
@@ -884,19 +885,22 @@
 
                     if (Array.isArray(itemsArray) && itemsArray.length > 0) {
                         itemsArray.forEach(item => {
+                            let moliendaTexto = item.molienda || item.grind || item.tipo_molienda || item.details || item.note || 'No especificada';
+                            
                             tbodyItems.innerHTML += `
                                 <tr>
-                                    <td>${item.name}</td>
-                                    <td>${item.quantity}</td>
-                                    <td>Q${Number(item.price).toFixed(2)}</td>
+                                    <td><strong>${item.name || item.nombre}</strong></td>
+                                    <td>${item.quantity || item.cantidad}</td>
+                                    <td>Q${Number(item.price || item.precio).toFixed(2)}</td>
+                                    <td><span style="color: var(--text-muted); font-size: 0.9rem;">${moliendaTexto}</span></td>
                                 </tr>
                             `;
                         });
                     } else {
-                        tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
+                        tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
                     }
                 } else {
-                    tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
+                    tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
                 }
 
                 // Buscar pago asociado (por order_id o coincidencia de ID)
