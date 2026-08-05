@@ -21,9 +21,9 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 # CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO)
 # ==========================================
 def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    remitente = os.getenv("EMAIL_REMITENTE", "tucorreo@gmail.com")
-    password = os.getenv("EMAIL_PASSWORD", "tu_contraseña_de_aplicacion")
-    destinatario = os.getenv("EMAIL_DESTINATARIO", "tucorreo@gmail.com")
+    remitente = os.getenv("EMAIL_REMITENTE", "mattajean063@gmail.com")
+    password = os.getenv("EMAIL_PASSWORD", "matamata6754")
+    destinatario = os.getenv("EMAIL_DESTINATARIO", "mattajean063@gmail.com")
     
     # Si mantienes los valores por defecto, se omite de forma segura sin romper nada
     if remitente == "tucorreo@gmail.com" or password == "tu_contraseña_de_aplicacion":
