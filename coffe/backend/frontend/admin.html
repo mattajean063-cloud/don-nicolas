@@ -756,16 +756,20 @@
                             <input type="number" id="prod-stock" required>
                         </div>
                         <div class="form-group">
-                            <label>Variedad (Primera Tasita)</label>
+                            <label>Variedad (1.ª Tasita)</label>
                             <input type="text" id="prod-variedad" placeholder="Ej. Arábica / Bourbon">
                         </div>
                         <div class="form-group">
-                            <label>Tueste (Segunda Tasita)</label>
+                            <label>Tueste (2.ª Tasita)</label>
                             <input type="text" id="prod-tueste" placeholder="Ej. Medio / Oscuro">
                         </div>
                         <div class="form-group">
-                            <label>Altura (Tercera Tasita)</label>
+                            <label>Altura (3.ª Tasita)</label>
                             <input type="text" id="prod-altura" placeholder="Ej. 1,350 msnm">
+                        </div>
+                        <div class="form-group">
+                            <label>Proceso (4.ª Tasita)</label>
+                            <input type="text" id="prod-proceso" placeholder="Ej. Lavado / Honey / Natural">
                         </div>
                         <div class="form-group">
                             <label>Descripción</label>
@@ -1212,6 +1216,7 @@
             document.getElementById('prod-variedad').value = "";
             document.getElementById('prod-tueste').value = "";
             document.getElementById('prod-altura').value = "";
+            document.getElementById('prod-proceso').value = "";
             document.getElementById('prod-desc').value = "";
             document.getElementById('prod-archivo-img').value = "";
             imagenBase64Actual = '';
@@ -1248,6 +1253,7 @@
             let valVariedad = "";
             let valTueste = "";
             let valAltura = "";
+            let valProceso = "";
 
             if (Array.isArray(specsArray)) {
                 specsArray.forEach(s => {
@@ -1255,15 +1261,18 @@
                     if (labelLower.includes("variedad")) valVariedad = s.value || s.label;
                     else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
                     else if (labelLower.includes("altura")) valAltura = s.value || s.label;
+                    else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
                 });
                 if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
                 if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
                 if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
+                if (!valProceso && specsArray[3]) valProceso = specsArray[3].label || specsArray[3];
             }
 
             document.getElementById('prod-variedad').value = valVariedad;
             document.getElementById('prod-tueste').value = valTueste;
             document.getElementById('prod-altura').value = valAltura;
+            document.getElementById('prod-proceso').value = valProceso;
             
             imagenBase64Actual = p.image_url || ''; 
 
@@ -1315,6 +1324,7 @@
             const variedad = document.getElementById('prod-variedad').value.trim();
             const tueste = document.getElementById('prod-tueste').value.trim();
             const altura = document.getElementById('prod-altura').value.trim();
+            const proceso = document.getElementById('prod-proceso').value.trim();
             const desc = document.getElementById('prod-desc').value;
             const archivoInput = document.getElementById('prod-archivo-img');
 
@@ -1326,7 +1336,8 @@
             const specsArray = [
                 { label: variedad || "Arábica" },
                 { label: tueste || "Medio" },
-                { label: altura || "1,350 msnm" }
+                { label: altura || "1,350 msnm" },
+                { label: proceso || "Lavado" }
             ];
 
             const formData = new FormData();
