@@ -506,8 +506,7 @@
             <ul class="admin-menu">
                 <li><a class="activo" onclick="cambiarSeccion('estadisticas', this)">Estadísticas</a></li>
                 <li><a onclick="cambiarSeccion('productos', this)">Gestión de Productos</a></li>
-                <li><a onclick="cambiarSeccion('pedidos', this)">Ver Pedidos</a></li>
-                <li><a onclick="cambiarSeccion('pagos', this)">Ver Pagos</a></li>
+                <li><a onclick="cambiarSeccion('pedidos', this)">Ver Pedidos y Pagos</a></li>
                 <li><a onclick="cerrarSesion()" style="color: #e74c3c; margin-top: 2rem;">Cerrar Sesión</a></li>
             </ul>
         </aside>
@@ -633,12 +632,12 @@
                 </div>
             </div>
 
-            <!-- 3. PEDIDOS -->
+            <!-- 3. PEDIDOS Y PAGOS UNIFICADOS -->
             <div id="seccion-pedidos" class="seccion-panel">
                 <div class="panel-header">
                     <div style="display: flex; align-items: center;">
                         <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-                        <h1>Pedidos</h1>
+                        <h1>Control de Pedidos y Pagos</h1>
                     </div>
                 </div>
 
@@ -647,7 +646,7 @@
                         <div class="logo-mini-circulo">DN</div>
                         <div class="logo-textos">
                             <h3>Don Nicolás</h3>
-                            <span>Control de Órdenes</span>
+                            <span>Órdenes, Transacciones y Comprobantes</span>
                         </div>
                     </div>
 
@@ -693,71 +692,33 @@
                             </thead>
                             <tbody id="tabla-detalle-items"></tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 4. PAGOS -->
-            <div id="seccion-pagos" class="seccion-panel">
-                <div class="panel-header">
-                    <div style="display: flex; align-items: center;">
-                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-                        <h1>Pagos</h1>
-                    </div>
-                </div>
+                        <!-- SECCIÓN DE PAGO ASOCIADA AL PEDIDO -->
+                        <div style="margin-top: 2rem; border-top: 2px solid var(--accent-gold); padding-top: 1.5rem;">
+                            <h3 style="font-family: 'Cinzel', serif; color: var(--primary-dark); margin-top: 0;">Detalle del Pago Asociado</h3>
+                            <div class="detalle-grid-3">
+                                <div class="info-box">
+                                    <h4>Transacción</h4>
+                                    <p><strong>ID Pago:</strong> <span id="det-pago-id">-</span></p>
+                                    <p><strong>Método:</strong> <span id="det-pago-metodo">-</span></p>
+                                    <p><strong>Monto:</strong> <span id="det-pago-monto">-</span></p>
+                                    <p><strong>Estado:</strong> <span id="det-pago-estado">-</span></p>
+                                    <p><strong>Fecha:</strong> <span id="det-pago-fecha">-</span></p>
+                                </div>
+                                
+                                <div class="info-box">
+                                    <h4>Facturación</h4>
+                                    <p><strong>Nombre:</strong> <span id="det-factura-nombre">-</span></p>
+                                    <p><strong>NIT:</strong> <span id="det-factura-nit">-</span></p>
+                                    <p><strong>No.:</strong> <span id="det-factura-numero">-</span></p>
+                                    <p><strong>Dirección:</strong> <span id="det-factura-direccion">-</span></p>
+                                </div>
 
-                <div class="contenido-bloque-principal">
-                    <div class="logo-bloque-superior">
-                        <div class="logo-mini-circulo">DN</div>
-                        <div class="logo-textos">
-                            <h3>Don Nicolás</h3>
-                            <span>Transacciones y Facturación</span>
-                        </div>
-                    </div>
-
-                    <div id="lista-pagos-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Cliente</th>
-                                    <th>Método</th>
-                                    <th>Monto</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-pagos-body"></tbody>
-                        </table>
-                    </div>
-
-                    <div id="detalle-pago-container" class="detalle-card" style="display: none;">
-                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
-                        <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción</h2>
-                        
-                        <div class="detalle-grid-3">
-                            <div class="info-box">
-                                <h4>Información</h4>
-                                <p><strong>ID:</strong> <span id="det-pago-id"></span></p>
-                                <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
-                                <p><strong>Método:</strong> <span id="det-pago-metodo"></span></p>
-                                <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
-                                <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
-                                <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
-                            </div>
-                            
-                            <div class="info-box">
-                                <h4>Factura</h4>
-                                <p><strong>Nombre:</strong> <span id="det-factura-nombre"></span></p>
-                                <p><strong>NIT:</strong> <span id="det-factura-nit"></span></p>
-                                <p><strong>No.:</strong> <span id="det-factura-numero"></span></p>
-                                <p><strong>Dirección:</strong> <span id="det-factura-direccion"></span></p>
-                            </div>
-
-                            <div class="info-box">
-                                <h4>Comprobante</h4>
-                                <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
-                                <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
+                                <div class="info-box">
+                                    <h4>Comprobante</h4>
+                                    <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
+                                    <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -829,11 +790,7 @@
             if (seccionId === 'productos') cargarProductos();
             if (seccionId === 'pedidos') {
                 volverAListaPedidos();
-                cargarPedidos();
-            }
-            if (seccionId === 'pagos') {
-                volverAListaPagos();
-                cargarPagos();
+                cargarPedidosYPagosUnificados();
             }
         }
 
@@ -872,20 +829,24 @@
             } catch (err) { console.error(err); }
         }
 
-        async function cargarPedidos() {
+        async function cargarPedidosYPagosUnificados() {
             try {
-                const res = await fetch(`${API_URL}/orders`);
-                const pedidos = await res.json();
-                cachePedidos = pedidos;
+                const [resPedidos, resPagos] = await Promise.all([
+                    fetch(`${API_URL}/orders`),
+                    fetch(`${API_URL}/payments`)
+                ]);
+                cachePedidos = await resPedidos.json();
+                cachePagos = await resPagos.json();
+
                 const tbody = document.getElementById('tabla-pedidos-body');
                 tbody.innerHTML = '';
                 
-                if (pedidos.length === 0) {
+                if (cachePedidos.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No hay pedidos registrados.</td></tr>`;
                     return;
                 }
 
-                pedidos.forEach(o => {
+                cachePedidos.forEach(o => {
                     const idLimpio = String(o.id).replace('#', '');
                     tbody.innerHTML += `
                         <tr>
@@ -893,7 +854,7 @@
                             <td>${o.customer || 'Cliente General'}</td>
                             <td>Q${Number(o.total).toFixed(2)}</td>
                             <td>
-                                <button class="btn-accion btn-ver" onclick="verDetallePedido('${idLimpio}')">Ver Detalle</button>
+                                <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Pedido y Pago</button>
                             </td>
                         </tr>
                     `;
@@ -901,10 +862,11 @@
             } catch (err) { console.error(err); }
         }
 
-        async function verDetallePedido(pedidoId) {
+        async function verDetallePedidoYPago(pedidoId) {
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
 
             if (pedido) {
+                // Rellenar datos del pedido
                 document.getElementById('det-id-pedido').innerText = `Detalle del Pedido: #${pedido.id}`;
                 document.getElementById('det-cliente').innerText = pedido.customer || 'No especificado';
                 document.getElementById('det-telefono').innerText = pedido.phone || 'No especificado';
@@ -937,6 +899,65 @@
                     tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
                 }
 
+                // Buscar pago asociado (por order_id o coincidencia de ID)
+                let pago = cachePagos.find(p => String(p.order_id) === String(pedidoId) || String(p.id) === String(pedidoId));
+
+                if (pago) {
+                    document.getElementById('det-pago-id').innerText = `#${pago.id}`;
+                    document.getElementById('det-pago-metodo').innerText = pago.method || 'Efectivo';
+                    document.getElementById('det-pago-monto').innerText = `Q${Number(pago.amount).toFixed(2)}`;
+                    document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
+                    document.getElementById('det-pago-fecha').innerText = pago.created_at || pago.date || 'No especificada';
+
+                    const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pago.numero_nit || pago.nit_factura || pago.documento_nit || pago.nit_cliente || pedido.invoice_nit;
+                    const rawNombre = pago.invoice_name || pago.billing_name || pago.nombre_factura || pago.factura_nombre || pago.client_nit_name || pedido.invoice_name;
+                    const rawNumero = pago.invoice_number || pago.factura_no || pago.numero_factura || pago.num_factura || pago.factura_id || pedido.invoice_number;
+                    const rawDireccion = pago.invoice_address || pago.billing_address || pago.direccion_fiscal || pago.address || pago.fiscal_address || pedido.invoice_address;
+
+                    const nombreCliente = pago.client || pago.customer || pedido.customer || 'Cliente General';
+                    const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null' && rawNombre !== undefined) ? rawNombre : nombreCliente;
+                    
+                    let nitLimpio = 'C/F';
+                    if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
+                        nitLimpio = String(rawNit).trim();
+                    }
+
+                    const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
+                    const direccionFiscalLimpio = (rawDireccion && rawDireccion !== '' && rawDireccion !== 'null' && rawDireccion !== undefined) ? rawDireccion : 'No especificada';
+
+                    document.getElementById('det-factura-nombre').innerText = nombreFacturaLimpio;
+                    document.getElementById('det-factura-nit').innerText = nitLimpio;
+                    document.getElementById('det-factura-numero').innerText = numeroFacturaLimpio;
+                    document.getElementById('det-factura-direccion').innerText = direccionFiscalLimpio;
+
+                    const imgElement = document.getElementById('det-pago-imagen');
+                    const sinFotoElement = document.getElementById('det-pago-sin-foto');
+                    const imgUrl = pago.receipt_url || pago.receipt || pago.image_url;
+
+                    if (imgUrl) {
+                        imgElement.src = imgUrl;
+                        imgElement.style.display = 'block';
+                        sinFotoElement.style.display = 'none';
+                    } else {
+                        imgElement.style.display = 'none';
+                        sinFotoElement.style.display = 'block';
+                    }
+                } else {
+                    // Si no hay registro en pagos separado pero el pedido tiene info
+                    document.getElementById('det-pago-id').innerText = `#${pedido.id}`;
+                    document.getElementById('det-pago-metodo').innerText = pedido.payment_method_type || 'Transferencia';
+                    document.getElementById('det-pago-monto').innerText = `Q${Number(pedido.total).toFixed(2)}`;
+                    document.getElementById('det-pago-estado').innerText = 'Completado';
+                    document.getElementById('det-pago-fecha').innerText = pedido.created_at || 'No especificada';
+                    document.getElementById('det-factura-nombre').innerText = pedido.invoice_name || pedido.customer || 'C/F';
+                    document.getElementById('det-factura-nit').innerText = pedido.invoice_nit || 'C/F';
+                    document.getElementById('det-factura-numero').innerText = pedido.invoice_number || 'Pendiente';
+                    document.getElementById('det-factura-direccion').innerText = pedido.invoice_address || 'No especificada';
+                    
+                    document.getElementById('det-pago-imagen').style.display = 'none';
+                    document.getElementById('det-pago-sin-foto').style.display = 'block';
+                }
+
                 document.getElementById('lista-pedidos-container').style.display = 'none';
                 document.getElementById('detalle-pedido-container').style.display = 'block';
             } else {
@@ -947,94 +968,6 @@
         function volverAListaPedidos() {
             document.getElementById('detalle-pedido-container').style.display = 'none';
             document.getElementById('lista-pedidos-container').style.display = 'block';
-        }
-
-        async function cargarPagos() {
-            try {
-                const res = await fetch(`${API_URL}/payments`);
-                const pagos = await res.json();
-                cachePagos = pagos;
-                const tbody = document.getElementById('tabla-pagos-body');
-                tbody.innerHTML = '';
-                
-                if (pagos.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No hay pagos registrados.</td></tr>`;
-                    return;
-                }
-
-                pagos.forEach(pay => {
-                    const idLimpio = String(pay.id).replace('#', '');
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>#${pay.id}</td>
-                            <td>${pay.client || pay.customer || 'Cliente General'}</td>
-                            <td>${pay.method || 'Efectivo'}</td>
-                            <td>Q${Number(pay.amount).toFixed(2)}</td>
-                            <td>${pay.status || 'Completado'}</td>
-                            <td>
-                                <button class="btn-accion btn-ver" onclick="verDetallePago('${idLimpio}')">Ver Detalle</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch (err) { console.error(err); }
-        }
-
-        async function verDetallePago(pagoId) {
-            let pago = cachePagos.find(p => String(p.id).replace('#', '') === String(pagoId));
-
-            if (pago) {
-                document.getElementById('det-pago-id').innerText = `#${pago.id}`;
-                const nombreCliente = pago.client || pago.customer || 'Cliente General';
-                document.getElementById('det-pago-cliente').innerText = nombreCliente;
-                document.getElementById('det-pago-metodo').innerText = pago.method || 'Efectivo';
-                document.getElementById('det-pago-monto').innerText = `Q${Number(pago.amount).toFixed(2)}`;
-                document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
-                document.getElementById('det-pago-fecha').innerText = pago.created_at || pago.date || 'No especificada';
-
-                const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pago.numero_nit || pago.nit_factura || pago.documento_nit || pago.nit_cliente;
-                const rawNombre = pago.invoice_name || pago.billing_name || pago.nombre_factura || pago.factura_nombre || pago.client_nit_name;
-                const rawNumero = pago.invoice_number || pago.factura_no || pago.numero_factura || pago.num_factura || pago.factura_id;
-                const rawDireccion = pago.invoice_address || pago.billing_address || pago.direccion_fiscal || pago.address || pago.fiscal_address;
-
-                const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null' && rawNombre !== undefined) ? rawNombre : nombreCliente;
-                
-                let nitLimpio = 'C/F';
-                if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
-                    nitLimpio = String(rawNit).trim();
-                }
-
-                const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
-                const direccionFiscalLimpio = (rawDireccion && rawDireccion !== '' && rawDireccion !== 'null' && rawDireccion !== undefined) ? rawDireccion : 'No especificada';
-
-                document.getElementById('det-factura-nombre').innerText = nombreFacturaLimpio;
-                document.getElementById('det-factura-nit').innerText = nitLimpio;
-                document.getElementById('det-factura-numero').innerText = numeroFacturaLimpio;
-                document.getElementById('det-factura-direccion').innerText = direccionFiscalLimpio;
-
-                const imgElement = document.getElementById('det-pago-imagen');
-                const sinFotoElement = document.getElementById('det-pago-sin-foto');
-                const imgUrl = pago.receipt_url || pago.receipt || pago.image_url;
-
-                if (imgUrl) {
-                    imgElement.src = imgUrl;
-                    imgElement.style.display = 'block';
-                    sinFotoElement.style.display = 'none';
-                } else {
-                    imgElement.style.display = 'none';
-                    sinFotoElement.style.display = 'block';
-                }
-
-                document.getElementById('lista-pagos-container').style.display = 'none';
-                document.getElementById('detalle-pago-container').style.display = 'block';
-            } else {
-                alert('No se pudieron encontrar los detalles de este pago.');
-            }
-        }
-
-        function volverAListaPagos() {
-            document.getElementById('detalle-pago-container').style.display = 'none';
-            document.getElementById('lista-pagos-container').style.display = 'block';
         }
 
         function abrirFormularioNuevo() {
@@ -1073,7 +1006,6 @@
             document.getElementById('prod-desc').value = p.description || '';
             document.getElementById('prod-archivo-img').value = "";
 
-            // Parsear specs existentes para rellenar variedad, tueste y altura
             let specsArray = [];
             if (p.specs) {
                 try {
@@ -1159,7 +1091,6 @@
                 return;
             }
 
-            // Construir JSON de specs para las tres tasitas
             const specsArray = [
                 { label: variedad || "Arábica" },
                 { label: tueste || "Medio" },
