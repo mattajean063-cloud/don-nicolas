@@ -23,7 +23,7 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 # ==========================================
 def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
     remitente = os.getenv("EMAIL_REMITENTE", "mattajean063@gmail.com")
-    password = os.getenv("EMAIL_PASSWORD", "matamata6754")
+    password = os.getenv("EMAIL_PASSWORD", "tvwo rkql ktyp zpfw")
     destinatario = os.getenv("EMAIL_DESTINATARIO", "mattajean063@gmail.com")
     
     if remitente == "tucorreo@gmail.com" or password == "tu_contraseña_de_aplicacion":
