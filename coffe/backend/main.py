@@ -6,10 +6,8 @@ from pydantic import BaseModel
 import sqlite3
 import os
 import requests
-import smtplib
+import urllib.parse
 import threading
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from typing import Optional, Any
 
 app = FastAPI()
@@ -19,50 +17,39 @@ UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 # ==========================================
-# CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO Y EN SEGUNDO PLANO)
+# CONFIGURACIÓN DE ALERTA DE WHATSAPP (GREEN API Y EN SEGUNDO PLANO)
 # ==========================================
-def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    remitente = os.getenv("EMAIL_REMITENTE", "mattajean063@gmail.com")
-    password = os.getenv("EMAIL_PASSWORD", "matamata6754")
-    destinatario = os.getenv("EMAIL_DESTINATARIO", "mattajean063@gmail.com")
+def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
+    id_instance = os.getenv("710722701638")
+    api_token = os.getenv("1d6010e069bb4166a8ec9e2ced9bccd668a8fd14f20c4bbca2")
+    whatsapp_destino = os.getenv("50246511325")
     
-    print(f"DEBUG: Intentando enviar correo para pedido #{pedido_id} con remitente {remitente}")
+    print(f"DEBUG: Intentando enviar WhatsApp para pedido #{pedido_id} a {whatsapp_destino}")
     
-    if remitente == "tucorreo@gmail.com" or password == "tu_contraseña_de_aplicacion":
-        print("Aviso: Credenciales de correo no configuradas. Se omite el envío del correo.")
+    if not id_instance or not api_token or not whatsapp_destino:
+        print("Aviso: Credenciales de Green API no configuradas. Se omite el envío de WhatsApp.")
         return False
 
-    asunto = f"¡Nuevo Pedido Recibido! #{pedido_id}"
-    cuerpo = f"""
-    ¡Hola! Hay un nuevo pedido en Don Nicolás.
+    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* #{pedido_id}\n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración para ver los detalles completos."
     
-    Detalles del pedido:
-    - ID del Pedido: #{pedido_id}
-    - Cliente: {cliente}
-    - Teléfono: {telefono}
-    - Dirección: {direccion}
-    - Total a cobrar: Q{total:.2f}
-    
-    Revisa el panel de administración para ver los detalles completos y el comprobante de pago.
-    """
-    
-    msg = MIMEMultipart()
-    msg['From'] = remitente
-    msg['To'] = destinatario
-    msg['Subject'] = asunto
-    msg.attach(MIMEText(cuerpo, 'plain'))
+    url = f"https://api.green-api.com/waInstance{id_instance}/sendMessage/{api_token}"
+    payload = {
+        "chatId": f"{whatsapp_destino}@c.us",
+        "message": mensaje
+    }
     
     try:
-        servidor = smtplib.SMTP('smtp.gmail.com', 587)
-        servidor.starttls()
-        servidor.login(remitente, password)
-        servidor.sendmail(remitente, destinatario, msg.as_string())
-        servidor.quit()
-        print(f"Correo de alerta enviado con éxito para el pedido #{pedido_id}")
-        return True
+        response = requests.post(url, json=payload, timeout=10)
+        resultado = response.json()
+        if response.status_code == 200 and resultado.get("idMessage"):
+            print(f"Alerta de WhatsApp enviada con éxito para el pedido #{pedido_id}")
+            return True
+        else:
+            print(f"Error al enviar WhatsApp: {response.text}")
+            return False
     except Exception as e:
         import traceback
-        print("--- ERROR DETALLADO DE CORREO ---")
+        print("--- ERROR DETALLADO DE WHATSAPP ---")
         traceback.print_exc()
         return False
 
@@ -388,9 +375,9 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        # Envío de correo en segundo plano para evitar errores 502 o bloqueos
+        # Envío de alerta a WhatsApp en segundo plano para evitar bloqueos
         threading.Thread(
-            target=enviar_alerta_correo,
+            target=enviar_alerta_whatsapp,
             args=(pedido_id, customer, total, phone, address)
         ).start()
 
