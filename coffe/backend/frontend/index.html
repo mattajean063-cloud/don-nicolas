@@ -556,8 +556,8 @@
 
         .specs-preview-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
             margin: 1.2rem 0;
         }
 
@@ -568,7 +568,7 @@
             text-align: center;
             background: #faf7f2;
             border: 1px solid var(--border-color);
-            padding: 10px 8px;
+            padding: 10px 4px;
             border-radius: 6px;
         }
 
@@ -582,7 +582,7 @@
         }
 
         .spec-badge .spec-valor {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--primary-dark);
             font-weight: 600;
         }
@@ -1231,6 +1231,10 @@
                         <span class="spec-titulo">Altura</span>
                         <span id="spec-altura" class="spec-valor">-</span>
                     </div>
+                    <div class="spec-badge">
+                        <span class="spec-titulo">Proceso</span>
+                        <span id="spec-proceso" class="spec-valor">-</span>
+                    </div>
                 </div>
 
                 <p id="modal-desc" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;"></p>
@@ -1626,6 +1630,7 @@
             let valVariedad = "Arábica";
             let valTueste = "Medio";
             let valAltura = "1,350 msnm";
+            let valProceso = "Lavado";
 
             if (Array.isArray(specsArray)) {
                 specsArray.forEach(s => {
@@ -1633,12 +1638,20 @@
                     if (labelLower.includes("variedad")) valVariedad = s.value || s.label;
                     else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
                     else if (labelLower.includes("altura")) valAltura = s.value || s.label;
+                    else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
                 });
+                
+                // Si no se encontraron por nombre estricto, asignamos por orden posicional como respaldo
+                if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
+                if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
+                if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
+                if (!valProceso && specsArray[3]) valProceso = specsArray[3].label || specsArray[3];
             }
 
             document.getElementById('spec-variedad').innerText = limpiarTexto(valVariedad, 'Arábica');
             document.getElementById('spec-tueste').innerText = limpiarTexto(valTueste, 'Medio');
             document.getElementById('spec-altura').innerText = limpiarTexto(valAltura, '1,350 msnm');
+            document.getElementById('spec-proceso').innerText = limpiarTexto(valProceso, 'Lavado');
 
             const moliendaContainer = document.getElementById('modal-molienda-container');
             if (p.has_grind === 'no') {
