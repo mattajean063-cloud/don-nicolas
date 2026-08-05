@@ -506,7 +506,8 @@
             <ul class="admin-menu">
                 <li><a class="activo" onclick="cambiarSeccion('estadisticas', this)">Estadísticas</a></li>
                 <li><a onclick="cambiarSeccion('productos', this)">Gestión de Productos</a></li>
-                <li><a onclick="cambiarSeccion('pedidos-pagos', this)">Pedidos y Pagos</a></li>
+                <li><a onclick="cambiarSeccion('pedidos', this)">Ver Pedidos</a></li>
+                <li><a onclick="cambiarSeccion('pagos', this)">Ver Pagos</a></li>
                 <li><a onclick="cerrarSesion()" style="color: #e74c3c; margin-top: 2rem;">Cerrar Sesión</a></li>
             </ul>
         </aside>
@@ -586,6 +587,18 @@
                             <input type="number" id="prod-stock" required>
                         </div>
                         <div class="form-group">
+                            <label>Variedad (Primera Tasita)</label>
+                            <input type="text" id="prod-variedad" placeholder="Ej. Arábica / Bourbon">
+                        </div>
+                        <div class="form-group">
+                            <label>Tueste (Segunda Tasita)</label>
+                            <input type="text" id="prod-tueste" placeholder="Ej. Medio / Oscuro">
+                        </div>
+                        <div class="form-group">
+                            <label>Altura (Tercera Tasita)</label>
+                            <input type="text" id="prod-altura" placeholder="Ej. 1,350 msnm">
+                        </div>
+                        <div class="form-group">
                             <label>Descripción</label>
                             <textarea id="prod-desc" rows="2"></textarea>
                         </div>
@@ -620,124 +633,131 @@
                 </div>
             </div>
 
-            <!-- 3. PEDIDOS Y PAGOS (UNIFICADO) -->
-            <div id="seccion-pedidos-pagos" class="seccion-panel">
+            <!-- 3. PEDIDOS -->
+            <div id="seccion-pedidos" class="seccion-panel">
                 <div class="panel-header">
                     <div style="display: flex; align-items: center;">
                         <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-                        <h1>Gestión de Transacciones y Órdenes</h1>
+                        <h1>Pedidos</h1>
                     </div>
                 </div>
 
                 <div class="contenido-bloque-principal">
-                    <div class="logo-bloque-superior" style="justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="logo-mini-circulo">DN</div>
-                            <div class="logo-textos">
-                                <h3>Don Nicolás</h3>
-                                <span id="subtitulo-vista-unificada">Listado de Órdenes y Pedidos</span>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button id="btn-tab-pedidos" class="btn-accion btn-editar" onclick="cambiarSubpestana('pedidos')">Ver Pedido</button>
-                            <button id="btn-tab-pagos" class="btn-accion" style="background:#736257; color:#fff;" onclick="cambiarSubpestana('pagos')">Ver Pago</button>
+                    <div class="logo-bloque-superior">
+                        <div class="logo-mini-circulo">DN</div>
+                        <div class="logo-textos">
+                            <h3>Don Nicolás</h3>
+                            <span>Control de Órdenes</span>
                         </div>
                     </div>
 
-                    <!-- VISTA INTERNA: PEDIDOS -->
-                    <div id="subvista-pedidos">
-                        <div id="lista-pedidos-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Pedido ID</th>
-                                        <th>Cliente</th>
-                                        <th>Total</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-pedidos-body"></tbody>
-                            </table>
+                    <div id="lista-pedidos-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pedido ID</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-pedidos-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
+                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
+                        <h2 id="det-id-pedido" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);"></h2>
+                        
+                        <div class="detalle-grid">
+                            <div class="info-box">
+                                <h4>Información de Contacto</h4>
+                                <p><strong>Cliente:</strong> <span id="det-cliente"></span></p>
+                                <p><strong>Teléfono:</strong> <span id="det-telefono"></span></p>
+                                <p><strong>Correo:</strong> <span id="det-correo"></span></p>
+                            </div>
+                            <div class="info-box">
+                                <h4>Dirección de Envío</h4>
+                                <p><span id="det-direccion"></span></p>
+                            </div>
                         </div>
 
-                        <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
-                            <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
-                            <h2 id="det-id-pedido" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);"></h2>
-                            
-                            <div class="detalle-grid">
-                                <div class="info-box">
-                                    <h4>Información de Contacto</h4>
-                                    <p><strong>Cliente:</strong> <span id="det-cliente"></span></p>
-                                    <p><strong>Teléfono:</strong> <span id="det-telefono"></span></p>
-                                    <p><strong>Correo:</strong> <span id="det-correo"></span></p>
-                                </div>
-                                <div class="info-box">
-                                    <h4>Dirección de Envío</h4>
-                                    <p><span id="det-direccion"></span></p>
-                                </div>
-                            </div>
+                        <h4>Productos Solicitados</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-detalle-items"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                            <h4>Productos Solicitados</h4>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Molienda</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio Unitario</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-detalle-items"></tbody>
-                            </table>
+            <!-- 4. PAGOS -->
+            <div id="seccion-pagos" class="seccion-panel">
+                <div class="panel-header">
+                    <div style="display: flex; align-items: center;">
+                        <button id="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                        <h1>Pagos</h1>
+                    </div>
+                </div>
+
+                <div class="contenido-bloque-principal">
+                    <div class="logo-bloque-superior">
+                        <div class="logo-mini-circulo">DN</div>
+                        <div class="logo-textos">
+                            <h3>Don Nicolás</h3>
+                            <span>Transacciones y Facturación</span>
                         </div>
                     </div>
 
-                    <!-- VISTA INTERNA: PAGOS -->
-                    <div id="subvista-pagos" style="display: none;">
-                        <div id="lista-pagos-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Método</th>
-                                        <th>Monto</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-pagos-body"></tbody>
-                            </table>
-                        </div>
+                    <div id="lista-pagos-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Método</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-pagos-body"></tbody>
+                        </table>
+                    </div>
 
-                        <div id="detalle-pago-container" class="detalle-card" style="display: none;">
-                            <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
-                            <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción</h2>
+                    <div id="detalle-pago-container" class="detalle-card" style="display: none;">
+                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem;" onclick="volverAListaPagos()">← Volver a la Lista</button>
+                        <h2 id="det-pago-titulo" style="font-family: 'Cinzel', serif; margin-top: 0; color: var(--primary-dark);">Detalle de Transacción</h2>
+                        
+                        <div class="detalle-grid-3">
+                            <div class="info-box">
+                                <h4>Información</h4>
+                                <p><strong>ID:</strong> <span id="det-pago-id"></span></p>
+                                <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
+                                <p><strong>Método:</strong> <span id="det-pago-metodo"></span></p>
+                                <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
+                                <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
+                                <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
+                            </div>
                             
-                            <div class="detalle-grid-3">
-                                <div class="info-box">
-                                    <h4>Información</h4>
-                                    <p><strong>ID:</strong> <span id="det-pago-id"></span></p>
-                                    <p><strong>Cliente:</strong> <span id="det-pago-cliente"></span></p>
-                                    <p><strong>Método:</strong> <span id="det-pago-metodo"></span></p>
-                                    <p><strong>Monto:</strong> <span id="det-pago-monto"></span></p>
-                                    <p><strong>Estado:</strong> <span id="det-pago-estado"></span></p>
-                                    <p><strong>Fecha:</strong> <span id="det-pago-fecha"></span></p>
-                                </div>
-                                
-                                <div class="info-box">
-                                    <h4>Factura</h4>
-                                    <p><strong>Nombre:</strong> <span id="det-factura-nombre"></span></p>
-                                    <p><strong>NIT:</strong> <span id="det-factura-nit"></span></p>
-                                    <p><strong>No.:</strong> <span id="det-factura-numero"></span></p>
-                                    <p><strong>Dirección:</strong> <span id="det-factura-direccion"></span></p>
-                                </div>
+                            <div class="info-box">
+                                <h4>Factura</h4>
+                                <p><strong>Nombre:</strong> <span id="det-factura-nombre"></span></p>
+                                <p><strong>NIT:</strong> <span id="det-factura-nit"></span></p>
+                                <p><strong>No.:</strong> <span id="det-factura-numero"></span></p>
+                                <p><strong>Dirección:</strong> <span id="det-factura-direccion"></span></p>
+                            </div>
 
-                                <div class="info-box">
-                                    <h4>Comprobante</h4>
-                                    <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
-                                    <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
-                                </div>
+                            <div class="info-box">
+                                <h4>Comprobante</h4>
+                                <p id="det-pago-sin-foto" style="color: var(--text-muted); font-style: italic;">No hay comprobante.</p>
+                                <img id="det-pago-imagen" class="comprobante-preview" style="display: none;" src="" alt="Comprobante" onclick="window.open(this.src, '_blank')">
                             </div>
                         </div>
                     </div>
@@ -807,34 +827,11 @@
 
             if (seccionId === 'estadisticas') cargarEstadisticas();
             if (seccionId === 'productos') cargarProductos();
-            if (seccionId === 'pedidos-pagos') {
-                cambiarSubpestana('pedidos');
-            }
-        }
-
-        function cambiarSubpestana(sub) {
-            const btnPedidos = document.getElementById('btn-tab-pedidos');
-            const btnPagos = document.getElementById('btn-tab-pagos');
-            const subvistaPedidos = document.getElementById('subvista-pedidos');
-            const subvistaPagos = document.getElementById('subvista-pagos');
-            const subtitulo = document.getElementById('subtitulo-vista-unificada');
-
-            if (sub === 'pedidos') {
-                btnPedidos.className = 'btn-accion btn-editar';
-                btnPagos.className = 'btn-accion';
-                btnPagos.style.background = '#736257';
-                subvistaPedidos.style.display = 'block';
-                subvistaPagos.style.display = 'none';
-                subtitulo.innerText = 'Listado de Órdenes y Pedidos';
+            if (seccionId === 'pedidos') {
                 volverAListaPedidos();
                 cargarPedidos();
-            } else {
-                btnPagos.className = 'btn-accion btn-editar';
-                btnPedidos.className = 'btn-accion';
-                btnPedidos.style.background = '#736257';
-                subvistaPagos.style.display = 'block';
-                subvistaPedidos.style.display = 'none';
-                subtitulo.innerText = 'Listado de Transacciones y Pagos';
+            }
+            if (seccionId === 'pagos') {
                 volverAListaPagos();
                 cargarPagos();
             }
@@ -925,30 +922,19 @@
 
                     if (Array.isArray(itemsArray) && itemsArray.length > 0) {
                         itemsArray.forEach(item => {
-                            let nombreProd = item.name || '';
-                            let moliendaProd = item.molienda || 'Grano';
-                            
-                            // Extraer molienda del nombre si se guardó adjunta (ej. "Café Tradicional (Fina)")
-                            const matchMolienda = nombreProd.match(/\((Grano|Fina|Media|Gruesa|N\/A)\)$/i);
-                            if (matchMolienda) {
-                                moliendaProd = matchMolienda[1];
-                                nombreProd = nombreProd.replace(/\s*\([^\)]+\)$/, '').trim();
-                            }
-
                             tbodyItems.innerHTML += `
                                 <tr>
-                                    <td>${nombreProd}</td>
-                                    <td><span style="background: #f2ebd9; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">${moliendaProd}</span></td>
+                                    <td>${item.name}</td>
                                     <td>${item.quantity}</td>
                                     <td>Q${Number(item.price).toFixed(2)}</td>
                                 </tr>
                             `;
                         });
                     } else {
-                        tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
+                        tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
                     }
                 } else {
-                    tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
+                    tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
                 }
 
                 document.getElementById('lista-pedidos-container').style.display = 'none';
@@ -1058,6 +1044,9 @@
             document.getElementById('prod-categoria').value = "Clásicos";
             document.getElementById('prod-precio').value = "";
             document.getElementById('prod-stock').value = "";
+            document.getElementById('prod-variedad').value = "";
+            document.getElementById('prod-tueste').value = "";
+            document.getElementById('prod-altura').value = "";
             document.getElementById('prod-desc').value = "";
             document.getElementById('prod-archivo-img').value = "";
             imagenBase64Actual = '';
@@ -1083,6 +1072,34 @@
             document.getElementById('prod-stock').value = p.stock || 0;
             document.getElementById('prod-desc').value = p.description || '';
             document.getElementById('prod-archivo-img').value = "";
+
+            // Parsear specs existentes para rellenar variedad, tueste y altura
+            let specsArray = [];
+            if (p.specs) {
+                try {
+                    specsArray = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
+                } catch(e) { specsArray = []; }
+            }
+
+            let valVariedad = "";
+            let valTueste = "";
+            let valAltura = "";
+
+            if (Array.isArray(specsArray)) {
+                specsArray.forEach(s => {
+                    const labelLower = (s.label || "").toLowerCase();
+                    if (labelLower.includes("variedad")) valVariedad = s.value || s.label;
+                    else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
+                    else if (labelLower.includes("altura")) valAltura = s.value || s.label;
+                });
+                if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
+                if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
+                if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
+            }
+
+            document.getElementById('prod-variedad').value = valVariedad;
+            document.getElementById('prod-tueste').value = valTueste;
+            document.getElementById('prod-altura').value = valAltura;
             
             imagenBase64Actual = p.image_url || ''; 
 
@@ -1131,6 +1148,9 @@
             const categoria = document.getElementById('prod-categoria').value.trim();
             const precioStr = document.getElementById('prod-precio').value;
             const stockStr = document.getElementById('prod-stock').value;
+            const variedad = document.getElementById('prod-variedad').value.trim();
+            const tueste = document.getElementById('prod-tueste').value.trim();
+            const altura = document.getElementById('prod-altura').value.trim();
             const desc = document.getElementById('prod-desc').value;
             const archivoInput = document.getElementById('prod-archivo-img');
 
@@ -1139,12 +1159,20 @@
                 return;
             }
 
+            // Construir JSON de specs para las tres tasitas
+            const specsArray = [
+                { label: variedad || "Arábica" },
+                { label: tueste || "Medio" },
+                { label: altura || "1,350 msnm" }
+            ];
+
             const formData = new FormData();
             formData.append('name', nombre);
             formData.append('category', categoria);
             formData.append('price', precioStr);
             formData.append('stock', stockStr);
             formData.append('description', desc);
+            formData.append('specs', JSON.stringify(specsArray));
 
             if (archivoInput.files && archivoInput.files[0]) {
                 formData.append('image', archivoInput.files[0]);
