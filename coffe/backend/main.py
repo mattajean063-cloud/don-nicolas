@@ -6,6 +6,9 @@ from pydantic import BaseModel
 import sqlite3
 import os
 import requests
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from typing import Optional, Any
 
 app = FastAPI()
@@ -13,6 +16,50 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# ==========================================
+# CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO)
+# ==========================================
+def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
+    remitente = os.getenv("EMAIL_REMITENTE", "tucorreo@gmail.com")
+    password = os.getenv("EMAIL_PASSWORD", "tu_contraseña_de_aplicacion")
+    destinatario = os.getenv("EMAIL_DESTINATARIO", "tucorreo@gmail.com")
+    
+    # Si mantienes los valores por defecto, se omite de forma segura sin romper nada
+    if remitente == "tucorreo@gmail.com" or password == "tu_contraseña_de_aplicacion":
+        print("Aviso: Credenciales de correo no configuradas. Se omite el envío del correo.")
+        return False
+
+    asunto = f"¡Nuevo Pedido Recibido! #{pedido_id}"
+    cuerpo = f"""
+    ¡Hola! Hay un nuevo pedido en Don Nicolás.
+    
+    Detalles del pedido:
+    - ID del Pedido: #{pedido_id}
+    - Cliente: {cliente}
+    - Teléfono: {telefono}
+    - Dirección: {direccion}
+    - Total a cobrar: Q{total:.2f}
+    
+    Revisa el panel de administración para ver los detalles completos y el comprobante de pago.
+    """
+    
+    msg = MIMEMultipart()
+    msg['From'] = remitente
+    msg['To'] = destinatario
+    msg['Subject'] = asunto
+    msg.attach(MIMEText(cuerpo, 'plain'))
+    
+    try:
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(remitente, password)
+        servidor.sendmail(remitente, destinatario, msg.as_string())
+        servidor.quit()
+        return True
+    except Exception as e:
+        print(f"Error al enviar correo (no afecta el pedido): {e}")
+        return False
 
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
 X_LOGIN = "AQUI_TU_X_LOGIN"
@@ -335,6 +382,13 @@ async def crear_pedido_cliente(
             (pedido_id, customer, payment_method_type, total, "Completado", receipt_url, invoice_name, nit_final, invoice_number, invoice_address)
         )
         conn.commit()
+
+        # Disparo seguro del correo (protegido contra fallos)
+        try:
+            enviar_alerta_correo(pedido_id, customer, total, phone, address)
+        except Exception as mail_err:
+            print(f"Aviso menor de correo: {mail_err}")
+
     except Exception as e:
         conn.rollback()
         conn.close()
