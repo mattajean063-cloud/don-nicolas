@@ -771,8 +771,10 @@
                             <label>Descripción</label>
                             <textarea id="prod-desc" rows="2"></textarea>
                         </div>
+                        
+                        <!-- SECCIÓN PARA SUBIR LA FOTO DEL GRANO DE CAFÉ -->
                         <div class="form-group">
-                            <label>Fotografía del Producto</label>
+                            <label>Fotografía del Grano de Café / Producto</label>
                             <input type="file" id="prod-archivo-img" accept="image/*" onchange="previsualizarImagen(event)">
                             <div class="img-preview-container">
                                 <div class="preview-box">
@@ -782,6 +784,7 @@
                                 <span id="nombre-archivo-txt" style="font-size: 0.85rem; color: var(--text-muted);">Ningún archivo seleccionado</span>
                             </div>
                         </div>
+
                         <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
                             <button class="btn-nuevo" onclick="guardarProducto()">Guardar Producto</button>
                             <button class="btn-accion" style="background:#736257; color:#fff; padding: 10px 20px;" onclick="ocultarFormulario()">Cancelar</button>
