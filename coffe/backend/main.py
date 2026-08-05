@@ -16,6 +16,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
+# Estado global en memoria para controlar si el pago con tarjeta está habilitado desde el admin
+configuracion_tienda = {
+    "card_payment_enabled": False
+}
+
 # ==========================================
 # CONFIGURACIÓN DE ALERTA DE WHATSAPP (GREEN API Y EN SEGUNDO PLANO)
 # ==========================================
@@ -64,8 +69,14 @@ class PagoQPayProRequest(BaseModel):
     customer_email: str
     card_number: Optional[str] = None
 
+class CardStatusUpdate(BaseModel):
+    enabled: bool
+
 @app.post("/api/create-payment-intent")
 def crear_pago_qpaypro(data: PagoQPayProRequest):
+    if not configuracion_tienda["card_payment_enabled"]:
+        raise HTTPException(status_code=403, detail="El pago con tarjeta se encuentra deshabilitado temporalmente.")
+    
     headers = {
         "Content-Type": "application/json",
         "x-login": X_LOGIN,
@@ -80,6 +91,22 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
         return response.json()
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ==========================================
+# ENDPOINTS DE CONFIGURACIÓN DE TARJETA (ADMIN Y PÚBLICO)
+# ==========================================
+@app.get("/api/admin/card-payment-status")
+def obtener_estado_tarjeta():
+    return {"enabled": configuracion_tienda["card_payment_enabled"]}
+
+@app.post("/api/admin/card-payment-status")
+def actualizar_estado_tarjeta(data: CardStatusUpdate):
+    configuracion_tienda["card_payment_enabled"] = data.enabled
+    return {"success": True, "enabled": configuracion_tienda["card_payment_enabled"]}
+
+@app.get("/api/shop/config")
+def obtener_configuracion_tienda():
+    return {"card_payment_enabled": configuracion_tienda["card_payment_enabled"]}
 
 imagenes_dir = os.path.join(BASE_DIR, "..", "imagenes")
 if os.path.exists(imagenes_dir):
