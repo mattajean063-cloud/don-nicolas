@@ -58,6 +58,39 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==========================================
+# CONFIGURACIÓN DE WHATSAPP CLOUD API
+# ==========================================
+def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float):
+    telefono_destino = "50246511325"
+    WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN", "TU_TOKEN_DE_ACCESO_PERMANENTE")
+    PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID", "TU_PHONE_NUMBER_ID")
+    
+    url = f"https://graph.facebook.com/v17.0/{PHONE_NUMBER_ID}/messages"
+    
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    
+    mensaje = f"¡Hay un nuevo pedido! \n\n*Pedido ID:* #{pedido_id}\n*Cliente:* {cliente}\n*Total:* Q{total:.2f}"
+    
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": telefono_destino,
+        "type": "text",
+        "text": {
+            "body": mensaje
+        }
+    }
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        return response.status_code in [200, 201]
+    except Exception as e:
+        print(f"Error al enviar mensaje de WhatsApp: {e}")
+        return False
+
+# ==========================================
 # CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y RUTAS
 # ==========================================
 
@@ -390,6 +423,9 @@ async def crear_pedido_cliente(
             (pedido_id, customer, payment_method_type, total, "Completado", receipt_url, invoice_name, nit_final, invoice_number, invoice_address)
         )
         conn.commit()
+
+        # Enviar notificación automática por WhatsApp al número 46511325
+        enviar_alerta_whatsapp(pedido_id, customer, total)
 
     except Exception as e:
         conn.rollback()
