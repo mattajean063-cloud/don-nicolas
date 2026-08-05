@@ -205,7 +205,6 @@
             border-radius: 2px;
         }
 
-        /* CONTROLES DE TIENDA (BUSCADOR Y FILTROS) */
         .tienda-controles {
             display: flex;
             flex-direction: column;
@@ -285,7 +284,6 @@
             box-shadow: 0 15px 35px rgba(27,18,12,0.08);
         }
 
-        /* CONTENEDOR DE FOTOS CORREGIDO (SIN ESPACIOS VACÍOS) */
         .producto-img-wrapper, .finca-img-wrapper {
             width: 100%;
             height: 220px;
@@ -513,7 +511,7 @@
             object-position: center;
         }
 
-        /* NUEVA DECORACIÓN BONITA DEBAJO DE LA IMAGEN EN DETALLES */
+        /* DECORACIÓN DE LA TASITA DE CAFÉ ABAJO DE LA IMAGEN */
         .decoracion-detalles {
             display: flex;
             align-items: center;
@@ -528,8 +526,7 @@
             background-color: var(--accent-gold);
         }
         .decoracion-detalles span {
-            font-size: 1.1rem;
-            color: var(--accent-gold);
+            font-size: 1.2rem;
         }
 
         .modal-info h2 {
@@ -928,7 +925,6 @@
             opacity: 0.92;
         }
 
-        /* PIE DE PÁGINA / DERECHOS RESERVADOS */
         footer {
             background-color: var(--sidebar-bg);
             color: #d8cebc;
@@ -945,7 +941,6 @@
             margin: 0;
         }
 
-        /* MEDIA QUERIES */
         @media (min-width: 768px) {
             header {
                 flex-direction: row;
@@ -1048,7 +1043,6 @@
     <div id="vista-tienda" class="seccion-sitio">
         <h2 class="titulo-seccion">Catálogo de Nuestra Cosecha</h2>
         
-        <!-- Controles: Buscador y Filtros por Categoría -->
         <div class="tienda-controles">
             <input type="text" id="buscador-tienda" class="buscador-input" placeholder="🔍 Buscar café o producto..." oninput="filtrarProductosTienda()">
             <div id="categorias-filtros-container" class="categorias-filtros">
@@ -1212,7 +1206,7 @@
                 <div class="modal-img-grande">
                     <img id="modal-img" src="" alt="Producto">
                 </div>
-                <!-- Decoración bonita debajo de la imagen -->
+                <!-- Tasita de café abajo de la imagen adaptada -->
                 <div class="decoracion-detalles">
                     <hr>
                     <span>☕</span>
@@ -1239,7 +1233,7 @@
                     </div>
                 </div>
 
-                <p id="modal-desc" style="font-size: 0.95srem; color: var(--text-muted); line-height: 1.6;"></p>
+                <p id="modal-desc" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;"></p>
 
                 <div id="modal-molienda-container" class="molienda-grupo">
                     <label>Selecciona tu molienda</label>
@@ -1300,7 +1294,6 @@
                 </div>
             </div>
 
-            <!-- Aviso sobre envíos los días martes y miércoles -->
             <div class="aviso-envios-box">
                 📦 <strong>Nota de Envíos:</strong> Los envíos a domicilio se realizan exclusivamente los días <strong>martes y miércoles</strong>.
             </div>
@@ -1336,7 +1329,6 @@
                 </select>
             </div>
 
-            <!-- CAMPO DE DIRECCIÓN: Solo se muestra cuando seleccionas Envío a Domicilio -->
             <div class="form-group" id="grupo-direccion-envio" style="display: none;">
                 <label>Dirección de Envío / Referencias *</label>
                 <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 60px;"></textarea>
@@ -1353,14 +1345,12 @@
             <!-- FORMULARIO EFECTIVO -->
             <div id="form-efectivo" class="formulario-metodo activo">
                 <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0;">Pagas al momento de recoger tu pedido directamente en nuestra tienda física en Esquipulas.</p>
-                
                 <div class="terminos-grupo">
                     <input type="checkbox" id="terminos-efectivo" required>
                     <label for="terminos-efectivo" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; display: inline; cursor: pointer;">
                         Acepto los <a href="#" onclick="alert('Términos y condiciones: Don Nicolás garantiza café fresco de estricta altura. Los pedidos de tienda se recogen en horario hábil.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
                     </label>
                 </div>
-
                 <button type="button" class="btn-enviar-mensaje" onclick="procesarPagoEfectivo()">Confirmar Pedido en Efectivo</button>
             </div>
 
@@ -1436,7 +1426,6 @@
         </div>
     </div>
 
-    <!-- DERECHOS RESERVADOS AL FINAL DE LA PÁGINA -->
     <footer>
         <p>&copy; 2026 Don Nicolás Coffee Shop. Todos los derechos reservados. | Esquipulas, Chiquimula, Guatemala.</p>
     </footer>
