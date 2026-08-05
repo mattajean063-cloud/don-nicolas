@@ -369,6 +369,11 @@
             color: #f7f4ed;
         }
 
+        .btn-entregar {
+            background: #27ae60;
+            color: #fff;
+        }
+
         .btn-nuevo {
             background: var(--primary-dark);
             color: #f7f4ed;
@@ -388,6 +393,32 @@
         .btn-nuevo:hover {
             background: var(--accent-gold);
             color: var(--primary-dark);
+        }
+
+        /* PESTAÑAS DE PEDIDOS */
+        .pedidos-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.activo {
+            background: var(--primary-dark);
+            color: var(--accent-gold);
+            border-color: var(--primary-dark);
         }
 
         .form-container {
@@ -829,6 +860,12 @@
                         </div>
                     </div>
 
+                    <!-- PESTAÑAS DE FILTRADO (PENDIENTES / ENTREGADOS) -->
+                    <div id="pedidos-tabs-container" class="pedidos-tabs">
+                        <button id="tab-pendientes-btn" class="tab-btn activo" onclick="filtrarTabPedidos('pendientes')">Pedidos Activos / Pendientes</button>
+                        <button id="tab-entregados-btn" class="tab-btn" onclick="filtrarTabPedidos('entregados')">Pedidos Entregados</button>
+                    </div>
+
                     <div id="lista-pedidos-container">
                         <table>
                             <thead>
@@ -836,6 +873,7 @@
                                     <th>Pedido ID</th>
                                     <th>Cliente</th>
                                     <th>Total</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -844,7 +882,11 @@
                     </div>
 
                     <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
-                        <button class="btn-accion" style="background:#736257; color:#fff; margin-bottom: 1.5rem; padding: 8px 14px;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
+                            <button class="btn-accion" style="background:#736257; color:#fff; padding: 8px 14px; margin-bottom:0;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
+                            <button id="btn-marcar-entregado" class="btn-accion btn-entregar" style="padding: 10px 18px; font-size: 0.85rem;" onclick="marcarPedidoEntregadoActual()">✓ Marcar como Entregado</button>
+                        </div>
+
                         <h2 id="det-id-pedido" style="font-family: 'Cormorant Garamond', serif; margin-top: 0; color: var(--primary-dark); font-size: 1.8rem;"></h2>
                         
                         <div class="detalle-grid">
@@ -914,6 +956,8 @@
         let cachePagos = [];
         let cacheProductos = []; 
         let imagenBase64Actual = ''; 
+        let tabActualPedidos = 'pendientes'; // 'pendientes' o 'entregados'
+        let pedidoIdEnVista = null;
 
         document.addEventListener("DOMContentLoaded", () => {
             verificarEstadoTarjetaGuardado();
@@ -1074,31 +1118,60 @@
                 cachePedidos = await resPedidos.json();
                 cachePagos = await resPagos.json();
 
-                const tbody = document.getElementById('tabla-pedidos-body');
-                tbody.innerHTML = '';
-                
-                if (cachePedidos.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No hay pedidos registrados.</td></tr>`;
-                    return;
-                }
-
-                cachePedidos.forEach(o => {
-                    const idLimpio = String(o.id).replace('#', '');
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>#${o.id}</td>
-                            <td>${o.customer || 'Cliente General'}</td>
-                            <td>Q${Number(o.total).toFixed(2)}</td>
-                            <td>
-                                <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Pedido y Pago</button>
-                            </td>
-                        </tr>
-                    `;
-                });
+                renderizarTablaPedidos();
             } catch (err) { console.error(err); }
         }
 
+        function filtrarTabPedidos(tab) {
+            tabActualPedidos = tab;
+            document.getElementById('tab-pendientes-btn').classList.toggle('activo', tab === 'pendientes');
+            document.getElementById('tab-entregados-btn').classList.toggle('activo', tab === 'entregados');
+            renderizarTablaPedidos();
+        }
+
+        function renderizarTablaPedidos() {
+            const tbody = document.getElementById('tabla-pedidos-body');
+            tbody.innerHTML = '';
+
+            // Filtrar según la pestaña activa (consideramos estado 'entregado' o 'completed')
+            const pedidosFiltrados = cachePedidos.filter(o => {
+                const estado = (o.status || o.estado || 'pendiente').toLowerCase();
+                const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
+                if (tabActualPedidos === 'entregados') {
+                    return esEntregado;
+                } else {
+                    return !esEntregado;
+                }
+            });
+
+            if (pedidosFiltrados.length === 0) {
+                const mensaje = tabActualPedidos === 'entregados' ? 'No hay pedidos entregados.' : 'No hay pedidos pendientes.';
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">${mensaje}</td></tr>`;
+                return;
+            }
+
+            pedidosFiltrados.forEach(o => {
+                const idLimpio = String(o.id).replace('#', '');
+                const estado = (o.status || o.estado || 'pendiente').toLowerCase();
+                const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
+                const etiquetaEstado = esEntregado ? '<span style="color: #27ae60; font-weight: 600;">Entregado</span>' : '<span style="color: #d35400; font-weight: 600;">Pendiente</span>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${o.id}</td>
+                        <td>${o.customer || 'Cliente General'}</td>
+                        <td>Q${Number(o.total).toFixed(2)}</td>
+                        <td>${etiquetaEstado}</td>
+                        <td>
+                            <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Detalle</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
         async function verDetallePedidoYPago(pedidoId) {
+            pedidoIdEnVista = pedidoId;
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
 
             if (pedido) {
@@ -1107,6 +1180,20 @@
                 document.getElementById('det-telefono').innerText = pedido.phone || 'No especificado';
                 document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
                 document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
+
+                // Gestionar visibilidad del botón de entregado según estado actual
+                const estado = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
+                const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
+                const btnEntregado = document.getElementById('btn-marcar-entregado');
+                if (esEntregado) {
+                    btnEntregado.innerText = '✓ Pedido Entregado';
+                    btnEntregado.style.background = '#7f8c8d';
+                    btnEntregado.disabled = true;
+                } else {
+                    btnEntregado.innerText = '✓ Marcar como Entregado';
+                    btnEntregado.style.background = '#27ae60';
+                    btnEntregado.disabled = false;
+                }
 
                 const tbodyItems = document.getElementById('tabla-detalle-items');
                 tbodyItems.innerHTML = '';
@@ -1194,6 +1281,7 @@
                     document.getElementById('det-pago-sin-foto').style.display = 'block';
                 }
 
+                document.getElementById('pedidos-tabs-container').style.display = 'none';
                 document.getElementById('lista-pedidos-container').style.display = 'none';
                 document.getElementById('detalle-pedido-container').style.display = 'block';
             } else {
@@ -1201,8 +1289,42 @@
             }
         }
 
+        async function marcarPedidoEntregadoActual() {
+            if (!pedidoIdEnVista) return;
+            if (!confirm('¿Deseas marcar este pedido como entregado? Se moverá a la sección de entregados.')) return;
+
+            try {
+                const res = await fetch(`${API_URL}/orders/${pedidoIdEnVista}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'entregado' })
+                });
+
+                // Actualizamos localmente para reflejar el cambio al instante
+                let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
+                if (pedido) {
+                    pedido.status = 'entregado';
+                }
+
+                alert('¡Pedido marcado como entregado con éxito!');
+                volverAListaPedidos();
+                cargarPedidosYPagosUnificados();
+            } catch (err) {
+                // Fallback local si la API remota no está activa
+                let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
+                if (pedido) {
+                    pedido.status = 'entregado';
+                }
+                alert('¡Pedido marcado como entregado localmente!');
+                volverAListaPedidos();
+                renderizarTablaPedidos();
+            }
+        }
+
         function volverAListaPedidos() {
+            pedidoIdEnVista = null;
             document.getElementById('detalle-pedido-container').style.display = 'none';
+            document.getElementById('pedidos-tabs-container').style.display = 'flex';
             document.getElementById('lista-pedidos-container').style.display = 'block';
         }
 
