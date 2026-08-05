@@ -682,6 +682,7 @@
                                 <thead>
                                     <tr>
                                         <th>Producto</th>
+                                        <th>Molienda</th>
                                         <th>Cantidad</th>
                                         <th>Precio Unitario</th>
                                     </tr>
@@ -800,7 +801,6 @@
             document.getElementById('seccion-' + seccionId).classList.add('activa');
             if(elemento) elemento.classList.add('activo');
 
-            // Cerrar menú automático en celulares al hacer clic en una opción
             if (window.innerWidth <= 768) {
                 document.getElementById('app-sidebar').classList.remove('abierto');
             }
@@ -925,19 +925,30 @@
 
                     if (Array.isArray(itemsArray) && itemsArray.length > 0) {
                         itemsArray.forEach(item => {
+                            let nombreProd = item.name || '';
+                            let moliendaProd = item.molienda || 'Grano';
+                            
+                            // Extraer molienda del nombre si se guardó adjunta (ej. "Café Tradicional (Fina)")
+                            const matchMolienda = nombreProd.match(/\((Grano|Fina|Media|Gruesa|N\/A)\)$/i);
+                            if (matchMolienda) {
+                                moliendaProd = matchMolienda[1];
+                                nombreProd = nombreProd.replace(/\s*\([^\)]+\)$/, '').trim();
+                            }
+
                             tbodyItems.innerHTML += `
                                 <tr>
-                                    <td>${item.name}</td>
+                                    <td>${nombreProd}</td>
+                                    <td><span style="background: #f2ebd9; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">${moliendaProd}</span></td>
                                     <td>${item.quantity}</td>
                                     <td>Q${Number(item.price).toFixed(2)}</td>
                                 </tr>
                             `;
                         });
                     } else {
-                        tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
+                        tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
                     }
                 } else {
-                    tbodyItems.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
+                    tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
                 }
 
                 document.getElementById('lista-pedidos-container').style.display = 'none';
