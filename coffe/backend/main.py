@@ -59,7 +59,9 @@ def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: s
         print(f"Correo de alerta enviado con éxito para el pedido #{pedido_id}")
         return True
     except Exception as e:
-        print(f"Error al enviar correo (no afecta el pedido): {e}")
+        import traceback
+        print("--- ERROR DETALLADO DE CORREO ---")
+        traceback.print_exc()
         return False
 
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
