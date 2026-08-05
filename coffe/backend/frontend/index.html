@@ -1174,8 +1174,9 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Dirección de Envío / Referencias</label>
+            <!-- CAMPO DE DIRECCIÓN: Solo se muestra cuando seleccionas Envío a Domicilio -->
+            <div class="form-group" id="grupo-direccion-envio" style="display: none;">
+                <label>Dirección de Envío / Referencias *</label>
                 <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 60px;"></textarea>
             </div>
 
@@ -1266,18 +1267,16 @@
         let cacheProductos = [];
         let productoSeleccionadoActual = null;
         let moliendaSeleccionada = 'Grano';
-        let tarjetaHabilitadaAdmin = false; // Control de estado desde Admin
+        let tarjetaHabilitadaAdmin = false;
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarDatosSistema();
             verificarEstadoTarjetaAdmin();
         });
 
-        // Verificar estado de la tarjeta configurado en el backend o localStorage
         async function verificarEstadoTarjetaAdmin() {
             try {
-                const res = await fetch(`${API_URL}/products`); // Usamos una consulta rápida para ver si el admin guardó el estado
-                // Simulación o lectura de configuración si el backend lo provee, por defecto desactivado:
+                const res = await fetch(`${API_URL}/products`);
                 actualizarEstadoUIpagoTarjeta(false);
             } catch(e) {
                 actualizarEstadoUIpagoTarjeta(false);
@@ -1569,19 +1568,30 @@
             carrito.forEach(item => { subtotal += item.price * item.quantity; });
 
             const tipoEntrega = document.getElementById('tipo-entrega').value;
-            let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00; // Tarifa de envío de 60 exacta
+            let costoEnvio = 0.00;
+            const grupoDireccion = document.getElementById('grupo-direccion-envio');
+
+            // Mostrar/Ocultar dirección y calcular envío exclusivamente cuando es domicilio
+            if (tipoEntrega === 'domicilio') {
+                costoEnvio = 60.00;
+                grupoDireccion.style.display = 'block';
+                document.getElementById('envio-direccion').setAttribute('required', 'true');
+            } else {
+                costoEnvio = 0.00;
+                grupoDireccion.style.display = 'none';
+                document.getElementById('envio-direccion').removeAttribute('required');
+            }
 
             document.getElementById('pago-modal-envio').innerText = `Q${costoEnvio.toFixed(2)}`;
             document.getElementById('pago-modal-total').innerText = `Q${(subtotal + costoEnvio).toFixed(2)}`;
 
-            // Restricción de pago en efectivo: solo activo cuando seleccionas recoger en tienda
             const selectorEfectivo = document.getElementById('selector-efectivo');
             if (tipoEntrega === 'tienda') {
                 selectorEfectivo.style.display = 'block';
             } else {
                 selectorEfectivo.style.display = 'none';
                 if (selectorEfectivo.classList.contains('seleccionado')) {
-                    seleccionarMetodo('transferencia'); // Cambiar a transferencia por defecto si estaba en efectivo y eligió domicilio
+                    seleccionarMetodo('transferencia');
                 }
             }
         }
