@@ -22,7 +22,7 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 # CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO Y EN SEGUNDO PLANO)
 # ==========================================
 def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    remitente = os.getenv("EMAIL_REMITENTE", "mattajean063@gmail.com")
+    remitente = os.getenv("EMAIL_REMITENTE", "jeanfmt21@gmail.com@gmail.com")
     password = os.getenv("EMAIL_PASSWORD", "tvwo rkql ktyp zpfw")
     destinatario = os.getenv("EMAIL_DESTINATARIO", "mattajean063@gmail.com")
     
