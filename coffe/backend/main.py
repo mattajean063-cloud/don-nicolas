@@ -22,9 +22,9 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 # ==========================================
 def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
     # Correo del negocio que recibirá la alerta y correo emisor
-    remitente = "tucorreo@gmail.com"
-    password = "tu_contraseña_de_aplicacion" # Contraseña de aplicación de Gmail
-    destinatario = "tucorreo@gmail.com" # Puede ser el mismo o el del administrador
+    remitente = "mattajean063@gmail.com"
+    password = "matamata6754" # Contraseña de aplicación de Gmail
+    destinatario = "mattajean063@gmail.com" # Puede ser el mismo o el del administrador
     
     asunto = f"¡Nuevo Pedido Recibido! #{pedido_id}"
     cuerpo = f"""
