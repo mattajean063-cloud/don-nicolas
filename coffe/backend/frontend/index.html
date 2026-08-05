@@ -384,30 +384,49 @@
             margin-bottom: 1rem;
         }
 
+        /* TRES TASITAS / ESPECIFICACIONES DINÁMICAS */
         .specs-preview-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             margin: 1rem 0;
         }
 
         .spec-badge {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            background: #f2ebd9;
+            text-align: center;
+            background: #fff;
             border: 1px solid #e3dbcc;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--primary-dark);
+            padding: 8px 6px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(44,29,17,0.02);
         }
 
         .spec-badge img {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             object-fit: cover;
+            margin-bottom: 4px;
+        }
+
+        .spec-badge .spec-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .spec-badge .spec-valor {
+            font-size: 0.75rem;
+            color: var(--primary-dark);
+            font-weight: 500;
+            word-break: break-word;
         }
 
         .molienda-grupo {
@@ -750,7 +769,6 @@
 
     <header>
         <div class="header-top">
-            <!-- LOGO COLOCADO CORRECTAMENTE AQUÍ -->
             <img src="/static/imagenes/logo.png" alt="Logo Don Nicolás" class="logo-img" onerror="this.style.display='none'">
             <div class="logo-container">
                 <h1>Don Nicolás</h1>
@@ -950,8 +968,21 @@
                 <h2 id="modal-nombre">Nombre del Producto</h2>
                 <div id="modal-precio" class="precio">Q0.00</div>
                 
-                <!-- ICONOS / ESPECIFICACIONES -->
-                <div id="modal-specs" class="specs-preview-grid"></div>
+                <!-- LAS TRES TASITAS (PRIMERA: VARIEDAD, SEGUNDA: TUESTE, TERCERA: ALTURA) -->
+                <div id="modal-specs" class="specs-preview-grid">
+                    <div class="spec-badge">
+                        <span class="spec-titulo">Variedad</span>
+                        <span id="spec-variedad" class="spec-valor">-</span>
+                    </div>
+                    <div class="spec-badge">
+                        <span class="spec-titulo">Tueste</span>
+                        <span id="spec-tueste" class="spec-valor">-</span>
+                    </div>
+                    <div class="spec-badge">
+                        <span class="spec-titulo">Altura</span>
+                        <span id="spec-altura" class="spec-valor">-</span>
+                    </div>
+                </div>
 
                 <p id="modal-desc" style="font-size: 0.9rem; color: var(--text-muted);"></p>
 
@@ -1220,26 +1251,36 @@
             }
             document.getElementById('modal-img').src = imagenSrc;
 
-            // Renderizar especificaciones / iconos redondos
-            const specsContainer = document.getElementById('modal-specs');
-            specsContainer.innerHTML = '';
+            // Rellenar las tres tasitas con la información del producto (variedad, tueste, altura)
+            let specsArray = [];
             if (p.specs) {
-                let specsArray = [];
                 try {
                     specsArray = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
                 } catch(e) { specsArray = []; }
-
-                if (Array.isArray(specsArray) && specsArray.length > 0) {
-                    specsArray.forEach(spec => {
-                        specsContainer.innerHTML += `
-                            <div class="spec-badge">
-                                ${spec.icon_url ? `<img src="${spec.icon_url}" alt="Icono">` : ''}
-                                <span>${spec.label}</span>
-                            </div>
-                        `;
-                    });
-                }
             }
+
+            // Buscar o asignar por defecto según los títulos requeridos
+            let valVariedad = "-";
+            let valTueste = "-";
+            let valAltura = "-";
+
+            if (Array.isArray(specsArray)) {
+                specsArray.forEach(s => {
+                    const labelLower = (s.label || "").toLowerCase();
+                    if (labelLower.includes("variedad")) valVariedad = s.value || s.label;
+                    else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
+                    else if (labelLower.includes("altura")) valAltura = s.value || s.label;
+                });
+                
+                // Si el formato usa array simple de strings u objetos personalizados
+                if (valVariedad === "-" && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
+                if (valTueste === "-" && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
+                if (valAltura === "-" && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
+            }
+
+            document.getElementById('spec-variedad').innerText = limpiarTexto(valVariedad, 'Arábica');
+            document.getElementById('spec-tueste').innerText = limpiarTexto(valTueste, 'Medio');
+            document.getElementById('spec-altura').innerText = limpiarTexto(valAltura, '1,350 msnm');
 
             // Gestionar selector de molienda
             const moliendaContainer = document.getElementById('modal-molienda-container');
@@ -1247,7 +1288,6 @@
                 moliendaContainer.style.display = 'none';
             } else {
                 moliendaContainer.style.display = 'block';
-                // Resetear botones de molienda visualmente
                 const botonesMolienda = moliendaContainer.querySelectorAll('.btn-molienda');
                 botonesMolienda.forEach(b => {
                     if (b.innerText.trim() === 'Grano') {
@@ -1290,7 +1330,6 @@
                 return;
             }
 
-            // Identificar el ítem de forma única por ID y tipo de molienda
             let itemExistente = carrito.find(item => item.id === productoSeleccionadoActual.id && item.molienda === moliendaFinal);
 
             if (itemExistente) {
@@ -1548,7 +1587,7 @@
                 document.getElementById('preview-placeholder-comprobante').style.display = 'block';
                 document.getElementById('nombre-archivo-comprobante-txt').innerText = 'Ningún archivo seleccionado';
                 actualizarCarritoUI();
-                cerrarMenuPortal(); // Correct function fallback
+                cerrarMenuPago();
             } catch (error) {
                 alert("Hubo un error al conectar con el servidor backend.");
             }
