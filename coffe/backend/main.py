@@ -13,19 +13,26 @@ from typing import Optional, Any
 
 app = FastAPI()
 
+# Directorio base donde se encuentra este archivo main.py (dentro de backend)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Crear directorio de subidas/uploads si no existe
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 # ==========================================
-# CONFIGURACIÓN DE CORREO ELECTRÓNICO
+# CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO)
 # ==========================================
 def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    # Correo del negocio que recibirá la alerta y correo emisor
-    remitente = "mattajean063@gmail.com"
-    password = "matamata6754" # Contraseña de aplicación de Gmail
-    destinatario = "mattajean063@gmail.com" # Puede ser el mismo o el del administrador
+    remitente = os.getenv("EMAIL_REMITENTE", "mattajean063@gmail.com")
+    password = os.getenv("EMAIL_PASSWORD", "matamata6754")
+    destinatario = os.getenv("EMAIL_DESTINATARIO", "mattajean063@gmail.com")
     
+    # Si no se han configurado credenciales reales, omitimos el envío para evitar bloqueos
+    if remitente == "tucorreo@gmail.com" or password == "tu_contraseña_de_aplicacion":
+        print("Aviso: Credenciales de correo no configuradas. Se omite el envío del correo.")
+        return False
+
     asunto = f"¡Nuevo Pedido Recibido! #{pedido_id}"
     cuerpo = f"""
     ¡Hola! Hay un nuevo pedido en Don Nicolás.
@@ -47,7 +54,6 @@ def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: s
     msg.attach(MIMEText(cuerpo, 'plain'))
     
     try:
-        # Configuración para Gmail (Puerto 587)
         servidor = smtplib.SMTP('smtp.gmail.com', 587)
         servidor.starttls()
         servidor.login(remitente, password)
@@ -55,7 +61,7 @@ def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: s
         servidor.quit()
         return True
     except Exception as e:
-        print(f"Error al enviar correo: {e}")
+        print(f"Error al enviar correo (no afecta el pedido): {e}")
         return False
 
 # ==========================================
@@ -90,8 +96,10 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
 
     try:
         response = requests.post(QPAYPRO_API_URL, json=payload, headers=headers)
+        
         if response.status_code not in [200, 201]:
             raise HTTPException(status_code=400, detail="Error al procesar el pago con QPayPro")
+            
         return response.json()
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -99,6 +107,7 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
 # ==========================================
 # CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y RUTAS
 # ==========================================
+
 imagenes_dir = os.path.join(BASE_DIR, "..", "imagenes")
 if os.path.exists(imagenes_dir):
     app.mount("/static/imagenes", StaticFiles(directory=imagenes_dir), name="imagenes_externas")
@@ -114,20 +123,24 @@ def leer_index():
     index_path = os.path.join(BASE_DIR, "frontend", "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
+    
     index_raiz = os.path.join(BASE_DIR, "index.html")
     if os.path.exists(index_raiz):
         return FileResponse(index_raiz)
-    return {"mensaje": "Error: No se encontró index.html"}
+        
+    return {"mensaje": f"Error: No se encontró index.html en {index_path}"}
 
 @app.get("/admin")
 def leer_admin():
     admin_path = os.path.join(BASE_DIR, "frontend", "admin.html")
     if os.path.exists(admin_path):
         return FileResponse(admin_path)
+    
     admin_raiz = os.path.join(BASE_DIR, "..", "frontend", "admin.html")
     if os.path.exists(admin_raiz):
         return FileResponse(admin_raiz)
-    return {"mensaje": "Error: No se encontró admin.html"}
+        
+    return {"mensaje": "Error: No se encontró el archivo admin.html"}
 
 app.add_middleware(
     CORSMiddleware,
@@ -421,8 +434,11 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        # Enviar notificación automática por Correo Electrónico[cite: 7]
-        enviar_alerta_correo(pedido_id, customer, total, phone, address)
+        # Intento seguro de envío de correo (Protegido para que NUNCA bloquee el pedido)
+        try:
+            enviar_alerta_correo(pedido_id, customer, total, phone, address)
+        except Exception as mail_err:
+            print(f"Aviso menor de correo: {mail_err}")
 
     except Exception as e:
         conn.rollback()
@@ -465,7 +481,7 @@ def listar_pagos():
         for row in filas:
             pago_dict = dict(row)
             pago_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
-            pago_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit`" in row.keys() and row["invoice_nit"] else "C/F"
+            pago_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
             pago_dict["invoice_number"] = row["invoice_number"] if "invoice_number" in row.keys() and row["invoice_number"] else "Pendiente"
             pago_dict["invoice_address"] = row["invoice_address"] if "invoice_address" in row.keys() and row["invoice_address"] else "No especificada"
             pagos.append(pago_dict)
