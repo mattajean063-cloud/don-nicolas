@@ -7,6 +7,7 @@ import sqlite3
 import os
 import requests
 import smtplib
+import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional, Any
@@ -18,14 +19,13 @@ UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 # ==========================================
-# CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO)
+# CONFIGURACIÓN DE CORREO ELECTRÓNICO (SEGURO Y EN SEGUNDO PLANO)
 # ==========================================
 def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
     remitente = os.getenv("EMAIL_REMITENTE", "mattajean063@gmail.com")
     password = os.getenv("EMAIL_PASSWORD", "matamata6754")
     destinatario = os.getenv("EMAIL_DESTINATARIO", "mattajean063@gmail.com")
     
-    # Si mantienes los valores por defecto, se omite de forma segura sin romper nada
     if remitente == "tucorreo@gmail.com" or password == "tu_contraseña_de_aplicacion":
         print("Aviso: Credenciales de correo no configuradas. Se omite el envío del correo.")
         return False
@@ -56,6 +56,7 @@ def enviar_alerta_correo(pedido_id: int, cliente: str, total: float, telefono: s
         servidor.login(remitente, password)
         servidor.sendmail(remitente, destinatario, msg.as_string())
         servidor.quit()
+        print(f"Correo de alerta enviado con éxito para el pedido #{pedido_id}")
         return True
     except Exception as e:
         print(f"Error al enviar correo (no afecta el pedido): {e}")
@@ -383,11 +384,11 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        # Disparo seguro del correo (protegido contra fallos)
-        try:
-            enviar_alerta_correo(pedido_id, customer, total, phone, address)
-        except Exception as mail_err:
-            print(f"Aviso menor de correo: {mail_err}")
+        # Envío de correo en segundo plano (No congela la página web)[cite: 3]
+        threading.Thread(
+            target=enviar_alerta_correo,
+            args=(pedido_id, customer, total, phone, address)
+        ).start()
 
     except Exception as e:
         conn.rollback()
