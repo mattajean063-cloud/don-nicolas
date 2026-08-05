@@ -20,9 +20,9 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 # CONFIGURACIÓN DE ALERTA DE WHATSAPP (GREEN API Y EN SEGUNDO PLANO)
 # ==========================================
 def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    id_instance = os.getenv("710722701638")
-    api_token = os.getenv("1d6010e069bb4166a8ec9e2ced9bccd668a8fd14f20c4bbca2")
-    whatsapp_destino = os.getenv("50246511325")
+    id_instance = os.getenv("GREEN_ID_INSTANCE")
+    api_token = os.getenv("GREEN_API_TOKEN")
+    whatsapp_destino = os.getenv("WHATSAPP_PHONE")
     
     print(f"DEBUG: Intentando enviar WhatsApp para pedido #{pedido_id} a {whatsapp_destino}")
     
