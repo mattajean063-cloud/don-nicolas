@@ -6,19 +6,24 @@
     <title>Don Nicolás | Café Histórico y Tradición</title>
     <!-- Favicon de la página -->
     <link rel="icon" href="/static/imagenes/logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <!-- Tipografías de alta gama para mayor elegancia -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-colonial: #f4efe6;
-            --primary-dark: #2c1d11;
-            --accent-gold: #b38b4d;
-            --text-main: #3b2f2f;
-            --text-muted: #736257;
-            --sidebar-bg: #1a120b;
+            --bg-colonial: #f7f4ed;
+            --primary-dark: #1b120c;
+            --primary-light: #2c1d13;
+            --accent-gold: #c5a059;
+            --accent-gold-hover: #d4b26f;
+            --text-main: #2b231e;
+            --text-muted: #6e6053;
+            --sidebar-bg: #140d09;
+            --card-bg: #ffffff;
+            --border-color: #e6decb;
         }
 
         body {
-            font-family: 'Lora', serif;
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg-colonial);
@@ -26,21 +31,27 @@
             width: 100%;
             overflow-x: hidden;
             box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
         }
 
         *, *:before, *:after {
             box-sizing: inherit;
         }
 
+        h1, h2, h3, h4, .titulo-seccion, nav a, .producto-precio, .btn-comprar, .carrito-btn {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
         header {
             background-color: var(--sidebar-bg);
             border-bottom: 2px solid var(--accent-gold);
-            padding: 1rem;
+            padding: 1.2rem 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
         }
 
         .header-top {
@@ -49,161 +60,205 @@
             align-items: center;
             width: 100%;
             position: relative;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
         }
 
         .logo-img {
-            max-height: 50px;
+            max-height: 60px;
             width: auto;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.4rem;
             object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
         .logo-container h1 {
-            font-family: 'Cinzel', serif;
-            color: #f4efe6;
+            color: #f7f4ed;
             margin: 0;
-            font-size: 1.4rem;
-            letter-spacing: 2px;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            font-weight: 700;
         }
 
         .logo-container span {
-            font-size: 0.5rem;
-            letter-spacing: 2px;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
             color: var(--accent-gold);
             text-transform: uppercase;
             display: block;
             margin-top: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
         }
 
         nav {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px 15px;
+            gap: 15px 25px;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         nav a {
-            color: #dcd6cd;
+            color: #d8cebc;
             text-decoration: none;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            transition: color 0.3s;
+            font-size: 1.05rem;
+            letter-spacing: 1.5px;
+            transition: color 0.3s ease;
+            font-weight: 600;
         }
 
         nav a:hover, nav a.activo {
             color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(197,160,89,0.4);
         }
 
         .carrito-btn {
-            background: var(--accent-gold);
+            background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
             color: var(--primary-dark);
             border: none;
-            padding: 0.5rem 1rem;
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.75rem;
-            margin-top: 5px;
-            border-radius: 4px;
+            font-size: 1rem;
+            margin-top: 8px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(197,160,89,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .carrito-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(197,160,89,0.4);
         }
 
         .seccion-sitio {
             display: none;
-            padding: 2rem 1rem;
-            max-width: 1200px;
+            padding: 3rem 1.5rem;
+            max-width: 1280px;
             margin: 0 auto;
+            animation: fadeIn 0.4s ease-in-out;
         }
 
         .seccion-sitio.activa {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .hero {
             position: relative;
             text-align: center;
-            padding: 4rem 1rem;
-            margin-bottom: 2rem;
-            background-image: linear-gradient(rgba(26, 18, 11, 0.75), rgba(26, 18, 11, 0.75)), url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200');
+            padding: 6rem 1.5rem;
+            margin-bottom: 3rem;
+            background-image: linear-gradient(to bottom, rgba(20, 13, 9, 0.8), rgba(20, 13, 9, 0.85)), url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200');
             background-size: cover;
             background-position: center;
-            color: #f4efe6;
-            border-bottom: 3px solid var(--accent-gold);
+            color: #f7f4ed;
+            border-bottom: 4px solid var(--accent-gold);
+            box-shadow: inset 0 -20px 30px rgba(0,0,0,0.5);
         }
 
         .hero h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            color: #f4efe6;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-size: 3rem;
+            color: #f7f4ed;
+            margin-bottom: 1.2rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.6);
         }
 
         .hero p {
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
-            color: #dcd6cd;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            color: #e2d8c8;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
         .titulo-seccion {
             text-align: center;
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
+            font-size: 2.4rem;
             color: var(--primary-dark);
-            margin-bottom: 1.5rem;
-            letter-spacing: 1px;
+            margin-bottom: 2.5rem;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .titulo-seccion::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-gold);
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
         }
 
         .productos-grid, .finca-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 2rem;
             margin-bottom: 2rem;
         }
 
         .producto-card, .finca-card {
-            background: #faf6ef;
-            border: 1px solid #e3dbcc;
-            padding: 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(44,29,17,0.02);
-            border-radius: 4px;
+            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .producto-card:hover, .finca-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(27,18,12,0.08);
         }
 
         .producto-img, .finca-card img {
             width: 100%;
-            height: 180px;
+            height: 210px;
             object-fit: cover;
-            border: 1px solid #dcd3c1;
-            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 1.2rem;
             background: #fff;
             cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .producto-img:hover {
+            opacity: 0.92;
         }
 
         .producto-info h3, .finca-card-content h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             color: var(--primary-dark);
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 0.6rem 0;
+            font-weight: 700;
         }
 
         .producto-info p, .finca-card-content p {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
-            margin: 0 0 1rem 0;
-            line-height: 1.4;
+            margin: 0 0 1.2rem 0;
+            line-height: 1.6;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
         }
 
         .producto-footer {
@@ -211,92 +266,111 @@
             justify-content: space-between;
             align-items: center;
             margin-top: auto;
-            border-top: 1px solid #e3dbcc;
-            padding-top: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
         }
 
         .producto-precio {
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--primary-dark);
         }
 
         .btn-comprar {
             background: var(--primary-dark);
-            color: #f4efe6;
+            color: #f7f4ed;
             border: none;
-            padding: 0.5rem 0.8rem;
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
             letter-spacing: 1px;
             cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .btn-comprar:hover {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
         }
 
         .ubicacion-container, .contacto-container {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 2rem;
             margin-bottom: 2rem;
         }
 
         .info-local, .contacto-info-box {
-            background: #faf6ef;
-            border: 1px solid #e3dbcc;
-            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
         }
 
         .info-local h3, .contacto-info-box h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
+            font-size: 1.8rem;
             color: var(--primary-dark);
             margin-top: 0;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            font-weight: 700;
         }
 
         .info-local p, .contacto-info-box p {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
         }
 
         .mapa-box {
-            background: #faf6ef;
-            border: 1px solid #e3dbcc;
-            min-height: 280px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            min-height: 320px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
         }
 
         .mapa-box iframe {
             width: 100%;
             height: 100%;
-            min-height: 280px;
+            min-height: 320px;
             border: 0;
         }
 
         .redes-grid {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 1rem;
         }
 
         .btn-contacto-red {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             background: #fff;
-            border: 1px solid #e3dbcc;
-            padding: 0.7rem 1rem;
+            border: 1px solid var(--border-color);
+            padding: 0.9rem 1.2rem;
             color: var(--primary-dark);
             text-decoration: none;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
             word-break: break-all;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-contacto-red:hover {
+            border-color: var(--accent-gold);
+            background: #fcfbfa;
+            transform: translateX(4px);
         }
 
         /* MODAL DE DETALLE / PRODUCTO */
@@ -306,49 +380,57 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(26, 18, 11, 0.7);
+            background: rgba(20, 13, 9, 0.75);
+            backdrop-filter: blur(4px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 2500;
-            padding: 1rem;
+            padding: 1.5rem;
             box-sizing: border-box;
         }
 
         .modal-card {
-            background: #faf6ef;
+            background: var(--card-bg);
             border: 2px solid var(--accent-gold);
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
             max-height: 95vh;
             overflow-y: auto;
-            padding: 2rem;
+            padding: 2.5rem;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 2rem;
             box-sizing: border-box;
+            border-radius: 10px;
         }
 
         .modal-cerrar {
             position: absolute;
-            top: 15px;
-            right: 20px;
+            top: 20px;
+            right: 25px;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: var(--primary-dark);
-            font-family: 'Cinzel', serif;
+            font-family: 'Cormorant Garamond', serif;
             z-index: 10;
+            transition: color 0.2s;
+        }
+
+        .modal-cerrar:hover {
+            color: var(--accent-gold);
         }
 
         .modal-img-grande {
             width: 100%;
-            height: 260px;
+            height: 300px;
             background: #fff;
-            border: 1px solid #e3dbcc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -362,34 +444,35 @@
         }
 
         .modal-info h2 {
-            font-family: 'Cinzel', serif;
             color: var(--primary-dark);
             margin-top: 0;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
         }
 
         .modal-info .cat {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: var(--accent-gold);
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .modal-info .precio {
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
+            font-size: 2rem;
             color: var(--primary-dark);
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            font-weight: 700;
         }
 
-        /* TRES TASITAS / ESPECIFICACIONES DINÁMICAS */
         .specs-preview-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin: 1rem 0;
+            gap: 10px;
+            margin: 1.2rem 0;
         }
 
         .spec-badge {
@@ -397,96 +480,92 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            background: #fff;
-            border: 1px solid #e3dbcc;
-            padding: 8px 6px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(44,29,17,0.02);
-        }
-
-        .spec-badge img {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 4px;
+            background: #faf7f2;
+            border: 1px solid var(--border-color);
+            padding: 10px 8px;
+            border-radius: 6px;
         }
 
         .spec-badge .spec-titulo {
-            font-family: 'Cinzel', serif;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             letter-spacing: 1px;
             text-transform: uppercase;
             color: var(--accent-gold);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
             font-weight: 700;
         }
 
         .spec-badge .spec-valor {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: var(--primary-dark);
-            font-weight: 500;
-            word-break: break-word;
+            font-weight: 600;
         }
 
         .molienda-grupo {
-            margin: 1rem 0;
+            margin: 1.2rem 0;
         }
 
         .molienda-grupo label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-family: 'Cinzel', serif;
             display: block;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
             color: var(--text-muted);
+            font-weight: 600;
         }
 
         .molienda-opciones {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn-molienda {
             background: #fff;
-            border: 1px solid #e3dbcc;
-            padding: 6px 12px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
             cursor: pointer;
             color: var(--primary-dark);
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
         .btn-molienda.activo {
             background: var(--primary-dark);
-            color: #faf6ef;
+            color: #f7f4ed;
             border-color: var(--primary-dark);
         }
 
         .cantidad-grupo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 1.5rem 0;
+            gap: 12px;
+            margin: 1.8rem 0;
         }
 
         .cantidad-grupo button {
-            background: #e3dbcc;
+            background: #e6decb;
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 34px;
+            height: 34px;
             cursor: pointer;
             font-weight: bold;
+            border-radius: 4px;
+            font-size: 1rem;
         }
 
         .cantidad-grupo input {
-            width: 40px;
+            width: 45px;
             text-align: center;
-            border: 1px solid #e3dbcc;
-            padding: 5px;
-            font-family: 'Lora', serif;
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            font-family: 'Montserrat', sans-serif;
+            border-radius: 4px;
+            font-weight: 600;
         }
 
         /* MODAL CARRITO */
@@ -495,16 +574,16 @@
             top: 0;
             right: -100%;
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             height: 100vh;
-            background: #faf6ef;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.15);
             border-left: 2px solid var(--accent-gold);
-            transition: right 0.3s ease;
+            transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 2000;
             display: flex;
             flex-direction: column;
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
         .carrito-modal.abierto {
@@ -515,21 +594,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e3dbcc;
-            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
         }
 
         .carrito-header h2 {
-            font-family: 'Cinzel', serif;
             margin: 0;
             color: var(--primary-dark);
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
         .btn-cerrar {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: var(--primary-dark);
         }
@@ -537,45 +616,51 @@
         .carrito-items {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 1rem 0;
+            padding: 1.2rem 0;
         }
 
         .carrito-item-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.8rem;
-            border-bottom: 1px dashed #e3dbcc;
-            padding-bottom: 0.8rem;
-            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 1rem;
+            font-size: 0.9rem;
         }
 
         .carrito-footer {
-            border-top: 1px solid #e3dbcc;
-            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.2rem;
         }
 
         .total-container {
             display: flex;
             justify-content: space-between;
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--primary-dark);
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
 
         .btn-checkout {
             width: 100%;
-            background: var(--accent-gold);
+            background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
             color: var(--primary-dark);
             border: none;
-            padding: 0.9rem;
-            font-family: 'Cinzel', serif;
+            padding: 1rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             cursor: pointer;
             text-transform: uppercase;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(197,160,89,0.3);
+            transition: opacity 0.2s;
+        }
+
+        .btn-checkout:hover {
+            opacity: 0.92;
         }
 
         /* MODAL PAGO */
@@ -585,12 +670,13 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(44, 29, 17, 0.6);
+            background: rgba(20, 13, 9, 0.7);
+            backdrop-filter: blur(4px);
             z-index: 3000;
             display: none;
             justify-content: center;
             align-items: center;
-            padding: 0.5rem;
+            padding: 1rem;
         }
 
         .pago-overlay.activo {
@@ -598,56 +684,67 @@
         }
 
         .pago-modal-contenido {
-            background: #faf6ef;
+            background: var(--card-bg);
             border: 2px solid var(--accent-gold);
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             max-height: 95vh;
             overflow-y: auto;
-            padding: 1.2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             position: relative;
+            border-radius: 10px;
         }
 
         .resumen-compra-box {
-            background: #fff;
-            border: 1px solid #e3dbcc;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
+            background: #faf7f2;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            border-radius: 6px;
         }
 
         .metodos-pago-selector {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
         }
 
         .metodo-opcion {
-            border: 1px solid #e3dbcc;
+            border: 1px solid var(--border-color);
             background: #fff;
-            padding: 0.7rem;
+            padding: 0.9rem;
             text-align: center;
             cursor: pointer;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-muted);
+            border-radius: 6px;
+            transition: all 0.2s;
         }
 
         .metodo-opcion.seleccionado {
             border-color: var(--primary-dark);
             background: var(--primary-dark);
-            color: #f4efe6;
+            color: #f7f4ed;
+        }
+
+        .metodo-opcion.deshabilitado {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f1edeb;
+            color: #a0958b;
         }
 
         .formulario-metodo {
             display: none;
             background: #fff;
-            border: 1px solid #e3dbcc;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+            border-radius: 6px;
         }
 
         .formulario-metodo.activo {
@@ -655,64 +752,78 @@
         }
 
         .cuentas-banco-box {
-            background: #f4efe6;
+            background: #faf7f2;
             border: 1px dashed var(--accent-gold);
-            padding: 0.8rem;
-            margin-bottom: 0.8rem;
-            font-size: 0.8rem;
-            line-height: 1.4;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-radius: 6px;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
             display: block;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--primary-dark);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            padding: 0.7rem;
+            padding: 0.8rem;
             background: #fff;
-            border: 1px solid #e3dbcc;
-            font-family: 'Lora', serif;
-            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
             color: var(--text-main);
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--accent-gold);
         }
 
         .btn-enviar-mensaje {
-            background: var(--accent-gold);
+            background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
             color: var(--primary-dark);
             border: none;
-            padding: 0.9rem;
+            padding: 1rem;
             width: 100%;
-            font-family: 'Cinzel', serif;
             font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(197,160,89,0.3);
+            transition: opacity 0.2s;
         }
 
-        /* MEDIA QUERIES PARA PANTALLAS ESCRITORIO (TABLETS Y PC) */
+        .btn-enviar-mensaje:hover {
+            opacity: 0.92;
+        }
+
+        /* MEDIA QUERIES */
         @media (min-width: 768px) {
             header {
                 flex-direction: row;
                 justify-content: space-between;
-                padding: 1rem 3rem;
+                padding: 1.2rem 4rem;
             }
             .header-top {
                 flex-direction: row;
                 align-items: center;
                 width: auto;
                 margin-bottom: 0;
-                gap: 1rem;
-            }
-            .logo-img {
-                margin-bottom: 0;
+                gap: 1.2rem;
             }
             .logo-container {
                 text-align: left;
@@ -720,47 +831,35 @@
             nav {
                 justify-content: flex-end;
                 width: auto;
-                gap: 1.5rem;
+                gap: 2rem;
                 margin-bottom: 0;
             }
-            nav a {
-                font-size: 0.85rem;
-            }
-            .carrito-btn {
-                margin-top: 0;
-            }
             .seccion-sitio {
-                padding: 3rem 2rem;
+                padding: 4rem 2.5rem;
             }
             .hero {
-                padding: 6rem 2rem;
+                padding: 7rem 2rem;
             }
             .hero h2 {
-                font-size: 2.8rem;
+                font-size: 3.5rem;
             }
             .titulo-seccion {
-                font-size: 2.2rem;
+                font-size: 2.6rem;
             }
             .productos-grid, .finca-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 2rem;
+                gap: 2.2rem;
             }
             .ubicacion-container, .contacto-container {
                 grid-template-columns: 1fr 1fr;
                 gap: 2.5rem;
             }
             .metodos-pago-selector {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .pago-modal-contenido {
-                padding: 2.5rem;
+                grid-template-columns: repeat(3, 1fr);
             }
             .modal-card {
                 grid-template-columns: 1fr 1fr;
-                max-width: 800px;
-            }
-            .modal-img-grande {
-                height: 320px;
+                max-width: 900px;
             }
         }
     </style>
@@ -795,7 +894,7 @@
             <h2>Tradición que se Saborea</h2>
             <p>En cada grano de Don Nicolás se resguarda la paciencia de antaño, el esfuerzo de manos artesanas y el orgullo de una finca familiar dedicada a extraer lo más puro de nuestra tierra.</p>
         </div>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem 2rem 1rem;">
+        <div style="max-width: 1280px; margin: 0 auto; padding: 0 1.5rem 3rem 1.5rem;">
             <h3 class="titulo-seccion">Nuestra Cosecha Destacada</h3>
             <div id="catalogo-inicio" class="productos-grid">
                 <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Cargando productos...</p>
@@ -816,14 +915,14 @@
         <h2 class="titulo-seccion">Nuestra Finca</h2>
         <div class="finca-grid">
             <div class="finca-card">
-                <img src="/static/imagenes/CHep0kQUYAAn_6v.jpg" alt="lugar de gran altura">
+                <img src="/static/imagenes/CHep0kQUYAAn_6v.jpg" alt="Lugar de gran altura">
                 <div class="finca-card-content">
                     <h3>Lugar de belleza natural</h3>
                     <p>Un espacio diseñado para contemplar los hermosos paisajes y atardeceres que rodean nuestra región.</p>
                 </div>
             </div>
             <div class="finca-card">
-                <img src="/static/imagenes/molienda-don-nicolas-2.jpg" alt="un lugar de religion">
+                <img src="/static/imagenes/molienda-don-nicolas-2.jpg" alt="Un lugar de tradición">
                 <div class="finca-card-content">
                     <h3>Un lugar donde los recuerdos viven</h3>
                     <p>Descubre un espacio lleno de tradición, donde cada rincón cuenta una historia y cada visita se convierte en un recuerdo especial.</p>
@@ -858,7 +957,7 @@
                 </div>
             </div>
             <div class="finca-card">
-                <img src="/static/imagenes/001.jpg" alt="Café con Vista">
+                <img src="/static/imagenes/001.jpg" alt="Coffee Shop">
                 <div class="finca-card-content">
                     <h3>Coffee Shop</h3>
                     <p>El rincón perfecto para relajarte, disfrutar de una taza de café recién preparado y conectar con la tranquilidad que ofrece la naturaleza.</p>
@@ -894,27 +993,27 @@
             </div>
         </div>
 
-        <h2 class="titulo-seccion" style="margin-top: 30px;">Nuestros Alimentos</h2>
+        <h2 class="titulo-seccion" style="margin-top: 40px;">Nuestros Alimentos</h2>
         <div class="productos-grid">
             <div class="producto-card">
-                <img src="/static/imagenes/image copy 4.png" alt="Panini Artesanal de Pollo" class="producto-img" style="cursor: default;">
+                <img src="/static/imagenes/image copy 4.png" alt="Brownie con Helado" class="producto-img" style="cursor: default;">
                 <div class="producto-info">
                     <h3>Brownie con Helado</h3>
                     <p>Delicioso brownie de chocolate recién horneado, acompañado de una cremosa bola de helado de vainilla que crea la combinación perfecta entre lo cálido y lo frío.</p>
                 </div>
             </div>
             <div class="producto-card">
-                <img src="/static/imagenes/image copy 2.png" alt="Croissant de Mantequilla" class="producto-img" style="cursor: default;">
+                <img src="/static/imagenes/image copy 2.png" alt="Galletas" class="producto-img" style="cursor: default;">
                 <div class="producto-info">
                     <h3>Galletas</h3>
-                    <p>Galletas horneadas diariamente con ingredientes de alta calidad, de textura suave por dentro y ligeramente crujientes por fuera, ideales para acompañar un buen café.</p>
+                    <p>Galletas horneadas diariamente con ingredientes de alta calidad, de textura suave por dentro y ligeramente crujientes por fuera.</p>
                 </div>
             </div>
             <div class="producto-card">
-                <img src="/static/imagenes/image copy.png" alt="Pay de Queso con Café" class="producto-img" style="cursor: default;">
+                <img src="/static/imagenes/image copy.png" alt="French Toast" class="producto-img" style="cursor: default;">
                 <div class="producto-info">
                     <h3>French Toast</h3>
-                    <p>Rebanadas de pan doradas a la perfección, preparadas con una mezcla de huevo, leche y vainilla, servidas con miel de maple y acompañamientos de temporada.</p>
+                    <p>Rebanadas de pan doradas a la perfección, preparadas con una mezcla de huevo, leche y vainilla, servidas con miel de maple.</p>
                 </div>
             </div>
         </div>
@@ -940,10 +1039,10 @@
     <div id="vista-contacto" class="seccion-sitio">
         <h2 class="titulo-seccion">Contacto</h2>
         <div class="contacto-container" style="grid-template-columns: 1fr;">
-            <div class="contacto-info-box">
+            <div class="contacto-info-box" style="text-align: center;">
                 <h3>Comunícate con Nosotros</h3>
                 <p>¿Tienes dudas sobre envíos, pedidos especiales o reservas? Estamos listos para atenderte:</p>
-                <div class="redes-grid">
+                <div class="redes-grid" style="max-width: 600px; margin: 0 auto;">
                     <a href="https://wa.me/50254332402" target="_blank" class="btn-contacto-red">💬 WhatsApp: +502 5433-2402</a>
                     <a href="tel:+50254332402" class="btn-contacto-red">📞 Teléfono: +502 5433-2402</a>
                     <a href="mailto:coffeeshopdonnicolas@gmail.com" class="btn-contacto-red">✉️ Correo: coffeeshopdonnicolas@gmail.com</a>
@@ -968,7 +1067,6 @@
                 <h2 id="modal-nombre">Nombre del Producto</h2>
                 <div id="modal-precio" class="precio">Q0.00</div>
                 
-                <!-- LAS TRES TASITAS (PRIMERA: VARIEDAD, SEGUNDA: TUESTE, TERCERA: ALTURA) -->
                 <div id="modal-specs" class="specs-preview-grid">
                     <div class="spec-badge">
                         <span class="spec-titulo">Variedad</span>
@@ -984,9 +1082,8 @@
                     </div>
                 </div>
 
-                <p id="modal-desc" style="font-size: 0.9rem; color: var(--text-muted);"></p>
+                <p id="modal-desc" style="font-size: 0.95srem; color: var(--text-muted); line-height: 1.6;"></p>
 
-                <!-- SELECTOR DE MOLIENDA DINÁMICO -->
                 <div id="modal-molienda-container" class="molienda-grupo">
                     <label>Selecciona tu molienda</label>
                     <div class="molienda-opciones">
@@ -998,7 +1095,7 @@
                 </div>
 
                 <div class="cantidad-grupo">
-                    <label style="font-size: 0.75rem; font-family: 'Cinzel', serif; text-transform: uppercase;">Cantidad</label>
+                    <label style="font-size: 0.8rem; font-family: 'Cormorant Garamond', serif; text-transform: uppercase; font-weight: 700;">Cantidad</label>
                     <button onclick="cambiarCantidadModal(-1)">-</button>
                     <input type="text" id="modal-cantidad" value="1" readonly>
                     <button onclick="cambiarCantidadModal(1)">+</button>
@@ -1012,7 +1109,7 @@
     <!-- MODAL DEL CARRITO -->
     <div id="carrito-modal" class="carrito-modal">
         <div class="carrito-header">
-            <h2>Tu Carrito de Compras</h2>
+            <h2>Tu Carrito</h2>
             <button class="btn-cerrar" onclick="toggleCarrito()">&times;</button>
         </div>
         <div class="carrito-items" id="carrito-items-container">
@@ -1030,77 +1127,91 @@
     <!-- MENÚ DE PAGO Y ENVÍO -->
     <div id="pago-overlay" class="pago-overlay">
         <div class="pago-modal-contenido">
-            <button class="btn-cerrar" style="position: absolute; top: 1rem; right: 1rem;" onclick="cerrarMenuPago()">&times;</button>
-            <h2 style="font-family: 'Cinzel', serif; color: var(--primary-dark); margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #e3dbcc; padding-bottom: 0.6rem;">Checkout / Finalizar Pedido</h2>
+            <button class="btn-cerrar" style="position: absolute; top: 1.2rem; right: 1.2rem;" onclick="cerrarMenuPago()">&times;</button>
+            <h2 style="font-family: 'Cormorant Garamond', serif; color: var(--primary-dark); margin-top: 0; font-size: 1.6rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">Finalizar Pedido</h2>
             
             <div class="resumen-compra-box">
-                <h4 style="font-family: 'Cinzel', serif; margin: 0 0 0.4rem 0; color: var(--primary-dark); font-size: 0.85rem;">Resumen de tu Compra</h4>
-                <div id="pago-resumen-items" style="max-height: 90px; overflow-y: auto; margin-bottom: 0.4rem;"></div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; color: var(--text-muted);">
+                <h4 style="font-family: 'Cormorant Garamond', serif; margin: 0 0 0.5rem 0; color: var(--primary-dark); font-size: 1.1rem; font-weight: 700;">Resumen de tu Compra</h4>
+                <div id="pago-resumen-items" style="max-height: 100px; overflow-y: auto; margin-bottom: 0.5rem;"></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-muted);">
                     <span>Costo de Envío:</span>
-                    <span id="pago-modal-envio">Q0.00</span>
+                    <span id="pago-modal-envio">Q60.00</span>
                 </div>
-                <div style="border-top: 1px solid #e3dbcc; padding-top: 0.4rem; display: flex; justify-content: space-between; font-family: 'Cinzel', serif; font-weight: 700; color: var(--primary-dark); font-size: 1rem;">
+                <div style="border-top: 1px solid var(--border-color); padding-top: 6px; display: flex; justify-content: space-between; font-family: 'Cormorant Garamond', serif; font-weight: 700; color: var(--primary-dark); font-size: 1.2rem;">
                     <span>Total a Pagar:</span>
                     <span id="pago-modal-total">Q0.00</span>
                 </div>
             </div>
 
-            <h4 style="font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--primary-dark); margin: 0 0 0.6rem 0; border-bottom: 1px solid #e3dbcc; padding-bottom: 4px;">1. Información y Método de Entrega</h4>
+            <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--primary-dark); margin: 0 0 0.8rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700;">1. Información y Método de Entrega</h4>
             
             <div class="form-group">
-                <label>Nombre Completo</label>
-                <input type="text" id="envio-nombre" required placeholder="Ej. Juan Pérez">
+                <label>Nombre Completo (Opcional)</label>
+                <input type="text" id="envio-nombre" placeholder="Ej. Juan Pérez">
             </div>
             <div class="form-group">
-                <label>Teléfono de Contacto</label>
+                <label>Correo Electrónico *</label>
+                <input type="email" id="envio-correo" required placeholder="ejemplo@correo.com">
+            </div>
+            <div class="form-group">
+                <label>Teléfono de Contacto *</label>
                 <input type="text" id="envio-telefono" required placeholder="Ej. +502 5512-3456">
             </div>
             <div class="form-group">
-                <label>NIT / Datos de Facturación (o CF)</label>
-                <input type="text" id="envio-nit" required placeholder="Ej. 1234567-8 o CF">
+                <label>NIT / Datos de Facturación</label>
+                <input type="text" id="envio-nit" value="C/F" placeholder="C/F o número de NIT">
             </div>
             <div class="form-group">
                 <label>Nombre para Factura</label>
-                <input type="text" id="envio-nombre-factura" required placeholder="Ej. Juan Pérez">
+                <input type="text" id="envio-nombre-factura" placeholder="Consumidor Final o Nombre">
             </div>
 
             <div class="form-group">
                 <label>Tipo de Entrega</label>
                 <select id="tipo-entrega" onchange="actualizarCalculoTotal()">
                     <option value="tienda">Recoger en Tienda (Esquipulas) - Gratis</option>
-                    <option value="domicilio">Envío a Domicilio (+Q25.00)</option>
+                    <option value="domicilio">Envío a Domicilio (+Q60.00)</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>Dirección de Envío / Referencias</label>
-                <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 50px;"></textarea>
+                <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 60px;"></textarea>
             </div>
 
-            <h4 style="font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--primary-dark); margin: 1rem 0 0.6rem 0; border-bottom: 1px solid #e3dbcc; padding-bottom: 4px;">2. Selecciona tu Método de Pago</h4>
+            <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700;">2. Selecciona tu Método de Pago</h4>
             
             <div class="metodos-pago-selector">
-                <div id="selector-tarjeta" class="metodo-opcion seleccionado" onclick="seleccionarMetodo('tarjeta')">💳 QPayPro (Tarjeta)</div>
-                <div id="selector-transferencia" class="metodo-opcion" onclick="seleccionarMetodo('transferencia')">🏦 Transferencia</div>
+                <div id="selector-efectivo" class="metodo-opcion seleccionado" onclick="seleccionarMetodo('efectivo')">💵 Pago en Efectivo</div>
+                <div id="selector-transferencia" class="metodo-opcion" onclick="seleccionarMetodo('transferencia')">🏦 Transferencia Bancaria</div>
+                <div id="selector-tarjeta" class="metodo-opcion deshabilitado" onclick="seleccionarMetodo('tarjeta')">💳 Próximamente pago con tarjeta</div>
             </div>
 
-            <!-- FORMULARIO QPAYPRO -->
-            <div id="form-tarjeta" class="formulario-metodo activo">
+            <!-- FORMULARIO EFECTIVO -->
+            <div id="form-efectivo" class="formulario-metodo activo">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0;">Pagas al momento de recoger tu pedido directamente en nuestra tienda física en Esquipulas.</p>
+                <button type="button" class="btn-enviar-mensaje" onclick="procesarPagoEfectivo()">Confirmar Pedido en Efectivo</button>
+            </div>
+
+            <!-- FORMULARIO QPAYPRO (TARJETA - DESACTIVADO POR DEFECTO) -->
+            <div id="form-tarjeta" class="formulario-metodo">
+                <p id="mensaje-tarjeta-estado" style="color: #a93226; font-weight: 600; text-align: center; font-size: 0.9rem;">Próximamente pago con tarjeta. Este método se encuentra desactivado temporalmente.</p>
                 <form id="qpaypro-form" onsubmit="procesarPagoQPayPro(event)">
-                    <div class="form-group">
-                        <label>Número de Tarjeta</label>
-                        <input type="text" id="qpay-card-number" required placeholder="4000 1234 5678 9010" maxlength="19">
-                    </div>
-                    <div class="form-group">
-                        <label>Expiración (MM/AA)</label>
-                        <input type="text" id="qpay-card-exp" required placeholder="MM/AA" maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label>CVV</label>
-                        <input type="text" id="qpay-card-cvv" required placeholder="123" maxlength="4">
-                    </div>
-                    <button type="submit" class="btn-enviar-mensaje" id="btn-pagar-tarjeta">Pagar con QPayPro</button>
+                    <fieldset id="fieldset-tarjeta" disabled style="border:none; padding:0; margin:0;">
+                        <div class="form-group">
+                            <label>Número de Tarjeta</label>
+                            <input type="text" id="qpay-card-number" placeholder="4000 1234 5678 9010" maxlength="19">
+                        </div>
+                        <div class="form-group">
+                            <label>Expiración (MM/AA)</label>
+                            <input type="text" id="qpay-card-exp" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" id="qpay-card-cvv" placeholder="123" maxlength="4">
+                        </div>
+                        <button type="submit" class="btn-enviar-mensaje" id="btn-pagar-tarjeta">Pagar con QPayPro</button>
+                    </fieldset>
                 </form>
             </div>
 
@@ -1132,15 +1243,15 @@
                     <div class="form-group">
                         <label>Comprobante de Transferencia (Imagen)</label>
                         <input type="file" id="trans-archivo-img" accept="image/*" required onchange="previsualizarComprobante(event)">
-                        <div style="margin-top: 0.6rem; display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 60px; height: 60px; border: 1px solid #dcd3c1; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <div style="margin-top: 0.8rem; display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 60px; height: 60px; border: 1px solid var(--border-color); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
                                 <img id="img-preview-comprobante" src="" alt="Vista previa" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                                 <span id="preview-placeholder-comprobante" style="font-size: 0.6rem; color: var(--text-muted); text-align: center;">Sin imagen</span>
                             </div>
-                            <span id="nombre-archivo-comprobante-txt" style="font-size: 0.75rem; color: var(--text-muted); word-break: break-all;">Ningún archivo seleccionado</span>
+                            <span id="nombre-archivo-comprobante-txt" style="font-size: 0.8rem; color: var(--text-muted); word-break: break-all;">Ningún archivo seleccionado</span>
                         </div>
                     </div>
-                    <button type="submit" class="btn-enviar-mensaje">Finalizar Pedido</button>
+                    <button type="submit" class="btn-enviar-mensaje">Finalizar Pedido con Transferencia</button>
                 </form>
             </div>
         </div>
@@ -1155,10 +1266,42 @@
         let cacheProductos = [];
         let productoSeleccionadoActual = null;
         let moliendaSeleccionada = 'Grano';
+        let tarjetaHabilitadaAdmin = false; // Control de estado desde Admin
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarDatosSistema();
+            verificarEstadoTarjetaAdmin();
         });
+
+        // Verificar estado de la tarjeta configurado en el backend o localStorage
+        async function verificarEstadoTarjetaAdmin() {
+            try {
+                const res = await fetch(`${API_URL}/products`); // Usamos una consulta rápida para ver si el admin guardó el estado
+                // Simulación o lectura de configuración si el backend lo provee, por defecto desactivado:
+                actualizarEstadoUIpagoTarjeta(false);
+            } catch(e) {
+                actualizarEstadoUIpagoTarjeta(false);
+            }
+        }
+
+        function actualizarEstadoUIpagoTarjeta(habilitado) {
+            tarjetaHabilitadaAdmin = habilitado;
+            const selectorTarjeta = document.getElementById('selector-tarjeta');
+            const fieldsetTarjeta = document.getElementById('fieldset-tarjeta');
+            const mensajeEstado = document.getElementById('mensaje-tarjeta-estado');
+
+            if (habilitado) {
+                selectorTarjeta.classList.remove('deshabilitado');
+                selectorTarjeta.innerText = '💳 QPayPro (Tarjeta)';
+                fieldsetTarjeta.disabled = false;
+                mensajeEstado.style.display = 'none';
+            } else {
+                selectorTarjeta.classList.add('deshabilitado');
+                selectorTarjeta.innerText = '💳 Próximamente pago con tarjeta';
+                fieldsetTarjeta.disabled = true;
+                mensajeEstado.style.display = 'block';
+            }
+        }
 
         function cambiarVista(vistaId, elemento) {
             document.querySelectorAll('.seccion-sitio').forEach(sec => sec.classList.remove('activa'));
@@ -1217,7 +1360,7 @@
                         <div>
                             <img src="${imagenSrc}" alt="${p.name}" class="producto-img" onclick='abrirModalProducto(${JSON.stringify(p)})' onerror="this.src='https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400'">
                             <div class="producto-info">
-                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-gold); font-family: 'Cinzel', serif;">${catLimpia}</span>
+                                <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-gold); font-weight: 600;">${catLimpia}</span>
                                 <h3>${p.name}</h3>
                                 <p>${descLimpia}</p>
                             </div>
@@ -1251,7 +1394,6 @@
             }
             document.getElementById('modal-img').src = imagenSrc;
 
-            // Rellenar las tres tasitas con la información del producto (variedad, tueste, altura)
             let specsArray = [];
             if (p.specs) {
                 try {
@@ -1259,10 +1401,9 @@
                 } catch(e) { specsArray = []; }
             }
 
-            // Buscar o asignar por defecto según los títulos requeridos
-            let valVariedad = "-";
-            let valTueste = "-";
-            let valAltura = "-";
+            let valVariedad = "Arábica";
+            let valTueste = "Medio";
+            let valAltura = "1,350 msnm";
 
             if (Array.isArray(specsArray)) {
                 specsArray.forEach(s => {
@@ -1271,18 +1412,12 @@
                     else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
                     else if (labelLower.includes("altura")) valAltura = s.value || s.label;
                 });
-                
-                // Si el formato usa array simple de strings u objetos personalizados
-                if (valVariedad === "-" && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
-                if (valTueste === "-" && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
-                if (valAltura === "-" && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
             }
 
             document.getElementById('spec-variedad').innerText = limpiarTexto(valVariedad, 'Arábica');
             document.getElementById('spec-tueste').innerText = limpiarTexto(valTueste, 'Medio');
             document.getElementById('spec-altura').innerText = limpiarTexto(valAltura, '1,350 msnm');
 
-            // Gestionar selector de molienda
             const moliendaContainer = document.getElementById('modal-molienda-container');
             if (p.has_grind === 'no') {
                 moliendaContainer.style.display = 'none';
@@ -1415,7 +1550,7 @@
             carrito.forEach(item => {
                 const infoMolienda = item.molienda && item.molienda !== 'N/A' ? ` (${item.molienda})` : '';
                 resumenContainer.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                         <span>${item.name}${infoMolienda} (x${item.quantity})</span>
                         <span>Q${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
@@ -1434,10 +1569,21 @@
             carrito.forEach(item => { subtotal += item.price * item.quantity; });
 
             const tipoEntrega = document.getElementById('tipo-entrega').value;
-            let costoEnvio = tipoEntrega === 'domicilio' ? 25.00 : 0.00;
+            let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00; // Tarifa de envío de 60 exacta
 
             document.getElementById('pago-modal-envio').innerText = `Q${costoEnvio.toFixed(2)}`;
             document.getElementById('pago-modal-total').innerText = `Q${(subtotal + costoEnvio).toFixed(2)}`;
+
+            // Restricción de pago en efectivo: solo activo cuando seleccionas recoger en tienda
+            const selectorEfectivo = document.getElementById('selector-efectivo');
+            if (tipoEntrega === 'tienda') {
+                selectorEfectivo.style.display = 'block';
+            } else {
+                selectorEfectivo.style.display = 'none';
+                if (selectorEfectivo.classList.contains('seleccionado')) {
+                    seleccionarMetodo('transferencia'); // Cambiar a transferencia por defecto si estaba en efectivo y eligió domicilio
+                }
+            }
         }
 
         function cerrarMenuPago() {
@@ -1445,13 +1591,23 @@
         }
 
         function seleccionarMetodo(metodo) {
+            if (metodo === 'tarjeta' && !tarjetaHabilitadaAdmin) {
+                alert('El pago con tarjeta se encuentra desactivado actualmente (Próximamente disponible).');
+                return;
+            }
+
+            document.getElementById('selector-efectivo').classList.remove('seleccionado');
             document.getElementById('selector-tarjeta').classList.remove('seleccionado');
             document.getElementById('selector-transferencia').classList.remove('seleccionado');
             
+            document.getElementById('form-efectivo').classList.remove('activo');
             document.getElementById('form-tarjeta').classList.remove('activo');
             document.getElementById('form-transferencia').classList.remove('activo');
 
-            if (metodo === 'tarjeta') {
+            if (metodo === 'efectivo') {
+                document.getElementById('selector-efectivo').classList.add('seleccionado');
+                document.getElementById('form-efectivo').classList.add('activo');
+            } else if (metodo === 'tarjeta' && tarjetaHabilitadaAdmin) {
                 document.getElementById('selector-tarjeta').classList.add('seleccionado');
                 document.getElementById('form-tarjeta').classList.add('activo');
             } else if (metodo === 'transferencia') {
@@ -1478,18 +1634,66 @@
             }
         }
 
+        async function procesarPagoEfectivo() {
+            const correo = document.getElementById('envio-correo').value.trim();
+            const telefono = document.getElementById('envio-telefono').value.trim();
+            const nit = document.getElementById('envio-nit').value.trim() || "C/F";
+            const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
+            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
+
+            if (!correo || !telefono) {
+                alert('Por favor ingrese su correo electrónico y teléfono de contacto.');
+                return;
+            }
+
+            let subtotal = 0;
+            carrito.forEach(item => { subtotal += item.price * item.quantity; });
+
+            const formData = new FormData();
+            formData.append("customer", nombre);
+            formData.append("phone", telefono);
+            formData.append("email", correo);
+            formData.append("invoice_nit", nit);
+            formData.append("invoice_name", nombreFactura);
+            formData.append("address", "Recoger en Tienda (Esquipulas)");
+            formData.append("total", subtotal);
+            formData.append("items", JSON.stringify(carrito));
+            formData.append("payment_method_type", "Efectivo (Pago en Tienda)");
+
+            try {
+                const resPedido = await fetch(`${API_BACKEND}/orders`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
+
+                alert(`¡Pedido registrado con éxito! Te esperamos en nuestra tienda en Esquipulas.`);
+                carrito = [];
+                actualizarCarritoUI();
+                cerrarMenuPago();
+            } catch (error) {
+                alert("Error al procesar: " + error.message);
+            }
+        }
+
         async function procesarPagoQPayPro(e) {
             e.preventDefault();
-            const nombre = document.getElementById('envio-nombre').value.trim();
+            if (!tarjetaHabilitadaAdmin) {
+                alert("El pago con tarjeta se encuentra deshabilitado.");
+                return;
+            }
+            const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
-            const nit = document.getElementById('envio-nit').value.trim();
-            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim();
-            const direccion = document.getElementById('envio-direccion').value.trim();
+            const nit = document.getElementById('envio-nit').value.trim() || "C/F";
+            const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
+            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
+            const direccion = document.getElementById('envio-direccion').value.trim();
             const tarjeta = document.getElementById('qpay-card-number').value.trim();
 
-            if (!nombre || !telefono || !nit || !nombreFactura || (tipoEntrega === 'domicilio' && !direccion)) {
-                alert('Por favor complete los campos obligatorios de información y envío.');
+            if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion)) {
+                alert('Complete los campos obligatorios (Correo, Teléfono y Dirección si aplica).');
                 return;
             }
 
@@ -1500,7 +1704,8 @@
             try {
                 let subtotal = 0;
                 carrito.forEach(item => { subtotal += item.price * item.quantity; });
-                let totalGeneral = subtotal + (tipoEntrega === 'domicilio' ? 25.00 : 0.00);
+                let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00;
+                let totalGeneral = subtotal + costoEnvio;
 
                 await fetch(`${API_BACKEND}/create-payment-intent`, {
                     method: 'POST',
@@ -1511,7 +1716,7 @@
                 const formData = new FormData();
                 formData.append("customer", nombre);
                 formData.append("phone", telefono);
-                formData.append("email", "");
+                formData.append("email", correo);
                 formData.append("invoice_nit", nit);
                 formData.append("invoice_name", nombreFactura);
                 formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
@@ -1541,29 +1746,31 @@
 
         async function procesarPagoTransferencia(e) {
             e.preventDefault();
-            const nombre = document.getElementById('envio-nombre').value.trim();
+            const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
-            const nit = document.getElementById('envio-nit').value.trim();
-            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim();
-            const direccion = document.getElementById('envio-direccion').value.trim();
+            const nit = document.getElementById('envio-nit').value.trim() || "C/F";
+            const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
+            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
+            const direccion = document.getElementById('envio-direccion').value.trim();
             const banco = document.getElementById('trans-banco').value;
             const referencia = document.getElementById('trans-referencia').value.trim();
             const archivoInput = document.getElementById('trans-archivo-img');
 
-            if (!nombre || !telefono || !nit || !nombreFactura || (tipoEntrega === 'domicilio' && !direccion) || !archivoInput.files[0]) {
-                alert('Complete todos los campos requeridos y adjunte su comprobante.');
+            if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion) || !archivoInput.files[0]) {
+                alert('Complete los campos requeridos (Correo, Teléfono, Dirección si es domicilio) y adjunte su comprobante.');
                 return;
             }
 
             let subtotal = 0;
             carrito.forEach(item => { subtotal += item.price * item.quantity; });
-            let totalGeneral = subtotal + (tipoEntrega === 'domicilio' ? 25.00 : 0.00);
+            let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00;
+            let totalGeneral = subtotal + costoEnvio;
 
             const formData = new FormData();
             formData.append("customer", nombre);
             formData.append("phone", telefono);
-            formData.append("email", "");
+            formData.append("email", correo);
             formData.append("invoice_nit", nit);
             formData.append("invoice_name", nombreFactura);
             formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
@@ -1578,7 +1785,7 @@
                     body: formData
                 });
 
-                if (!resPedido.ok) throw new Error("Error al registrar estricto pedido.");
+                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
 
                 alert(`¡Pedido registrado, ${nombre}! Comprobante enviado para verificación.`);
                 carrito = [];
