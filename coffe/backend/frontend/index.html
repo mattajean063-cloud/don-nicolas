@@ -205,6 +205,60 @@
             border-radius: 2px;
         }
 
+        /* FILTROS Y BUSCADOR TIENDA */
+        .tienda-controles {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 2.5rem;
+            background: #faf7f2;
+            padding: 1.2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .buscador-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .buscador-input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .categorias-filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-filtro-cat {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-filtro-cat.activo {
+            background: var(--primary-dark);
+            color: #f7f4ed;
+            border-color: var(--primary-dark);
+        }
+
         .productos-grid, .finca-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -373,7 +427,7 @@
             transform: translateX(4px);
         }
 
-        /* MODAL DE DETALLE / PRODUCTO */
+        /* MODAL DE DETALLE / PRODUCTO (MEJORADO PARA EVITAR ESPACIOS VACÍOS) */
         #modal-detalle {
             position: fixed;
             top: 0;
@@ -394,7 +448,7 @@
             background: var(--card-bg);
             border: 2px solid var(--accent-gold);
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
             max-height: 95vh;
             overflow-y: auto;
             padding: 2.5rem;
@@ -405,6 +459,7 @@
             gap: 2rem;
             box-sizing: border-box;
             border-radius: 10px;
+            align-items: center;
         }
 
         .modal-cerrar {
@@ -425,22 +480,28 @@
             color: var(--accent-gold);
         }
 
-        .modal-img-grande {
+        /* CONTENEDOR DE IMAGEN LLENO Y ELEGANTE */
+        .modal-img-wrapper {
             width: 100%;
-            height: 300px;
-            background: #fff;
+            height: 100%;
+            min-height: 350px;
+            background: #140d09;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        .modal-img-grande img {
+        .modal-img-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            max-height: 420px;
+            display: block;
         }
 
         .modal-info h2 {
@@ -846,6 +907,14 @@
             .titulo-seccion {
                 font-size: 2.6rem;
             }
+            .tienda-controles {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .buscador-input {
+                max-width: 350px;
+            }
             .productos-grid, .finca-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 2.2rem;
@@ -859,7 +928,7 @@
             }
             .modal-card {
                 grid-template-columns: 1fr 1fr;
-                max-width: 900px;
+                max-width: 950px;
             }
         }
     </style>
@@ -905,6 +974,15 @@
     <!-- 2. TIENDA ONLINE -->
     <div id="vista-tienda" class="seccion-sitio">
         <h2 class="titulo-seccion">Catálogo de Nuestra Cosecha</h2>
+        
+        <!-- BUSCADOR Y FILTROS POR CATEGORÍA -->
+        <div class="tienda-controles">
+            <input type="text" id="input-buscador-tienda" class="buscador-input" placeholder="🔍 Buscar café por nombre..." oninput="filtrarTienda()">
+            <div id="contenedor-filtros-cat" class="categorias-filtros">
+                <button class="btn-filtro-cat activo" onclick="seleccionarFiltroCat('todos', this)">Todos</button>
+            </div>
+        </div>
+
         <div id="catalogo-tienda" class="productos-grid">
             <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Cargando inventario de café...</p>
         </div>
@@ -1053,12 +1131,12 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALLE DEL PRODUCTO -->
+    <!-- MODAL DE DETALLE DEL PRODUCTO (CON IMAGEN ELEGANTE Y LLENA) -->
     <div id="modal-detalle">
         <div class="modal-card">
             <button class="modal-cerrar" onclick="cerrarModal()">&times;</button>
             <div>
-                <div class="modal-img-grande">
+                <div class="modal-img-wrapper">
                     <img id="modal-img" src="" alt="Producto">
                 </div>
             </div>
@@ -1082,7 +1160,7 @@
                     </div>
                 </div>
 
-                <p id="modal-desc" style="font-size: 0.95srem; color: var(--text-muted); line-height: 1.6;"></p>
+                <p id="modal-desc" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;"></p>
 
                 <div id="modal-molienda-container" class="molienda-grupo">
                     <label>Selecciona tu molienda</label>
@@ -1268,6 +1346,7 @@
         let productoSeleccionadoActual = null;
         let moliendaSeleccionada = 'Grano';
         let tarjetaHabilitadaAdmin = false;
+        let categoriaFiltroActual = 'todos';
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarDatosSistema();
@@ -1314,6 +1393,7 @@
             try {
                 const res = await fetch(`${API_URL}/products`);
                 cacheProductos = await res.json();
+                generarBotonesFiltroCategorias();
                 renderizarInicioYTienda();
             } catch (err) {
                 console.error("Error al conectar con la API:", err);
@@ -1327,19 +1407,65 @@
             return texto;
         }
 
+        function generarBotonesFiltroCategorias() {
+            const contenedorFiltros = document.getElementById('contenedor-filtros-cat');
+            const categoriasUnicas = new Set();
+
+            cacheProductos.forEach(p => {
+                if (p.price > 0) {
+                    const cat = limpiarTexto(p.category, 'Café en Grano');
+                    categoriasUnicas.add(cat);
+                }
+            });
+
+            let htmlFiltros = `<button class="btn-filtro-cat activo" onclick="seleccionarFiltroCat('todos', this)">Todos</button>`;
+            categoriasUnicas.forEach(cat => {
+                htmlFiltros += `<button class="btn-filtro-cat" onclick="seleccionarFiltroCat('${cat}', this)">${cat}</button>`;
+            });
+            contenedorFiltros.innerHTML = htmlFiltros;
+        }
+
+        function seleccionarFiltroCat(cat, elemento) {
+            categoriaFiltroActual = cat;
+            document.querySelectorAll('.btn-filtro-cat').forEach(b => b.classList.remove('activo'));
+            elemento.classList.add('activo');
+            renderizarInicioYTienda();
+        }
+
+        function filtrarTienda() {
+            renderizarInicioYTienda();
+        }
+
         function renderizarInicioYTienda() {
             const contInicio = document.getElementById('catalogo-inicio');
             const contTienda = document.getElementById('catalogo-tienda');
+            const textoBusqueda = (document.getElementById('input-buscador-tienda')?.value || "").toLowerCase().trim();
             
             contInicio.innerHTML = '';
             contTienda.innerHTML = '';
 
-            const productosTienda = cacheProductos.filter(p => p.price > 0);
+            let productosTienda = cacheProductos.filter(p => p.price > 0);
+
+            // Aplicar filtro por categoría seleccionada
+            if (categoriaFiltroActual !== 'todos') {
+                productosTienda = productosTienda.filter(p => limpiarTexto(p.category, 'Café en Grano').toLowerCase() === categoriaFiltroActual.toLowerCase());
+            }
+
+            // Aplicar buscador de texto
+            if (textoBusqueda !== "") {
+                productosTienda = productosTienda.filter(p => {
+                    const nombre = (p.name || "").toLowerCase();
+                    const desc = (p.description || "").toLowerCase();
+                    return nombre.includes(textoBusqueda) || desc.includes(textoBusqueda);
+                });
+            }
 
             if (productosTienda.length === 0) {
-                const msg = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No hay productos en la tienda.</p>';
-                contInicio.innerHTML = msg;
+                const msg = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted); padding: 2rem;">No se encontraron productos con esos criterios.</p>';
                 contTienda.innerHTML = msg;
+                if(categoriaFiltroActual === 'todos' && textoBusqueda === "") {
+                    contInicio.innerHTML = msg;
+                }
                 return;
             }
 
@@ -1371,8 +1497,14 @@
                     </div>
                 `;
                 contTienda.innerHTML += tarjetaHTML;
-                if (index < 3) contInicio.innerHTML += tarjetaHTML;
+                if (index < 3 && categoriaFiltroActual === 'todos' && textoBusqueda === "") {
+                    contInicio.innerHTML += tarjetaHTML;
+                }
             });
+
+            if (contInicio.innerHTML.trim() === "" && categoriaFiltroActual === 'todos' && textoBusqueda === "") {
+                contInicio.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No hay productos destacados.</p>';
+            }
         }
 
         function abrirModalProducto(p) {
@@ -1571,7 +1703,6 @@
             let costoEnvio = 0.00;
             const grupoDireccion = document.getElementById('grupo-direccion-envio');
 
-            // Mostrar/Ocultar dirección y calcular envío exclusivamente cuando es domicilio
             if (tipoEntrega === 'domicilio') {
                 costoEnvio = 60.00;
                 grupoDireccion.style.display = 'block';
