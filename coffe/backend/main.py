@@ -142,10 +142,18 @@ def inicializar_base_datos():
             price REAL NOT NULL,
             stock INTEGER NOT NULL,
             description TEXT,
-            image_url TEXT
+            image_url TEXT,
+            specs TEXT
         )
     """)
     
+    # Intentar agregar la columna specs si la tabla ya existía previamente sin ella
+    try:
+        cursor.execute("ALTER TABLE products ADD COLUMN specs TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass # La columna ya existe
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -243,6 +251,7 @@ async def crear_producto(
     price: str = Form(...),
     stock: str = Form(...),
     description: Optional[str] = Form(""),
+    specs: Optional[str] = Form(None),
     image: UploadFile = File(None)
 ):
     try:
@@ -264,8 +273,8 @@ async def crear_producto(
             image_url = f"/uploads/{image.filename}"
 
         cursor.execute(
-            "INSERT INTO products (name, category, price, stock, description, image_url) VALUES (?, ?, ?, ?, ?, ?)",
-            (name, category, price_val, stock_val, description, image_url)
+            "INSERT INTO products (name, category, price, stock, description, image_url, specs) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (name, category, price_val, stock_val, description, image_url, specs)
         )
         conn.commit()
         nuevo_id = cursor.lastrowid
@@ -285,6 +294,7 @@ async def actualizar_producto(
     price: str = Form(...),
     stock: str = Form(...),
     description: Optional[str] = Form(""),
+    specs: Optional[str] = Form(None),
     image: UploadFile = File(None)
 ):
     try:
@@ -304,13 +314,13 @@ async def actualizar_producto(
             image_url = f"/uploads/{image.filename}"
             
             cursor.execute(
-                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, image_url = ? WHERE id = ?",
-                (name, category, price_val, stock_val, description, image_url, producto_id)
+                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, image_url = ?, specs = ? WHERE id = ?",
+                (name, category, price_val, stock_val, description, image_url, specs, producto_id)
             )
         else:
             cursor.execute(
-                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ? WHERE id = ?",
-                (name, category, price_val, stock_val, description, producto_id)
+                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, specs = ? WHERE id = ?",
+                (name, category, price_val, stock_val, description, specs, producto_id)
             )
         conn.commit()
     except Exception as e:
