@@ -45,7 +45,7 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
         print("Aviso: Credenciales de Green API no configuradas. Se omite el envío de WhatsApp.")
         return False
 
-    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración para ver los detalles completos."
+    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* #{pedido_id}\n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración para ver los detalles completos."
     
     url = f"https://api.green-api.com/waInstance{id_instance}/sendMessage/{api_token}"
     payload = {
