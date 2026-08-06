@@ -32,44 +32,37 @@ configuracion_tienda = {
 }
 
 # ==========================================
-# CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (META CLOUD)
+# CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (CALLMEBOT)
 # ==========================================
 def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    access_token = "EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm"
-    phone_number_id = "1261942240343175"
-    whatsapp_destino = "50246511325"
+    apikey = "TU_APIKEY_DE_CALLMEBOT"
+    whatsapp_destino = "50246511325" # Tu número personal con código de país
     
+    if not apikey or not whatsapp_destino:
+        print("Aviso: Credenciales de CallMeBot o teléfono de destino no configurados.")
+        return False
+
     whatsapp_destino_limpio = "".join(filter(str.isdigit, whatsapp_destino))
     mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración."
     
-    url = f"https://graph.facebook.com/v17.0/{phone_number_id}/messages"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": whatsapp_destino_limpio,
-        "type": "text",
-        "text": { "body": mensaje }
-    }
+    mensaje_codificado = urllib.parse.quote(mensaje)
+    url = f"https://api.callmebot.com/whatsapp.php?phone={whatsapp_destino_limpio}&text={mensaje_codificado}&apikey={apikey}"
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        response = requests.get(url, timeout=10)
         return response.status_code == 200
     except Exception as e:
-        print(f"Error enviando alerta de admin por Meta: {e}")
+        print(f"Error enviando alerta de admin por CallMeBot: {e}")
         return False
 
 # ==========================================
-# NOTIFICACIÓN DE ESTADO AL CLIENTE (META CLOUD)
+# NOTIFICACIÓN DE ESTADO AL CLIENTE (CALLMEBOT)
 # ==========================================
 def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
-    access_token = "EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm"
-    phone_number_id = "1261942240343175"
+    apikey = "TU_APIKEY_DE_CALLMEBOT"
     
-    if not telefono:
-        print("DEBUG: El teléfono del cliente está vacío.")
+    if not apikey or not telefono:
+        print("DEBUG: Falta la APIKey de CallMeBot o el teléfono del cliente está vacío.")
         return False
 
     telefono_limpio = "".join(filter(str.isdigit, telefono))
@@ -90,24 +83,15 @@ def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_
     else:
         mensaje = f"☕ ¡Hola, {cliente}! El estado de tu pedido #{pedido_id} ha cambiado a: {nuevo_estado}. Gracias por confiar en Don Nicolás."
 
-    url = f"https://graph.facebook.com/v17.0/{phone_number_id}/messages"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": telefono_limpio,
-        "type": "text",
-        "text": { "body": mensaje }
-    }
+    mensaje_codificado = urllib.parse.quote(mensaje)
+    url = f"https://api.callmebot.com/whatsapp.php?phone={telefono_limpio}&text={mensaje_codificado}&apikey={apikey}"
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        print(f"DEBUG Meta WhatsApp Cliente - Status: {response.status_code}, Response: {response.text}")
+        response = requests.get(url, timeout=10)
+        print(f"DEBUG CallMeBot WhatsApp Cliente - Status: {response.status_code}")
         return response.status_code == 200
     except Exception as e:
-        print(f"Error enviando notificación por Meta: {e}")
+        print(f"Error enviando notificación por CallMeBot: {e}")
         return False
 
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
