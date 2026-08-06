@@ -369,6 +369,11 @@
             color: #f7f4ed;
         }
 
+        .btn-empaque {
+            background: #d35400;
+            color: #fff;
+        }
+
         .btn-entregar {
             background: #27ae60;
             color: #fff;
@@ -400,6 +405,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -860,9 +866,10 @@
                         </div>
                     </div>
 
-                    <!-- PESTAÑAS DE FILTRADO (PENDIENTES / ENTREGADOS) -->
+                    <!-- PESTAÑAS DE FILTRADO (PENDIENTES / EMPAQUE / ENTREGADOS) -->
                     <div id="pedidos-tabs-container" class="pedidos-tabs">
-                        <button id="tab-pendientes-btn" class="tab-btn activo" onclick="filtrarTabPedidos('pendientes')">Pedidos Activos / Pendientes</button>
+                        <button id="tab-pendientes-btn" class="tab-btn activo" onclick="filtrarTabPedidos('pendientes')">Pedidos Nuevos</button>
+                        <button id="tab-empaque-btn" class="tab-btn" onclick="filtrarTabPedidos('empaque')">En Proceso de Empaque</button>
                         <button id="tab-entregados-btn" class="tab-btn" onclick="filtrarTabPedidos('entregados')">Pedidos Entregados</button>
                     </div>
 
@@ -884,7 +891,10 @@
                     <div id="detalle-pedido-container" class="detalle-card" style="display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
                             <button class="btn-accion" style="background:#736257; color:#fff; padding: 8px 14px; margin-bottom:0;" onclick="volverAListaPedidos()">← Volver a la Lista</button>
-                            <button id="btn-marcar-entregado" class="btn-accion btn-entregar" style="padding: 10px 18px; font-size: 0.85rem;" onclick="marcarPedidoEntregadoActual()">✓ Marcar como Entregado</button>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button id="btn-marcar-empaque" class="btn-accion btn-empaque" style="padding: 10px 18px; font-size: 0.85rem;" onclick="cambiarEstadoPedidoActual('empaque')">📦 Pasar a Empaque</button>
+                                <button id="btn-marcar-entregado" class="btn-accion btn-entregar" style="padding: 10px 18px; font-size: 0.85rem;" onclick="cambiarEstadoPedidoActual('entregado')">✓ Marcar como Entregado</button>
+                            </div>
                         </div>
 
                         <h2 id="det-id-pedido" style="font-family: 'Cormorant Garamond', serif; margin-top: 0; color: var(--primary-dark); font-size: 1.8rem;"></h2>
@@ -956,7 +966,7 @@
         let cachePagos = [];
         let cacheProductos = []; 
         let imagenBase64Actual = ''; 
-        let tabActualPedidos = 'pendientes'; // 'pendientes' o 'entregados'
+        let tabActualPedidos = 'pendientes'; // 'pendientes', 'empaque' o 'entregados'
         let pedidoIdEnVista = null;
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -1125,6 +1135,7 @@
         function filtrarTabPedidos(tab) {
             tabActualPedidos = tab;
             document.getElementById('tab-pendientes-btn').classList.toggle('activo', tab === 'pendientes');
+            document.getElementById('tab-empaque-btn').classList.toggle('activo', tab === 'empaque');
             document.getElementById('tab-entregados-btn').classList.toggle('activo', tab === 'entregados');
             renderizarTablaPedidos();
         }
@@ -1133,19 +1144,23 @@
             const tbody = document.getElementById('tabla-pedidos-body');
             tbody.innerHTML = '';
 
-            // Filtrar según la pestaña activa (consideramos estado 'entregado' o 'completed')
+            // Filtrar según la pestaña activa ('pendientes', 'empaque' o 'entregados')
             const pedidosFiltrados = cachePedidos.filter(o => {
                 const estado = (o.status || o.estado || 'pendiente').toLowerCase();
                 const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
-                if (tabActualPedidos === 'entregados') {
-                    return esEntregado;
-                } else {
-                    return !esEntregado;
-                }
+                const esEmpaque = estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing';
+                const esPendiente = !esEntregado && !esEmpaque;
+
+                if (tabActualPedidos === 'entregados') return esEntregado;
+                if (tabActualPedidos === 'empaque') return esEmpaque;
+                return esPendiente;
             });
 
             if (pedidosFiltrados.length === 0) {
-                const mensaje = tabActualPedidos === 'entregados' ? 'No hay pedidos entregados.' : 'No hay pedidos pendientes.';
+                let mensaje = 'No hay pedidos nuevos.';
+                if (tabActualPedidos === 'empaque') mensaje = 'No hay pedidos en proceso de empaque.';
+                if (tabActualPedidos === 'entregados') mensaje = 'No hay pedidos entregados.';
+                
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">${mensaje}</td></tr>`;
                 return;
             }
@@ -1153,8 +1168,13 @@
             pedidosFiltrados.forEach(o => {
                 const idLimpio = String(o.id).replace('#', '');
                 const estado = (o.status || o.estado || 'pendiente').toLowerCase();
-                const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
-                const etiquetaEstado = esEntregado ? '<span style="color: #27ae60; font-weight: 600;">Entregado</span>' : '<span style="color: #d35400; font-weight: 600;">Pendiente</span>';
+                
+                let etiquetaEstado = '<span style="color: #d35400; font-weight: 600;">Nuevo / Pendiente</span>';
+                if (estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing') {
+                    etiquetaEstado = '<span style="color: #e67e22; font-weight: 600;">En Proceso de Empaque</span>';
+                } else if (estado === 'entregado' || estado === 'completado' || estado === 'delivered') {
+                    etiquetaEstado = '<span style="color: #27ae60; font-weight: 600;">Entregado</span>';
+                }
 
                 tbody.innerHTML += `
                     <tr>
@@ -1181,15 +1201,30 @@
                 document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
                 document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
 
-                // Gestionar visibilidad del botón de entregado según estado actual
+                // Gestionar visibilidad de botones de acción según el estado actual
                 const estado = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
                 const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
+                const esEmpaque = estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing';
+
+                const btnEmpaque = document.getElementById('btn-marcar-empaque');
                 const btnEntregado = document.getElementById('btn-marcar-entregado');
+
                 if (esEntregado) {
+                    btnEmpaque.style.display = 'none';
                     btnEntregado.innerText = '✓ Pedido Entregado';
                     btnEntregado.style.background = '#7f8c8d';
                     btnEntregado.disabled = true;
+                } else if (esEmpaque) {
+                    btnEmpaque.style.display = 'none';
+                    btnEntregado.innerText = '✓ Marcar como Entregado';
+                    btnEntregado.style.background = '#27ae60';
+                    btnEntregado.disabled = false;
                 } else {
+                    btnEmpaque.style.display = 'inline-block';
+                    btnEmpaque.innerText = '📦 Pasar a Empaque';
+                    btnEmpaque.style.background = '#d35400';
+                    btnEmpaque.disabled = false;
+                    
                     btnEntregado.innerText = '✓ Marcar como Entregado';
                     btnEntregado.style.background = '#27ae60';
                     btnEntregado.disabled = false;
@@ -1289,33 +1324,38 @@
             }
         }
 
-        async function marcarPedidoEntregadoActual() {
+        async function cambiarEstadoPedidoActual(nuevoEstado) {
             if (!pedidoIdEnVista) return;
-            if (!confirm('¿Deseas marcar este pedido como entregado? Se moverá a la sección de entregados.')) return;
+            
+            const mensajeConfirm = nuevoEstado === 'empaque' 
+                ? '¿Deseas pasar este pedido a "En Proceso de Empaque"?' 
+                : '¿Deseas marcar este pedido como entregado? Se moverá a la sección de entregados.';
+            
+            if (!confirm(mensajeConfirm)) return;
 
             try {
                 const res = await fetch(`${API_URL}/orders/${pedidoIdEnVista}/status`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'entregado' })
+                    body: JSON.stringify({ status: nuevoEstado })
                 });
 
                 // Actualizamos localmente para reflejar el cambio al instante
                 let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
                 if (pedido) {
-                    pedido.status = 'entregado';
+                    pedido.status = nuevoEstado;
                 }
 
-                alert('¡Pedido marcado como entregado con éxito!');
+                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a proceso de empaque!' : '¡Pedido marcado como entregado con éxito!');
                 volverAListaPedidos();
                 cargarPedidosYPagosUnificados();
             } catch (err) {
                 // Fallback local si la API remota no está activa
                 let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
                 if (pedido) {
-                    pedido.status = 'entregado';
+                    pedido.status = nuevoEstado;
                 }
-                alert('¡Pedido marcado como entregado localmente!');
+                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado localmente a empaque!' : '¡Pedido marcado como entregado localmente!');
                 volverAListaPedidos();
                 renderizarTablaPedidos();
             }
