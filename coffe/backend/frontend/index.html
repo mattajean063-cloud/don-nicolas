@@ -515,7 +515,6 @@
             object-position: center;
         }
 
-        /* DECORACIÓN DE LA TASITA DE CAFÉ ABAJO DE LA IMAGEN */
         .decoracion-detalles {
             display: flex;
             align-items: center;
@@ -1031,13 +1030,13 @@
         </nav>
     </header>
 
-    <!-- 1. INICIO -->
-    <div id="vista-inicio" class="seccion-sitio activa" style="max-width: 100%; padding: 0;">
-        <div class="hero">
+    <!-- 1. INICIO CORREGIDO (Estructura fluida estándar) -->
+    <div id="vista-inicio" class="seccion-sitio activa">
+        <div class="hero" style="margin-left: -1.5rem; margin-right: -1.5rem; margin-top: -3rem;">
             <h2>Tradición que se Saborea</h2>
             <p>En cada grano de Don Nicolás se resguarda la paciencia de antaño, el esfuerzo de manos artesanas y el orgullo de una finca familiar dedicada a extraer lo más puro de nuestra tierra.</p>
         </div>
-        <div style="max-width: 1280px; margin: 0 auto; padding: 0 1.5rem 3rem 1.5rem;">
+        <div style="padding-top: 1rem;">
             <h3 class="titulo-seccion">Nuestra Cosecha Destacada</h3>
             <div id="catalogo-inicio" class="productos-grid">
                 <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Cargando productos...</p>
@@ -1212,7 +1211,6 @@
                 <div class="modal-img-grande">
                     <img id="modal-img" src="" alt="Producto">
                 </div>
-                <!-- Tasita de café abajo de la imagen adaptada -->
                 <div class="decoracion-detalles">
                     <hr>
                     <span>☕</span>
@@ -2040,7 +2038,7 @@
             formData.append("receipt", archivoInput.files[0]);
 
             try {
-                const resPedido =await fetch(`${API_BACKEND}/orders`, {
+                const resPedido = await fetch(`${API_BACKEND}/orders`, {
                     method: 'POST',
                     body: formData
                 });
