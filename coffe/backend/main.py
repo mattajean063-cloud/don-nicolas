@@ -68,21 +68,26 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
         traceback.print_exc()
         return False
 
-def enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
+ddef enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
     id_instance = os.getenv("GREEN_ID_INSTANCE")
     api_token = os.getenv("GREEN_API_TOKEN")
     
     if not id_instance or not api_token or not telefono:
+        print("DEBUG: Faltan credenciales de Green API o el teléfono del cliente está vacío.")
         return False
 
-    # Limpiar número de teléfono obtenido de la información de envío
+    # Limpiar número de teléfono extrayendo solo los dígitos[cite: 5]
     telefono_limpio = "".join(filter(str.isdigit, telefono))
     if not telefono_limpio:
         return False
 
+    # Si el número no trae el código de país (por ejemplo, en Guatemala son 8 dígitos), se lo agregamos
+    # Ajusta "502" según tu país si es necesario
+    if len(telefono_limpio) == 8:
+        telefono_limpio = "502" + telefono_limpio
+
     estado_lower = nuevo_estado.strip().lower()
     
-    # Mensajes personalizados, amables y de agradecimiento según el estado del pedido
     if "pendiente" in estado_lower or "recibido" in estado_lower:
         mensaje = f"☕ ¡Hola, *{cliente}*! Hemos recibido con mucha alegría tu pedido *#{pedido_id}*. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨"
     elif "empaquetando" in estado_lower or "proceso" in estado_lower:
@@ -100,11 +105,11 @@ def enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: i
     
     try:
         response = requests.post(url, json=payload, timeout=10)
+        print(f"DEBUG WhatsApp Cliente - Status: {response.status_code}, Response: {response.text}")
         return response.status_code == 200
     except Exception as e:
         print(f"Error enviando notificación al cliente: {e}")
         return False
-
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
 X_LOGIN = "AQUI_TU_X_LOGIN"
 X_PRIVATE_KEY = "AQUI_TU_X_PRIVATE_KEY"
