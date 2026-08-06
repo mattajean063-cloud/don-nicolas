@@ -35,7 +35,7 @@ configuracion_tienda = {
 # CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (CALLMEBOT)
 # ==========================================
 def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    apikey = "TU_APIKEY_DE_CALLMEBOT"
+    apikey = "2288133"
     whatsapp_destino = "50246511325" # Tu número personal con código de país
     
     if not apikey or not whatsapp_destino:
@@ -59,7 +59,7 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
 # NOTIFICACIÓN DE ESTADO AL CLIENTE (CALLMEBOT)
 # ==========================================
 def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
-    apikey = "TU_APIKEY_DE_CALLMEBOT"
+    apikey = "2288133"
     
     if not apikey or not telefono:
         print("DEBUG: Falta la APIKey de CallMeBot o el teléfono del cliente está vacío.")
