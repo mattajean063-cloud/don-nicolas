@@ -35,9 +35,9 @@ configuracion_tienda = {
 # CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (META CLOUD)
 # ==========================================
 def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    access_token = os.getenv("META_ACCESS_TOKEN")
-    phone_number_id = os.getenv("META_PHONE_NUMBER_ID")
-    whatsapp_destino = os.getenv("WHATSAPP_PHONE") # Tu número personal con código de país
+    access_token = os.getenv("EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm")
+    phone_number_id = os.getenv("1261942240343175")
+    whatsapp_destino = os.getenv("50246511325") # Tu número personal con código de país
     
     if not access_token or not phone_number_id or not whatsapp_destino:
         print("Aviso: Credenciales de Meta o teléfono de destino no configurados.")
