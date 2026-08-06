@@ -113,26 +113,30 @@
             text-shadow: 0 0 10px rgba(197,160,89,0.4);
         }
 
+        /* CARRITO FLOTANTE FIJO EN LA ESQUINA */
         .carrito-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1500;
             background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
             color: var(--primary-dark);
             border: none;
-            padding: 0.6rem 1.2rem;
+            padding: 0.7rem 1.3rem;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 1rem;
-            margin-top: 8px;
+            font-size: 1.05rem;
             border-radius: 30px;
-            box-shadow: 0 4px 12px rgba(197,160,89,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .carrito-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(197,160,89,0.4);
+            box-shadow: 0 6px 20px rgba(197,160,89,0.5);
         }
 
         .seccion-sitio {
@@ -1003,6 +1007,11 @@
 </head>
 <body>
 
+    <!-- BOTÓN DE CARRITO FLOTANTE SIEMPRE VISIBLE EN LA ESQUINA -->
+    <button class="carrito-btn" onclick="toggleCarrito()">
+        🛒 Carrito (<span id="contador-carrito">0</span>)
+    </button>
+
     <header>
         <div class="header-top">
             <img src="/static/imagenes/logo.png" alt="Logo Don Nicolás" class="logo-img" onerror="this.style.display='none'">
@@ -1020,9 +1029,6 @@
             <a href="#" onclick="cambiarVista('ubicanos', this)">Ubícanos</a>
             <a href="#" onclick="cambiarVista('contacto', this)">Contacto</a>
         </nav>
-        <button class="carrito-btn" onclick="toggleCarrito()">
-            🛒 Carrito (<span id="contador-carrito">0</span>)
-        </button>
     </header>
 
     <!-- 1. INICIO -->
@@ -1641,7 +1647,6 @@
                     else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
                 });
                 
-                // Si no se encontraron por nombre estricto, asignamos por orden posicional como respaldo
                 if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
                 if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
                 if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
@@ -2035,7 +2040,7 @@
             formData.append("receipt", archivoInput.files[0]);
 
             try {
-                const resPedido = await fetch(`${API_BACKEND}/orders`, {
+                const resPedido =await fetch(`${API_BACKEND}/orders`, {
                     method: 'POST',
                     body: formData
                 });
