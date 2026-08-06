@@ -1,2072 +1,524 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Don Nicolás | Café Histórico y Tradición</title>
-    <!-- Favicon de la página -->
-    <link rel="icon" href="/static/imagenes/logo.png" type="image/png">
-    <!-- Tipografías de alta gama -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-colonial: #f7f4ed;
-            --primary-dark: #1b120c;
-            --primary-light: #2c1d13;
-            --accent-gold: #c5a059;
-            --accent-gold-hover: #d4b26f;
-            --text-main: #2b231e;
-            --text-muted: #6e6053;
-            --sidebar-bg: #140d09;
-            --card-bg: #ffffff;
-            --border-color: #e6decb;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-colonial);
-            color: var(--text-main);
-            width: 100%;
-            overflow-x: hidden;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        *, *:before, *:after {
-            box-sizing: inherit;
-        }
-
-        h1, h2, h3, h4, .titulo-seccion, nav a, .producto-precio, .btn-comprar, .carrito-btn {
-            font-family: 'Cormorant Garamond', serif;
-        }
-
-        header {
-            background-color: var(--sidebar-bg);
-            border-bottom: 2px solid var(--accent-gold);
-            padding: 1.2rem 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-        }
-
-        .header-top {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            position: relative;
-            margin-bottom: 1rem;
-        }
-
-        .logo-img {
-            max-height: 60px;
-            width: auto;
-            margin-bottom: 0.4rem;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-
-        .logo-container h1 {
-            color: #f7f4ed;
-            margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
-            font-weight: 700;
-        }
-
-        .logo-container span {
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: var(--accent-gold);
-            text-transform: uppercase;
-            display: block;
-            margin-top: 4px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-        }
-
-        nav {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 15px 25px;
-            width: 100%;
-            margin-bottom: 5px;
-        }
-
-        nav a {
-            color: #d8cebc;
-            text-decoration: none;
-            font-size: 1.05rem;
-            letter-spacing: 1.5px;
-            transition: color 0.3s ease;
-            font-weight: 600;
-        }
-
-        nav a:hover, nav a.activo {
-            color: var(--accent-gold);
-            text-shadow: 0 0 10px rgba(197,160,89,0.4);
-        }
-
-        /* CARRITO FLOTANTE FIJO EN LA ESQUINA */
-        .carrito-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1500;
-            background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
-            color: var(--primary-dark);
-            border: none;
-            padding: 0.7rem 1.3rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.05rem;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .carrito-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(197,160,89,0.5);
-        }
-
-        .seccion-sitio {
-            display: none;
-            padding: 3rem 1.5rem;
-            max-width: 1280px;
-            margin: 0 auto;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        .seccion-sitio.activa {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero {
-            position: relative;
-            text-align: center;
-            padding: 6rem 1.5rem;
-            margin-bottom: 3rem;
-            background-image: linear-gradient(to bottom, rgba(20, 13, 9, 0.8), rgba(20, 13, 9, 0.85)), url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200');
-            background-size: cover;
-            background-position: center;
-            color: #f7f4ed;
-            border-bottom: 4px solid var(--accent-gold);
-            box-shadow: inset 0 -20px 30px rgba(0,0,0,0.5);
-        }
-
-        .hero h2 {
-            font-size: 3rem;
-            color: #f7f4ed;
-            margin-bottom: 1.2rem;
-            letter-spacing: 2px;
-            font-weight: 700;
-            text-shadow: 0 3px 6px rgba(0,0,0,0.6);
-        }
-
-        .hero p {
-            max-width: 750px;
-            margin: 0 auto;
-            color: #e2d8c8;
-            font-size: 1.15rem;
-            line-height: 1.7;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        }
-
-        .titulo-seccion {
-            text-align: center;
-            font-size: 2.4rem;
-            color: var(--primary-dark);
-            margin-bottom: 2.5rem;
-            letter-spacing: 1.5px;
-            font-weight: 700;
-            position: relative;
-        }
-
-        .titulo-seccion::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 3px;
-            background-color: var(--accent-gold);
-            margin: 10px auto 0 auto;
-            border-radius: 2px;
-        }
-
-        .tienda-controles {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
-            background: var(--card-bg);
-            padding: 1.2rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(27,18,12,0.03);
-        }
-
-        .buscador-input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.95rem;
-            outline: none;
-            background: #faf7f2;
-            color: var(--text-main);
-            transition: border-color 0.2s;
-        }
-
-        .buscador-input:focus {
-            border-color: var(--accent-gold);
-            background: #fff;
-        }
-
-        .categorias-filtros {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .btn-filtro {
-            background: #faf7f2;
-            border: 1px solid var(--border-color);
-            padding: 0.5rem 1rem;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            border-radius: 20px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn-filtro:hover, .btn-filtro.activo {
-            background: var(--primary-dark);
-            color: #f7f4ed;
-            border-color: var(--primary-dark);
-        }
-
-        .productos-grid, .finca-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .producto-card, .finca-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
-            border-radius: 8px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .producto-card:hover, .finca-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 35px rgba(27,18,12,0.08);
-        }
-
-        .producto-img-wrapper, .finca-img-wrapper {
-            width: 100%;
-            height: 220px;
-            background: #140d09;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            margin-bottom: 1.2rem;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .producto-img, .finca-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            transition: transform 0.4s ease, opacity 0.3s;
-        }
-
-        .producto-img-wrapper:hover .producto-img {
-            transform: scale(1.03);
-        }
-
-        .producto-info h3, .finca-card-content h3 {
-            font-size: 1.4rem;
-            color: var(--primary-dark);
-            margin: 0 0 0.6rem 0;
-            font-weight: 700;
-        }
-
-        .producto-info p, .finca-card-content p {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin: 0 0 1.2rem 0;
-            line-height: 1.6;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-        }
-
-        .producto-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-            border-top: 1px solid var(--border-color);
-            padding-top: 1rem;
-        }
-
-        .producto-precio {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .btn-comprar {
-            background: var(--primary-dark);
-            color: #f7f4ed;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-
-        .btn-comprar:hover {
-            background: var(--accent-gold);
-            color: var(--primary-dark);
-        }
-
-        .ubicacion-container, .contacto-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .info-local, .contacto-info-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
-        }
-
-        .info-local h3, .contacto-info-box h3 {
-            font-size: 1.8rem;
-            color: var(--primary-dark);
-            margin-top: 0;
-            margin-bottom: 1.2rem;
-            font-weight: 700;
-        }
-
-        .info-local p, .contacto-info-box p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.7;
-            margin-bottom: 1.2rem;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-        }
-
-        .mapa-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            min-height: 320px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
-        }
-
-        .mapa-box iframe {
-            width: 100%;
-            height: 100%;
-            min-height: 320px;
-            border: 0;
-        }
-
-        .redes-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .btn-contacto-red {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #fff;
-            border: 1px solid var(--border-color);
-            padding: 0.9rem 1.2rem;
-            color: var(--primary-dark);
-            text-decoration: none;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            word-break: break-all;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .btn-contacto-red:hover {
-            border-color: var(--accent-gold);
-            background: #fcfbfa;
-            transform: translateX(4px);
-        }
-
-        /* MODAL DE DETALLE / PRODUCTO */
-        #modal-detalle {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(20, 13, 9, 0.75);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2500;
-            padding: 1.5rem;
-            box-sizing: border-box;
-        }
-
-        .modal-card {
-            background: var(--card-bg);
-            border: 2px solid var(--accent-gold);
-            width: 100%;
-            max-width: 850px;
-            max-height: 95vh;
-            overflow-y: auto;
-            padding: 2.5rem;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            box-sizing: border-box;
-            border-radius: 10px;
-        }
-
-        .modal-cerrar {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: var(--primary-dark);
-            font-family: 'Cormorant Garamond', serif;
-            z-index: 10;
-            transition: color 0.2s;
-        }
-
-        .modal-cerrar:hover {
-            color: var(--accent-gold);
-        }
-
-        .modal-img-grande {
-            width: 100%;
-            height: 320px;
-            background: #140d09;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .modal-img-grande img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        /* DECORACIÓN DE LA TASITA DE CAFÉ ABAJO DE LA IMAGEN */
-        .decoracion-detalles {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 1.2rem 0;
-        }
-        .decoracion-detalles hr {
-            flex-grow: 1;
-            border: none;
-            height: 1px;
-            background-color: var(--accent-gold);
-        }
-        .decoracion-detalles span {
-            font-size: 1.2rem;
-        }
-
-        .modal-info h2 {
-            color: var(--primary-dark);
-            margin-top: 0;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .modal-info .cat {
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent-gold);
-            display: block;
-            margin-bottom: 0.6rem;
-            font-weight: 600;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .modal-info .precio {
-            font-size: 2rem;
-            color: var(--primary-dark);
-            margin-bottom: 1.2rem;
-            font-weight: 700;
-        }
-
-        .specs-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin: 1.2rem 0;
-        }
-
-        .spec-badge {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background: #faf7f2;
-            border: 1px solid var(--border-color);
-            padding: 10px 4px;
-            border-radius: 6px;
-        }
-
-        .spec-badge .spec-titulo {
-            font-size: 0.65rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--accent-gold);
-            margin-bottom: 3px;
-            font-weight: 700;
-        }
-
-        .spec-badge .spec-valor {
-            font-size: 0.8rem;
-            color: var(--primary-dark);
-            font-weight: 600;
-        }
-
-        .molienda-grupo {
-            margin: 1.2rem 0;
-        }
-
-        .molienda-grupo label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .molienda-opciones {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn-molienda {
-            background: #fff;
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            cursor: pointer;
-            color: var(--primary-dark);
-            border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn-molienda.activo {
-            background: var(--primary-dark);
-            color: #f7f4ed;
-            border-color: var(--primary-dark);
-        }
-
-        .cantidad-grupo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 1.8rem 0;
-        }
-
-        .cantidad-grupo button {
-            background: #e6decb;
-            border: none;
-            width: 34px;
-            height: 34px;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .cantidad-grupo input {
-            width: 45px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            padding: 6px;
-            font-family: 'Montserrat', sans-serif;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        /* MODAL CARRITO */
-        .carrito-modal {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 400px;
-            height: 100vh;
-            background: var(--card-bg);
-            box-shadow: -10px 0 30px rgba(0,0,0,0.15);
-            border-left: 2px solid var(--accent-gold);
-            transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            padding: 2rem;
-        }
-
-        .carrito-modal.abierto {
-            right: 0;
-        }
-
-        .carrito-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-        }
-
-        .carrito-header h2 {
-            margin: 0;
-            color: var(--primary-dark);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .btn-cerrar {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: var(--primary-dark);
-        }
-
-        .carrito-items {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1.2rem 0;
-        }
-
-        .carrito-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .carrito-footer {
-            border-top: 1px solid var(--border-color);
-            padding-top: 1.2rem;
-        }
-
-        .total-container {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 1.2rem;
-        }
-
-        .btn-checkout {
-            width: 100%;
-            background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
-            color: var(--primary-dark);
-            border: none;
-            padding: 1rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            text-transform: uppercase;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 15px rgba(197,160,89,0.3);
-            transition: opacity 0.2s;
-        }
-
-        .btn-checkout:hover {
-            opacity: 0.92;
-        }
-
-        /* MODAL PAGO */
-        .pago-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(20, 13, 9, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 3000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .pago-overlay.activo {
-            display: flex;
-        }
-
-        .pago-modal-contenido {
-            background: var(--card-bg);
-            border: 2px solid var(--accent-gold);
-            width: 100%;
-            max-width: 650px;
-            max-height: 95vh;
-            overflow-y: auto;
-            padding: 2rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            position: relative;
-            border-radius: 10px;
-        }
-
-        .resumen-compra-box {
-            background: #faf7f2;
-            border: 1px solid var(--border-color);
-            padding: 1rem;
-            margin-bottom: 1.2rem;
-            font-size: 0.9rem;
-            border-radius: 6px;
-        }
-
-        .aviso-envios-box {
-            background: #fbf6ec;
-            border-left: 4px solid var(--accent-gold);
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.2rem;
-            font-size: 0.88rem;
-            color: var(--primary-light);
-            border-radius: 4px;
-            font-weight: 500;
-        }
-
-        .metodos-pago-selector {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .metodo-opcion {
-            border: 1px solid var(--border-color);
-            background: #fff;
-            padding: 0.9rem;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .metodo-opcion.seleccionado {
-            border-color: var(--primary-dark);
-            background: var(--primary-dark);
-            color: #f7f4ed;
-        }
-
-        .metodo-opcion.deshabilitado {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #f1edeb;
-            color: #a0958b;
-        }
-
-        .formulario-metodo {
-            display: none;
-            background: #fff;
-            border: 1px solid var(--border-color);
-            padding: 1.2rem;
-            margin-bottom: 1.2rem;
-            border-radius: 6px;
-        }
-
-        .formulario-metodo.activo {
-            display: block;
-        }
-
-        .cuentas-banco-box {
-            background: #faf7f2;
-            border: 1px dashed var(--accent-gold);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            border-radius: 6px;
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--primary-dark);
-            margin-bottom: 0.4rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            background: #fff;
-            border: 1px solid var(--border-color);
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            border-radius: 6px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            border-color: var(--accent-gold);
-        }
-
-        .terminos-grupo {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin: 1.2rem 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .terminos-grupo input[type="checkbox"] {
-            margin-top: 3px;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary-dark);
-            cursor: pointer;
-        }
-
-        .btn-enviar-mensaje {
-            background: linear-gradient(135deg, var(--accent-gold), #b38b4d);
-            color: var(--primary-dark);
-            border: none;
-            padding: 1rem;
-            width: 100%;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 12px rgba(197,160,89,0.3);
-            transition: opacity 0.2s;
-        }
-
-        .btn-enviar-mensaje:hover {
-            opacity: 0.92;
-        }
-
-        footer {
-            background-color: var(--sidebar-bg);
-            color: #d8cebc;
-            text-align: center;
-            padding: 2.5rem 2rem;
-            border-top: 2px solid var(--accent-gold);
-            margin-top: 4rem;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        footer p {
-            margin: 0;
-        }
-
-        @media (min-width: 768px) {
-            header {
-                flex-direction: row;
-                justify-content: space-between;
-                padding: 1.2rem 4rem;
-            }
-            .header-top {
-                flex-direction: row;
-                align-items: center;
-                width: auto;
-                margin-bottom: 0;
-                gap: 1.2rem;
-            }
-            .logo-container {
-                text-align: left;
-            }
-            nav {
-                justify-content: center;
-                width: auto;
-                gap: 2rem;
-                margin-bottom: 0;
-            }
-            .seccion-sitio {
-                padding: 4rem 2.5rem;
-            }
-            .hero {
-                padding: 7rem 2rem;
-            }
-            .hero h2 {
-                font-size: 3.5rem;
-            }
-            .titulo-seccion {
-                font-size: 2.6rem;
-            }
-            .tienda-controles {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .buscador-input {
-                max-width: 320px;
-            }
-            .productos-grid, .finca-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 2.2rem;
-            }
-            .ubicacion-container, .contacto-container {
-                grid-template-columns: 1fr 1fr;
-                gap: 2.5rem;
-            }
-            .metodos-pago-selector {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .modal-card {
-                grid-template-columns: 1fr 1fr;
-                max-width: 900px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- BOTÓN DE CARRITO FLOTANTE SIEMPRE VISIBLE EN LA ESQUINA -->
-    <button class="carrito-btn" onclick="toggleCarrito()">
-        🛒 Carrito (<span id="contador-carrito">0</span>)
-    </button>
-
-    <header>
-        <div class="header-top">
-            <img src="/static/imagenes/logo.png" alt="Logo Don Nicolás" class="logo-img" onerror="this.style.display='none'">
-            <div class="logo-container">
-                <h1>Don Nicolás</h1>
-                <span>Café Histórico y Tradición</span>
-            </div>
-        </div>
-        <nav>
-            <a href="#" onclick="cambiarVista('inicio', this)" class="activo">Inicio</a>
-            <a href="#" onclick="cambiarVista('tienda', this)">Tienda Online</a>
-            <a href="#" onclick="cambiarVista('finca', this)">Nuestra Finca</a>
-            <a href="#" onclick="cambiarVista('mirador', this)">Nuestras Instalaciones</a>
-            <a href="#" onclick="cambiarVista('menu', this)">Menú</a>
-            <a href="#" onclick="cambiarVista('ubicanos', this)">Ubícanos</a>
-            <a href="#" onclick="cambiarVista('contacto', this)">Contacto</a>
-        </nav>
-    </header>
-
-    <!-- 1. INICIO -->
-    <div id="vista-inicio" class="seccion-sitio activa" style="max-width: 100%; padding: 0;">
-        <div class="hero">
-            <h2>Tradición que se Saborea</h2>
-            <p>En cada grano de Don Nicolás se resguarda la paciencia de antaño, el esfuerzo de manos artesanas y el orgullo de una finca familiar dedicada a extraer lo más puro de nuestra tierra.</p>
-        </div>
-        <div style="max-width: 1280px; margin: 0 auto; padding: 0 1.5rem 3rem 1.5rem;">
-            <h3 class="titulo-seccion">Nuestra Cosecha Destacada</h3>
-            <div id="catalogo-inicio" class="productos-grid">
-                <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Cargando productos...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. TIENDA ONLINE -->
-    <div id="vista-tienda" class="seccion-sitio">
-        <h2 class="titulo-seccion">Catálogo de Nuestra Cosecha</h2>
-        
-        <div class="tienda-controles">
-            <input type="text" id="buscador-tienda" class="buscador-input" placeholder="🔍 Buscar café o producto..." oninput="filtrarProductosTienda()">
-            <div id="categorias-filtros-container" class="categorias-filtros">
-                <button class="btn-filtro activo" onclick="seleccionarFiltroCategoria('todos', this)">Todos</button>
-            </div>
-        </div>
-
-        <div id="catalogo-tienda" class="productos-grid">
-            <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Cargando inventario de café...</p>
-        </div>
-    </div>
-
-    <!-- 3. NUESTRA FINCA -->
-    <div id="vista-finca" class="seccion-sitio">
-        <h2 class="titulo-seccion">Nuestra Finca</h2>
-        <div class="finca-grid">
-            <div class="finca-card">
-                <div class="finca-img-wrapper"><img src="/static/imagenes/CHep0kQUYAAn_6v.jpg" alt="Lugar de gran altura"></div>
-                <div class="finca-card-content">
-                    <h3>Lugar de belleza natural</h3>
-                    <p>Un espacio diseñado para contemplar los hermosos paisajes y atardeceres que rodean nuestra región.</p>
-                </div>
-            </div>
-            <div class="finca-card">
-                <div class="finca-img-wrapper"><img src="/static/imagenes/molienda-don-nicolas-2.jpg" alt="Un lugar de tradición"></div>
-                <div class="finca-card-content">
-                    <h3>Un lugar donde los recuerdos viven</h3>
-                    <p>Descubre un espacio lleno de tradición, donde cada rincón cuenta una historia y cada visita se convierte en un recuerdo especial.</p>
-                </div>
-            </div>
-            <div class="finca-card">
-                <div class="finca-img-wrapper"><img src="/static/imagenes/images1.jpg" alt="Tradición y Cosecha Manual"></div>
-                <div class="finca-card-content">
-                    <h3>Raíces y Tradición</h3>
-                    <p>Descubre un rincón lleno de historia y serenidad, donde la tradición y la naturaleza se encuentran para ofrecer una experiencia inolvidable.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECCIÓN: NUESTRAS INSTALACIONES -->
-    <div id="vista-mirador" class="seccion-sitio">
-        <h2 class="titulo-seccion">Nuestras Instalaciones</h2>
-        <div class="finca-grid">
-            <div class="finca-card">
-                <div class="finca-img-wrapper"><img src="/static/imagenes/coffeshop.jpg" alt="Vista panorámica"></div>
-                <div class="finca-card-content">
-                    <h3>Sabores que Enamoran</h3>
-                    <p>Un espacio diseñado para contemplar los hermosos paisajes y atardeceres que rodean nuestra región.</p>
-                </div>
-            </div>
-            <div class="finca-card">
-                <div class="finca-img-wrapper"><img src="/static/imagenes/02.jpg" alt="Punto de Paz"></div>
-                <div class="finca-card-content">
-                    <h3>Café con Vista</h3>
-                    <p>Déjate cautivar por impresionantes paisajes mientras saboreas nuestras especialidades, creando una experiencia que deleita todos los sentidos.</p>
-                </div>
-            </div>
-            <div class="finca-card">
-                <div class="finca-img-wrapper"><img src="/static/imagenes/001.jpg" alt="Coffee Shop"></div>
-                <div class="finca-card-content">
-                    <h3>Coffee Shop</h3>
-                    <p>El rincón perfecto para relajarte, disfrutar de una taza de café recién preparado y conectar con la tranquilidad que ofrece la naturaleza.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. MENÚ (DECORATIVO) -->
-    <div id="vista-menu" class="seccion-sitio">
-        <h2 class="titulo-seccion">Nuestras Bebidas</h2>
-        <div class="productos-grid">
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="/static/imagenes/americano.jpg" alt="Café Americano Clásico" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Café Americano Clásico</h3>
-                    <p>Shot de espresso equilibrado con agua caliente, resaltando notas dulces y cuerpo limpio.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="/static/imagenes/flawhit.jpg" alt="Latte Don Nicolás" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Flat White</h3>
-                    <p>Un espresso doble combinado con leche microespumada de textura sedosa, logrando un sabor intenso, equilibrado y una experiencia suave en cada sorbo.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="/static/imagenes/coold.jpg" alt="Café Frío Cold Brew" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Café Frío Cold Brew</h3>
-                    <p>Extracción en frío durante 14 horas, ofreciendo una bebida refrescante con baja acidez.</p>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="titulo-seccion" style="margin-top: 40px;">Nuestros Alimentos</h2>
-        <div class="productos-grid">
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="/static/imagenes/image copy 4.png" alt="Brownie con Helado" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Brownie con Helado</h3>
-                    <p>Delicioso brownie de chocolate recién horneado, acompañado de una cremosa bola de helado de vainilla que crea la combinación perfecta entre lo cálido y lo frío.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="/static/imagenes/image copy 2.png" alt="Galletas" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Galletas</h3>
-                    <p>Galletas horneadas diariamente con ingredientes de alta calidad, de textura suave por dentro y ligeramente crujientes por fuera.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="/static/imagenes/image copy.png" alt="French Toast" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>French Toast</h3>
-                    <p>Rebanadas de pan doradas a la perfección, preparadas con una mezcla de huevo, leche y vainilla, servidas con miel de maple.</p>
-                </div>
-            </div>
-        </div>
-    </div>  
-
-    <!-- 5. UBÍCANOS -->
-    <div id="vista-ubicanos" class="seccion-sitio">
-        <h2 class="titulo-seccion">Ubícanos</h2>
-        <div class="ubicacion-container">
-            <div class="info-local">
-                <h3>Visita Nuestra Cafetería</h3>
-                <p>Nos encontramos en el corazón colonial, un espacio acogedor rodeado de historia, aroma a café recién molido y calidez tradicional.</p>
-                <p><strong>Dirección:</strong><br>2da Calle 3-01 Zona 1 Esquipulas, Chiquimula</p>
-                <p><strong>Horarios:</strong><br>Lunes a Domingo: 7:30 AM – 8:00 PM</p>
-            </div>
-            <div class="mapa-box">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7723.135803480417!2d-89.35422938203202!3d14.566684988695311!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f63b50b96338217%3A0x625753b4e875a18d!2sDon%20Nicol%C3%A1s%20Coffee%20Shop!5e0!3m2!1ses-419!2sgt!4v1785730621461!5m2!1ses-419!2sgt" allowfullscreen="" loading="lazy"></iframe>
-            </div>
-        </div>
-    </div>
-
-    <!-- 6. CONTACTO -->
-    <div id="vista-contacto" class="seccion-sitio">
-        <h2 class="titulo-seccion">Contacto</h2>
-        <div class="contacto-container" style="grid-template-columns: 1fr;">
-            <div class="contacto-info-box" style="text-align: center;">
-                <h3>Comunícate con Nosotros</h3>
-                <p>¿Tienes dudas sobre envíos, pedidos especiales o reservas? Estamos listos para atenderte:</p>
-                <div class="redes-grid" style="max-width: 600px; margin: 0 auto;">
-                    <a href="https://wa.me/50254332402" target="_blank" class="btn-contacto-red">💬 WhatsApp: +502 5433-2402</a>
-                    <a href="tel:+50254332402" class="btn-contacto-red">📞 Teléfono: +502 5433-2402</a>
-                    <a href="mailto:coffeeshopdonnicolas@gmail.com" class="btn-contacto-red">✉️ Correo: coffeeshopdonnicolas@gmail.com</a>
-                    <a href="https://www.facebook.com/DonNicolaspanaderiaycoffeeshop?locale=es_LA" target="_blank" class="btn-contacto-red">📘 Facebook: /Don Nicolás Coffee Shop</a>
-                    <a href="https://www.instagram.com/donnicolascoffeeshop?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="btn-contacto-red">📸 Instagram: @donnicolascoffeeshop</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE DETALLE DEL PRODUCTO -->
-    <div id="modal-detalle">
-        <div class="modal-card">
-            <button class="modal-cerrar" onclick="cerrarModal()">&times;</button>
-            <div>
-                <div class="modal-img-grande">
-                    <img id="modal-img" src="" alt="Producto">
-                </div>
-                <!-- Tasita de café abajo de la imagen adaptada -->
-                <div class="decoracion-detalles">
-                    <hr>
-                    <span>☕</span>
-                    <hr>
-                </div>
-            </div>
-            <div class="modal-info">
-                <span id="modal-cat" class="cat">Categoría</span>
-                <h2 id="modal-nombre">Nombre del Producto</h2>
-                <div id="modal-precio" class="precio">Q0.00</div>
-                
-                <div id="modal-specs" class="specs-preview-grid">
-                    <div class="spec-badge">
-                        <span class="spec-titulo">Variedad</span>
-                        <span id="spec-variedad" class="spec-valor">-</span>
-                    </div>
-                    <div class="spec-badge">
-                        <span class="spec-titulo">Tueste</span>
-                        <span id="spec-tueste" class="spec-valor">-</span>
-                    </div>
-                    <div class="spec-badge">
-                        <span class="spec-titulo">Altura</span>
-                        <span id="spec-altura" class="spec-valor">-</span>
-                    </div>
-                    <div class="spec-badge">
-                        <span class="spec-titulo">Proceso</span>
-                        <span id="spec-proceso" class="spec-valor">-</span>
-                    </div>
-                </div>
-
-                <p id="modal-desc" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;"></p>
-
-                <div id="modal-molienda-container" class="molienda-grupo">
-                    <label>Selecciona tu molienda</label>
-                    <div class="molienda-opciones">
-                        <button type="button" class="btn-molienda activo" onclick="seleccionarMolienda(this, 'Grano')">Grano</button>
-                        <button type="button" class="btn-molienda" onclick="seleccionarMolienda(this, 'Fina')">Fina</button>
-                        <button type="button" class="btn-molienda" onclick="seleccionarMolienda(this, 'Media')">Media</button>
-                        <button type="button" class="btn-molienda" onclick="seleccionarMolienda(this, 'Gruesa')">Gruesa</button>
-                    </div>
-                </div>
-
-                <div class="cantidad-grupo">
-                    <label style="font-size: 0.8rem; font-family: 'Cormorant Garamond', serif; text-transform: uppercase; font-weight: 700;">Cantidad</label>
-                    <button onclick="cambiarCantidadModal(-1)">-</button>
-                    <input type="text" id="modal-cantidad" value="1" readonly>
-                    <button onclick="cambiarCantidadModal(1)">+</button>
-                </div>
-
-                <button class="btn-checkout" style="width: 100%;" onclick="agregarAlCarritoDesdeModal()">Añadir al Carrito</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DEL CARRITO -->
-    <div id="carrito-modal" class="carrito-modal">
-        <div class="carrito-header">
-            <h2>Tu Carrito</h2>
-            <button class="btn-cerrar" onclick="toggleCarrito()">&times;</button>
-        </div>
-        <div class="carrito-items" id="carrito-items-container">
-            <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Tu carrito está vacío.</p>
-        </div>
-        <div class="carrito-footer">
-            <div class="total-container">
-                <span>Total:</span>
-                <span id="carrito-total">Q0.00</span>
-            </div>
-            <button class="btn-checkout" onclick="abrirMenuPago()">Proceder al Pago</button>
-        </div>
-    </div>
-
-    <!-- MENÚ DE PAGO Y ENVÍO -->
-    <div id="pago-overlay" class="pago-overlay">
-        <div class="pago-modal-contenido">
-            <button class="btn-cerrar" style="position: absolute; top: 1.2rem; right: 1.2rem;" onclick="cerrarMenuPago()">&times;</button>
-            <h2 style="font-family: 'Cormorant Garamond', serif; color: var(--primary-dark); margin-top: 0; font-size: 1.6rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">Finalizar Pedido</h2>
-            
-            <div class="resumen-compra-box">
-                <h4 style="font-family: 'Cormorant Garamond', serif; margin: 0 0 0.5rem 0; color: var(--primary-dark); font-size: 1.1rem; font-weight: 700;">Resumen de tu Compra</h4>
-                <div id="pago-resumen-items" style="max-height: 100px; overflow-y: auto; margin-bottom: 0.5rem;"></div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-muted);">
-                    <span>Costo de Envío:</span>
-                    <span id="pago-modal-envio">Q60.00</span>
-                </div>
-                <div style="border-top: 1px solid var(--border-color); padding-top: 6px; display: flex; justify-content: space-between; font-family: 'Cormorant Garamond', serif; font-weight: 700; color: var(--primary-dark); font-size: 1.2rem;">
-                    <span>Total a Pagar:</span>
-                    <span id="pago-modal-total">Q0.00</span>
-                </div>
-            </div>
-
-            <div class="aviso-envios-box">
-                📦 <strong>Nota de Envíos:</strong> Los envíos a domicilio se realizan exclusivamente los días <strong>martes y miércoles</strong>.
-            </div>
-
-            <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--primary-dark); margin: 0 0 0.8rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700;">1. Información y Método de Entrega</h4>
-            
-            <div class="form-group">
-                <label>Nombre Completo (Opcional)</label>
-                <input type="text" id="envio-nombre" placeholder="Ej. Juan Pérez">
-            </div>
-            <div class="form-group">
-                <label>Correo Electrónico *</label>
-                <input type="email" id="envio-correo" required placeholder="ejemplo@correo.com">
-            </div>
-            <div class="form-group">
-                <label>Teléfono de Contacto *</label>
-                <input type="text" id="envio-telefono" required placeholder="Ej. +502 5512-3456">
-            </div>
-            <div class="form-group">
-                <label>NIT / Datos de Facturación</label>
-                <input type="text" id="envio-nit" value="C/F" placeholder="C/F o número de NIT">
-            </div>
-            <div class="form-group">
-                <label>Nombre para Factura</label>
-                <input type="text" id="envio-nombre-factura" value="C/F" placeholder=" C/F o nombre">
-            </div>
-
-            <div class="form-group">
-                <label>Tipo de Entrega</label>
-                <select id="tipo-entrega" onchange="actualizarCalculoTotal()">
-                    <option value="tienda">Recoger en Tienda (Esquipulas) - Gratis</option>
-                    <option value="domicilio">Envío a Domicilio (+Q60.00)</option>
-                </select>
-            </div>
-
-            <div class="form-group" id="grupo-direccion-envio" style="display: none;">
-                <label>Dirección de Envío / Referencias *</label>
-                <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 60px;"></textarea>
-            </div>
-
-            <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700;">2. Selecciona tu Método de Pago</h4>
-            
-            <div class="metodos-pago-selector">
-                <div id="selector-efectivo" class="metodo-opcion seleccionado" onclick="seleccionarMetodo('efectivo')">💵 Pago en Efectivo</div>
-                <div id="selector-transferencia" class="metodo-opcion" onclick="seleccionarMetodo('transferencia')">🏦 Transferencia Bancaria</div>
-                <div id="selector-tarjeta" class="metodo-opcion deshabilitado" onclick="seleccionarMetodo('tarjeta')">💳 Próximamente pago con tarjeta</div>
-            </div>
-
-            <!-- FORMULARIO EFECTIVO -->
-            <div id="form-efectivo" class="formulario-metodo activo">
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0;">Pagas al momento de recoger tu pedido directamente en nuestra tienda física en Esquipulas.</p>
-                <div class="terminos-grupo">
-                    <input type="checkbox" id="terminos-efectivo" required>
-                    <label for="terminos-efectivo" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; display: inline; cursor: pointer;">
-                        Acepto los <a href="#" onclick="alert('Términos y condiciones: Don Nicolás garantiza café fresco de estricta altura. Los pedidos de tienda se recogen en horario hábil.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
-                    </label>
-                </div>
-                <button type="button" class="btn-enviar-mensaje" onclick="procesarPagoEfectivo()">Confirmar Pedido en Efectivo</button>
-            </div>
-
-            <!-- FORMULARIO QPAYPRO (TARJETA) -->
-            <div id="form-tarjeta" class="formulario-metodo">
-                <p id="mensaje-tarjeta-estado" style="color: #a93226; font-weight: 600; text-align: center; font-size: 0.9rem;">Próximamente pago con tarjeta. Este método se encuentra desactivado temporalmente.</p>
-                <form id="qpaypro-form" onsubmit="procesarPagoQPayPro(event)">
-                    <fieldset id="fieldset-tarjeta" disabled style="border:none; padding:0; margin:0;">
-                        <div class="form-group">
-                            <label>Número de Tarjeta</label>
-                            <input type="text" id="qpay-card-number" placeholder="4000 1234 5678 9010" maxlength="19">
-                        </div>
-                        <div class="form-group">
-                            <label>Expiración (MM/AA)</label>
-                            <input type="text" id="qpay-card-exp" placeholder="MM/AA" maxlength="5">
-                        </div>
-                        <div class="form-group">
-                            <label>CVV</label>
-                            <input type="text" id="qpay-card-cvv" placeholder="123" maxlength="4">
-                        </div>
-                        <button type="submit" class="btn-enviar-mensaje" id="btn-pagar-tarjeta">Pagar con QPayPro</button>
-                    </fieldset>
-                </form>
-            </div>
-
-            <!-- FORMULARIO TRANSFERENCIA BANCARIA -->
-            <div id="form-transferencia" class="formulario-metodo">
-                <form onsubmit="procesarPagoTransferencia(event)">
-                    <div class="cuentas-banco-box">
-                        <strong>BANCO INDUSTRIAL (Monetaria)</strong><br>
-                        Cuenta: 123-456789-0<br><br>
-                        <strong>BANCO G&T CONTINENTAL (Monetaria)</strong><br>
-                        Cuenta: 987-654321-0<br><br>
-                        <strong>BAC CREDOMATIC (Monetaria)</strong><br>
-                        Cuenta: 456-123789-9
-                    </div>
-                    <div class="form-group">
-                        <label>Banco de Origen</label>
-                        <select id="trans-banco" required>
-                            <option value="">Selecciona el banco...</option>
-                            <option value="BI">Banco Industrial</option>
-                            <option value="GYT">Banco G&T Continental</option>
-                            <option value="BANRURAL">Banrural</option>
-                            <option value="BAC">BAC Credomatic</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Número de Boleta o Referencia</label>
-                        <input type="text" id="trans-referencia" required placeholder="Ej. REF-9876543">
-                    </div>
-                    <div class="form-group">
-                        <label>Comprobante de Transferencia (Imagen)</label>
-                        <input type="file" id="trans-archivo-img" accept="image/*" required onchange="previsualizarComprobante(event)">
-                        <div style="margin-top: 0.8rem; display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 60px; height: 60px; border: 1px solid var(--border-color); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                                <img id="img-preview-comprobante" src="" alt="Vista previa" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                                <span id="preview-placeholder-comprobante" style="font-size: 0.6rem; color: var(--text-muted); text-align: center;">Sin imagen</span>
-                            </div>
-                            <span id="nombre-archivo-comprobante-txt" style="font-size: 0.8rem; color: var(--text-muted); word-break: break-all;">Ningún archivo seleccionado</span>
-                        </div>
-                    </div>
-
-                    <div class="terminos-grupo">
-                        <input type="checkbox" id="terminos-transferencia" required>
-                        <label for="terminos-transferencia" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; display: inline; cursor: pointer;">
-                            Acepto los <a href="#" onclick="alert('Términos y condiciones: Don Nicolás procesará su pedido una vez verificado el comprobante de transferencia.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
-                        </label>
-                    </div>
-
-                    <button type="submit" class="btn-enviar-mensaje">Finalizar Pedido con Transferencia</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 Don Nicolás Coffee Shop. Todos los derechos reservados.</p>
-        <p>Esquipulas, Chiquimula, Guatemala.</p>
-    </footer>
-
-    <script>
-        const API_URL = `/api/admin`;
-        const API_BACKEND = `/api`;
-        const HOST_STATIC = ``;
-
-        let carrito = [];
-        let cacheProductos = [];
-        let productoSeleccionadoActual = null;
-        let moliendaSeleccionada = 'Grano';
-        let tarjetaHabilitadaAdmin = false;
-        let categoriaFiltroActual = 'todos';
-
-        document.addEventListener("DOMContentLoaded", () => {
-            cargarDatosSistema();
-            verificarEstadoTarjetaAdmin();
-        });
-
-        async function verificarEstadoTarjetaAdmin() {
-            try {
-                const res = await fetch(`${API_BACKEND}/shop/config`);
-                if (res.ok) {
-                    const data = await res.json();
-                    actualizarEstadoUIpagoTarjeta(data.card_payment_enabled);
-                } else {
-                    actualizarEstadoUIpagoTarjeta(false);
-                }
-            } catch(e) {
-                actualizarEstadoUIpagoTarjeta(false);
-            }
-        }
-
-        function actualizarEstadoUIpagoTarjeta(habilitado) {
-            tarjetaHabilitadaAdmin = habilitado;
-            const selectorTarjeta = document.getElementById('selector-tarjeta');
-            const fieldsetTarjeta = document.getElementById('fieldset-tarjeta');
-            const mensajeEstado = document.getElementById('mensaje-tarjeta-estado');
-
-            if (habilitado) {
-                selectorTarjeta.classList.remove('deshabilitado');
-                selectorTarjeta.innerText = '💳 QPayPro (Tarjeta)';
-                fieldsetTarjeta.disabled = false;
-                mensajeEstado.style.display = 'none';
-            } else {
-                selectorTarjeta.classList.add('deshabilitado');
-                selectorTarjeta.innerText = '💳 Próximamente pago con tarjeta';
-                fieldsetTarjeta.disabled = true;
-                mensajeEstado.style.display = 'block';
-            }
-        }
-
-        function cambiarVista(vistaId, elemento) {
-            document.querySelectorAll('.seccion-sitio').forEach(sec => sec.classList.remove('activa'));
-            document.querySelectorAll('nav a').forEach(nav => nav.classList.remove('activo'));
-            document.getElementById('vista-' + vistaId).classList.add('activa');
-            if(elemento) elemento.classList.add('activo');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        async function cargarDatosSistema() {
-            try {
-                const res = await fetch(`${API_URL}/products`);
-                cacheProductos = await res.json();
-                generarFiltrosCategorias();
-                renderizarInicioYTienda();
-            } catch (err) {
-                console.error("Error al conectar con la API:", err);
-            }
-        }
-
-        function limpiarTexto(texto, respaldo) {
-            if (!texto || texto === "undefined" || texto === "null") return respaldo;
-            if (texto.trim().length <= 3 && !isNaN(texto.trim())) return respaldo;
-            if (texto.trim().toLowerCase() === "c") return respaldo;
-            return texto;
-        }
-
-        function generarFiltrosCategorias() {
-            const contenedorFiltros = document.getElementById('categorias-filtros-container');
-            let categoriasSet = new Set();
-            
-            cacheProductos.forEach(p => {
-                if (p.price > 0) {
-                    let cat = limpiarTexto(p.category, 'Café en Grano');
-                    categoriasSet.add(cat);
-                }
-            });
-
-            let htmlFiltros = `<button class="btn-filtro ${categoriaFiltroActual === 'todos' ? 'activo' : ''}" onclick="seleccionarFiltroCategoria('todos', this)">Todos</button>`;
-            categoriasSet.forEach(cat => {
-                htmlFiltros += `<button class="btn-filtro ${categoriaFiltroActual === cat ? 'activo' : ''}" onclick="seleccionarFiltroCategoria('${cat}', this)">${cat}</button>`;
-            });
-            contenedorFiltros.innerHTML = htmlFiltros;
-        }
-
-        function seleccionarFiltroCategoria(cat, elemento) {
-            categoriaFiltroActual = cat;
-            document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('activo'));
-            elemento.classList.add('activo');
-            renderizarInicioYTienda();
-        }
-
-        function filtrarProductosTienda() {
-            renderizarInicioYTienda();
-        }
-
-        function renderizarInicioYTienda() {
-            const contInicio = document.getElementById('catalogo-inicio');
-            const contTienda = document.getElementById('catalogo-tienda');
-            const textoBusqueda = (document.getElementById('buscador-tienda')?.value || "").toLowerCase();
-            
-            contInicio.innerHTML = '';
-            contTienda.innerHTML = '';
-
-            const productosTienda = cacheProductos.filter(p => p.price > 0);
-
-            const productosFiltrados = productosTienda.filter(p => {
-                const catLimpia = limpiarTexto(p.category, 'Café en Grano');
-                const coincideCat = (categoriaFiltroActual === 'todos' || catLimpia.toLowerCase() === categoriaFiltroActual.toLowerCase());
-                const coincideTexto = (p.name.toLowerCase().includes(textoBusqueda) || (p.description && p.description.toLowerCase().includes(textoBusqueda)));
-                return coincideCat && coincideTexto;
-            });
-
-            if (productosFiltrados.length === 0) {
-                contTienda.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No se encontraron productos con esos criterios.</p>';
-                if(contInicio.innerHTML === '') contInicio.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No hay productos disponibles.</p>';
-                return;
-            }
-
-            productosFiltrados.forEach((p, index) => {
-                const descLimpia = limpiarTexto(p.description, 'Café artesanal de estricta altura.');
-                const catLimpia = limpiarTexto(p.category, 'Café en Grano');
-                
-                let imagenSrc = p.image_url;
-                if (!imagenSrc || imagenSrc.trim() === "") {
-                    imagenSrc = 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400';
-                } else if (imagenSrc.startsWith('/')) {
-                    imagenSrc = `${HOST_STATIC}${imagenSrc}`;
-                }
-
-                const tarjetaHTML = `
-                    <div class="producto-card">
-                        <div>
-                            <div class="producto-img-wrapper" onclick='abrirModalProducto(${JSON.stringify(p)})'>
-                                <img src="${imagenSrc}" alt="${p.name}" class="producto-img" onerror="this.src='https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400'">
-                            </div>
-                            <div class="producto-info">
-                                <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-gold); font-weight: 600;">${catLimpia}</span>
-                                <h3>${p.name}</h3>
-                                <p>${descLimpia}</p>
-                            </div>
-                        </div>
-                        <div class="producto-footer">
-                            <span class="producto-precio">Q${p.price.toFixed(2)}</span>
-                            <button class="btn-comprar" onclick='abrirModalProducto(${JSON.stringify(p)})'>Ver Opciones</button>
-                        </div>
-                    </div>
-                `;
-                contTienda.innerHTML += tarjetaHTML;
-                if (index < 3 && categoriaFiltroActual === 'todos' && !textoBusqueda) {
-                    contInicio.innerHTML += tarjetaHTML;
-                }
-            });
-
-            if (contInicio.innerHTML === '' && categoriaFiltroActual === 'todos' && !textoBusqueda) {
-                contInicio.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">No hay productos destacados.</p>';
-            }
-        }
-
-        function abrirModalProducto(p) {
-            productoSeleccionadoActual = p;
-            moliendaSeleccionada = 'Grano';
-
-            document.getElementById('modal-nombre').innerText = p.name;
-            document.getElementById('modal-cat').innerText = limpiarTexto(p.category, 'Café en Grano');
-            document.getElementById('modal-precio').innerText = `Q${Number(p.price).toFixed(2)}`;
-            document.getElementById('modal-desc').innerText = limpiarTexto(p.description, 'Café artesanal de estricta altura.');
-            document.getElementById('modal-cantidad').value = 1;
-
-            let imagenSrc = p.image_url;
-            if (!imagenSrc || imagenSrc.trim() === "") {
-                imagenSrc = 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400';
-            } else if (imagenSrc.startsWith('/')) {
-                imagenSrc = `${HOST_STATIC}${imagenSrc}`;
-            }
-            document.getElementById('modal-img').src = imagenSrc;
-
-            let specsArray = [];
-            if (p.specs) {
-                try {
-                    specsArray = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
-                } catch(e) { specsArray = []; }
-            }
-
-            let valVariedad = "Arábica";
-            let valTueste = "Medio";
-            let valAltura = "1,350 msnm";
-            let valProceso = "Lavado";
-
-            if (Array.isArray(specsArray)) {
-                specsArray.forEach(s => {
-                    const labelLower = (s.label || "").toLowerCase();
-                    if (labelLower.includes("variedad")) valVariedad = s.value || s.label;
-                    else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
-                    else if (labelLower.includes("altura")) valAltura = s.value || s.label;
-                    else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
-                });
-                
-                if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
-                if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
-                if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
-                if (!valProceso && specsArray[3]) valProceso = specsArray[3].label || specsArray[3];
-            }
-
-            document.getElementById('spec-variedad').innerText = limpiarTexto(valVariedad, 'Arábica');
-            document.getElementById('spec-tueste').innerText = limpiarTexto(valTueste, 'Medio');
-            document.getElementById('spec-altura').innerText = limpiarTexto(valAltura, '1,350 msnm');
-            document.getElementById('spec-proceso').innerText = limpiarTexto(valProceso, 'Lavado');
-
-            const moliendaContainer = document.getElementById('modal-molienda-container');
-            if (p.has_grind === 'no') {
-                moliendaContainer.style.display = 'none';
-            } else {
-                moliendaContainer.style.display = 'block';
-                const botonesMolienda = moliendaContainer.querySelectorAll('.btn-molienda');
-                botonesMolienda.forEach(b => {
-                    if (b.innerText.trim() === 'Grano') {
-                        b.classList.add('activo');
-                    } else {
-                        b.classList.remove('activo');
-                    }
-                });
-            }
-
-            document.getElementById('modal-detalle').style.display = 'flex';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modal-detalle').style.display = 'none';
-        }
-
-        function seleccionarMolienda(btn, tipo) {
-            document.querySelectorAll('.btn-molienda').forEach(b => b.classList.remove('activo'));
-            btn.classList.add('activo');
-            moliendaSeleccionada = tipo;
-        }
-
-        function cambiarCantidadModal(delta) {
-            const input = document.getElementById('modal-cantidad');
-            let val = parseInt(input.value) + delta;
-            if (val < 1) val = 1;
-            input.value = val;
-        }
-
-        function agregarAlCarritoDesdeModal() {
-            if (!productoSeleccionadoActual) return;
-            const cantidad = parseInt(document.getElementById('modal-cantidad').value);
-            const moliendaFinal = (productoSeleccionadoActual.has_grind === 'no') ? 'N/A' : moliendaSeleccionada;
-            
-            let totalBolsasActuales = carrito.reduce((sum, item) => sum + item.quantity, 0);
-            if (totalBolsasActuales + cantidad > 20) {
-                alert('Has superado el límite de 20 bolsas permitidas. Comunícate a nuestro WhatsApp (+502 5433-2402).');
-                window.open('https://wa.me/50254332402?text=Hola,%20deseo%20hacer%20un%20pedido%20mayor%20a%2020%20bolsas', '_blank');
-                return;
-            }
-
-            let itemExistente = carrito.find(item => item.id === productoSeleccionadoActual.id && item.molienda === moliendaFinal);
-
-            if (itemExistente) {
-                itemExistente.quantity += cantidad;
-            } else {
-                carrito.push({
-                    id: productoSeleccionadoActual.id,
-                    name: productoSeleccionadoActual.name,
-                    price: productoSeleccionadoActual.price,
-                    quantity: cantidad,
-                    molienda: moliendaFinal
-                });
-            }
-
-            actualizarCarritoUI();
-            cerrarModal();
-            toggleCarrito();
-        }
-
-        function toggleCarrito() {
-            document.getElementById('carrito-modal').classList.toggle('abierto');
-        }
-
-        function actualizarCarritoUI() {
-            const contenedorItems = document.getElementById('carrito-items-container');
-            const contador = document.getElementById('contador-carrito');
-            const totalSpan = document.getElementById('carrito-total');
-
-            contenedorItems.innerHTML = '';
-            let total = 0;
-            let totalItemsCount = 0;
-
-            if (carrito.length === 0) {
-                contenedorItems.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Tu carrito está vacío.</p>';
-                contador.innerText = '0';
-                totalSpan.innerText = 'Q0.00';
-                return;
-            }
-
-            carrito.forEach((item, index) => {
-                total += item.price * item.quantity;
-                totalItemsCount += item.quantity;
-                const textoMolienda = item.molienda && item.molienda !== 'N/A' ? `<br><small style="color: var(--accent-gold);">Molienda: ${item.molienda}</small>` : '';
-                contenedorItems.innerHTML += `
-                    <div class="carrito-item-row">
-                        <div>
-                            <strong>${item.name}</strong>${textoMolienda}<br>
-                            <small style="color: var(--text-muted);">Q${item.price.toFixed(2)} x ${item.quantity}</small>
-                        </div>
-                        <div>
-                            <span>Q${(item.price * item.quantity).toFixed(2)}</span>
-                            <button onclick="eliminarDelCarrito(${index})" style="background:none; border:none; color:#a93226; cursor:pointer; margin-left: 8px; font-weight:bold; font-size: 1.1rem;">&times;</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            contador.innerText = totalItemsCount;
-            totalSpan.innerText = `Q${total.toFixed(2)}`;
-        }
-
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            actualizarCarritoUI();
-        }
-
-        function abrirMenuPago() {
-            if (carrito.length === 0) {
-                alert('Tu carrito está vacío.');
-                return;
-            }
-
-            let totalBolsas = carrito.reduce((sum, item) => sum + item.quantity, 0);
-            if (totalBolsas > 20) {
-                alert('Tu pedido supera las 20 bolsas. Comunícate a nuestro WhatsApp.');
-                window.open('https://wa.me/50254332402', '_blank');
-                return;
-            }
-            
-            const resumenContainer = document.getElementById('pago-resumen-items');
-            resumenContainer.innerHTML = '';
-            
-            carrito.forEach(item => {
-                const infoMolienda = item.molienda && item.molienda !== 'N/A' ? ` (${item.molienda})` : '';
-                resumenContainer.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <span>${item.name}${infoMolienda} (x${item.quantity})</span>
-                        <span>Q${(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                `;
-            });
-
-            document.getElementById('tipo-entrega').value = 'tienda';
-            actualizarCalculoTotal();
-
-            toggleCarrito(); 
-            document.getElementById('pago-overlay').classList.add('activo');
-        }
-
-        function actualizarCalculoTotal() {
-            let subtotal = 0;
-            carrito.forEach(item => { subtotal += item.price * item.quantity; });
-
-            const tipoEntrega = document.getElementById('tipo-entrega').value;
-            let costoEnvio = 0.00;
-            const grupoDireccion = document.getElementById('grupo-direccion-envio');
-
-            if (tipoEntrega === 'domicilio') {
-                costoEnvio = 60.00;
-                grupoDireccion.style.display = 'block';
-                document.getElementById('envio-direccion').setAttribute('required', 'true');
-            } else {
-                costoEnvio = 0.00;
-                grupoDireccion.style.display = 'none';
-                document.getElementById('envio-direccion').removeAttribute('required');
-            }
-
-            document.getElementById('pago-modal-envio').innerText = `Q${costoEnvio.toFixed(2)}`;
-            document.getElementById('pago-modal-total').innerText = `Q${(subtotal + costoEnvio).toFixed(2)}`;
-
-            const selectorEfectivo = document.getElementById('selector-efectivo');
-            if (tipoEntrega === 'tienda') {
-                selectorEfectivo.style.display = 'block';
-            } else {
-                selectorEfectivo.style.display = 'none';
-                if (selectorEfectivo.classList.contains('seleccionado')) {
-                    seleccionarMetodo('transferencia');
-                }
-            }
-        }
-
-        function cerrarMenuPago() {
-            document.getElementById('pago-overlay').classList.remove('activo');
-        }
-
-        function seleccionarMetodo(metodo) {
-            if (metodo === 'tarjeta' && !tarjetaHabilitadaAdmin) {
-                alert('El pago con tarjeta se encuentra desactivado actualmente (Próximamente disponible).');
-                return;
-            }
-
-            document.getElementById('selector-efectivo').classList.remove('seleccionado');
-            document.getElementById('selector-tarjeta').classList.remove('seleccionado');
-            document.getElementById('selector-transferencia').classList.remove('seleccionado');
-            
-            document.getElementById('form-efectivo').classList.remove('activo');
-            document.getElementById('form-tarjeta').classList.remove('activo');
-            document.getElementById('form-transferencia').classList.remove('activo');
-
-            if (metodo === 'efectivo') {
-                document.getElementById('selector-efectivo').classList.add('seleccionado');
-                document.getElementById('form-efectivo').classList.add('activo');
-            } else if (metodo === 'tarjeta' && tarjetaHabilitadaAdmin) {
-                document.getElementById('selector-tarjeta').classList.add('seleccionado');
-                document.getElementById('form-tarjeta').classList.add('activo');
-            } else if (metodo === 'transferencia') {
-                document.getElementById('selector-transferencia').classList.add('seleccionado');
-                document.getElementById('form-transferencia').classList.add('activo');
-            }
-        }
-
-        function previsualizarComprobante(event) {
-            const archivo = event.target.files[0];
-            const imgPreview = document.getElementById('img-preview-comprobante');
-            const placeholder = document.getElementById('preview-placeholder-comprobante');
-            const textoArchivo = document.getElementById('nombre-archivo-comprobante-txt');
-
-            if (archivo) {
-                textoArchivo.innerText = archivo.name;
-                const lector = new FileReader();
-                lector.onload = function(e) {
-                    imgPreview.src = e.target.result;
-                    imgPreview.style.display = 'block';
-                    placeholder.style.display = 'none';
-                }
-                lector.readAsDataURL(archivo);
-            }
-        }
-
-        async function procesarPagoEfectivo() {
-            if (!document.getElementById('terminos-efectivo').checked) {
-                alert('Debes aceptar los términos y condiciones para continuar.');
-                return;
-            }
-
-            const correo = document.getElementById('envio-correo').value.trim();
-            const telefono = document.getElementById('envio-telefono').value.trim();
-            const nit = document.getElementById('envio-nit').value.trim() || "C/F";
-            const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
-            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
-
-            if (!correo || !telefono) {
-                alert('Por favor ingrese su correo electrónico y teléfono de contacto.');
-                return;
-            }
-
-            let subtotal = 0;
-            carrito.forEach(item => { subtotal += item.price * item.quantity; });
-
-            const formData = new FormData();
-            formData.append("customer", nombre);
-            formData.append("phone", telefono);
-            formData.append("email", correo);
-            formData.append("invoice_nit", nit);
-            formData.append("invoice_name", nombreFactura);
-            formData.append("address", "Recoger en Tienda (Esquipulas)");
-            formData.append("total", subtotal);
-            formData.append("items", JSON.stringify(carrito));
-            formData.append("payment_method_type", "Efectivo (Pago en Tienda)");
-
-            try {
-                const resPedido = await fetch(`${API_BACKEND}/orders`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
-
-                alert(`¡Pedido registrado con éxito! Te esperamos en nuestra tienda en Esquipulas.`);
-                carrito = [];
-                actualizarCarritoUI();
-                cerrarMenuPago();
-            } catch (error) {
-                alert("Error al procesar: " + error.message);
-            }
-        }
-
-        async function procesarPagoQPayPro(e) {
-            e.preventDefault();
-            if (!tarjetaHabilitadaAdmin) {
-                alert("El pago con tarjeta se encuentra deshabilitado.");
-                return;
-            }
-            const correo = document.getElementById('envio-correo').value.trim();
-            const telefono = document.getElementById('envio-telefono').value.trim();
-            const nit = document.getElementById('envio-nit').value.trim() || "C/F";
-            const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
-            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
-            const tipoEntrega = document.getElementById('tipo-entrega').value;
-            const direccion = document.getElementById('envio-direccion').value.trim();
-            const tarjeta = document.getElementById('qpay-card-number').value.trim();
-
-            if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion)) {
-                alert('Complete los campos obligatorios (Correo, Teléfono y Dirección si aplica).');
-                return;
-            }
-
-            const btnPagar = document.getElementById('btn-pagar-tarjeta');
-            btnPagar.disabled = true;
-            btnPagar.innerText = "Procesando...";
-
-            try {
-                let subtotal = 0;
-                carrito.forEach(item => { subtotal += item.price * item.quantity; });
-                let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00;
-                let totalGeneral = subtotal + costoEnvio;
-
-                await fetch(`${API_BACKEND}/create-payment-intent`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: totalGeneral, card_number: tarjeta })
-                });
-
-                const formData = new FormData();
-                formData.append("customer", nombre);
-                formData.append("phone", telefono);
-                formData.append("email", correo);
-                formData.append("invoice_nit", nit);
-                formData.append("invoice_name", nombreFactura);
-                formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
-                formData.append("total", totalGeneral);
-                formData.append("items", JSON.stringify(carrito));
-                formData.append("payment_method_type", "Tarjeta (QPayPro)");
-
-                const resPedido = await fetch(`${API_BACKEND}/orders`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
-
-                alert(`¡Pago exitoso, ${nombre}! Pedido confirmado.`);
-                carrito = [];
-                actualizarCarritoUI();
-                cerrarMenuPago();
-                document.getElementById('qpaypro-form').reset();
-            } catch (error) {
-                alert("Error en el pago: " + error.message);
-            } finally {
-                btnPagar.disabled = false;
-                btnPagar.innerText = "Pagar con QPayPro";
-            }
-        }
-
-        async function procesarPagoTransferencia(e) {
-            e.preventDefault();
-            if (!document.getElementById('terminos-transferencia').checked) {
-                alert('Debes aceptar los términos y condiciones para continuar.');
-                return;
-            }
-
-            const correo = document.getElementById('envio-correo').value.trim();
-            const telefono = document.getElementById('envio-telefono').value.trim();
-            const nit = document.getElementById('envio-nit').value.trim() || "C/F";
-            const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
-            const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
-            const tipoEntrega = document.getElementById('tipo-entrega').value;
-            const direccion = document.getElementById('envio-direccion').value.trim();
-            const banco = document.getElementById('trans-banco').value;
-            const referencia = document.getElementById('trans-referencia').value.trim();
-            const archivoInput = document.getElementById('trans-archivo-img');
-
-            if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion) || !archivoInput.files[0]) {
-                alert('Complete los campos requeridos (Correo, Teléfono, Dirección si es domicilio) y adjunte su comprobante.');
-                return;
-            }
-
-            let subtotal = 0;
-            carrito.forEach(item => { subtotal += item.price * item.quantity; });
-            let costoEnvio = tipoEntrega === 'domicilio' ? 60.00 : 0.00;
-            let totalGeneral = subtotal + costoEnvio;
-
-            const formData = new FormData();
-            formData.append("customer", nombre);
-            formData.append("phone", telefono);
-            formData.append("email", correo);
-            formData.append("invoice_nit", nit);
-            formData.append("invoice_name", nombreFactura);
-            formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
-            formData.append("total", totalGeneral);
-            formData.append("items", JSON.stringify(carrito));
-            formData.append("payment_method_type", `Transferencia (${banco} - Ref: ${referencia})`);
-            formData.append("receipt", archivoInput.files[0]);
-
-            try {
-                const resPedido = await fetch(`${API_BACKEND}/orders`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!resPedido.ok) throw new Error("Error al registrar el pedido.");
-
-                alert(`¡Pedido registrado, ${nombre}! Comprobante enviado para verificación.`);
-                carrito = [];
-                archivoInput.value = '';
-                document.getElementById('img-preview-comprobante').style.display = 'none';
-                document.getElementById('preview-placeholder-comprobante').style.display = 'block';
-                document.getElementById('nombre-archivo-comprobante-txt').innerText = 'Ningún archivo seleccionado';
-                actualizarCarritoUI();
-                cerrarMenuPago();
-            } catch (error) {
-                alert("Hubo un error al conectar con el servidor backend.");
-            }
-        }
-    </script>
-</body>
-</html>
-```[cite: 5]
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import sqlite3
+import os
+import requests
+import urllib.parse
+import threading
+from typing import Optional, Any
+
+# Intentamos importar libsql si está disponible para la nube (Turso)
+try:
+    import libsql_experimental as libsql
+    USING_TURSO = True
+except ImportError:
+    USING_TURSO = False
+
+LIBSQL_DATABASE_URL = os.getenv("libsql://don-nicolasdb-mattajean063-cloud.aws-us-west-2.turso.io")
+LIBSQL_AUTH_TOKEN = os.getenv("eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU5NDE0MzAsImlkIjoiMDE5ZmQyNjMtZDkwMS03NjQ4LWEwNjktNDdhMmFiM2ExNjcwIiwia2lkIjoiUVdJREtKTlc3QzhiVlV2N0stTzdPeDAxYkdnWEpuM1hmTWg5bWkzVkhOOCIsInJpZCI6IjkyMWJlM2FmLTkwZGQtNGNhMy04MmY4LTVkMTcwNTdhM2VmNiJ9.pCTY9PA87-cTs81mfQDLYj8XAnZlrGXRZf2OyvLillgrDW69zCUbOUPfZ9Et6BuQDN7CkV_JOg0rcfVkpnaOAg")
+
+app = FastAPI()
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# Estado global en memoria para controlar si el pago con tarjeta está habilitado desde el admin
+configuracion_tienda = {
+    "card_payment_enabled": False
+}
+
+# ==========================================
+# CONFIGURACIÓN DE ALERTA DE WHATSAPP (GREEN API Y EN SEGUNDO PLANO)
+# ==========================================
+def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
+    id_instance = os.getenv("GREEN_ID_INSTANCE")
+    api_token = os.getenv("GREEN_API_TOKEN")
+    whatsapp_destino = os.getenv("WHATSAPP_PHONE")
+    
+    print(f"DEBUG: Intentando enviar WhatsApp para pedido #{pedido_id} a {whatsapp_destino}")
+    
+    if not id_instance or not api_token or not whatsapp_destino:
+        print("Aviso: Credenciales de Green API no configuradas. Se omite el envío de WhatsApp.")
+        return False
+
+    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración para ver los detalles completos."
+    
+    url = f"https://api.green-api.com/waInstance{id_instance}/sendMessage/{api_token}"
+    payload = {
+        "chatId": f"{whatsapp_destino}@c.us",
+        "message": mensaje
+    }
+    
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        resultado = response.json()
+        if response.status_code == 200 and resultado.get("idMessage"):
+            print(f"Alerta de WhatsApp enviada con éxito para el pedido #{pedido_id}")
+            return True
+        else:
+            print(f"Error al enviar WhatsApp: {response.text}")
+            return False
+    except Exception as e:
+        import traceback
+        print("--- ERROR DETALLADO DE WHATSAPP ---")
+        traceback.print_exc()
+        return False
+
+QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
+X_LOGIN = "AQUI_TU_X_LOGIN"
+X_PRIVATE_KEY = "AQUI_TU_X_PRIVATE_KEY"
+X_API_SECRET = "AQUI_TU_X_API_SECRET"
+
+class PagoQPayProRequest(BaseModel):
+    amount: float
+    customer_name: str
+    customer_email: str
+    card_number: Optional[str] = None
+
+class CardStatusUpdate(BaseModel):
+    enabled: bool
+
+@app.post("/api/create-payment-intent")
+def crear_pago_qpaypro(data: PagoQPayProRequest):
+    if not configuracion_tienda["card_payment_enabled"]:
+        raise HTTPException(status_code=403, detail="El pago con tarjeta se encuentra deshabilitado temporalmente.")
+    
+    headers = {
+        "Content-Type": "application/json",
+        "x-login": X_LOGIN,
+        "x-private-key": X_PRIVATE_KEY,
+        "x-api-secret": X_API_SECRET
+    }
+    payload = {"amount": data.amount, "nombre": data.customer_name, "email": data.customer_email}
+    try:
+        response = requests.post(QPAYPRO_API_URL, json=payload, headers=headers)
+        if response.status_code not in [200, 201]:
+            raise HTTPException(status_code=400, detail="Error al procesar el pago con QPayPro")
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ==========================================
+# ENDPOINTS DE CONFIGURACIÓN DE TARJETA (ADMIN Y PÚBLICO)
+# ==========================================
+@app.get("/api/admin/card-payment-status")
+def obtener_estado_tarjeta():
+    return {"enabled": configuracion_tienda["card_payment_enabled"]}
+
+@app.post("/api/admin/card-payment-status")
+def actualizar_estado_tarjeta(data: CardStatusUpdate):
+    configuracion_tienda["card_payment_enabled"] = data.enabled
+    return {"success": True, "enabled": configuracion_tienda["card_payment_enabled"]}
+
+@app.get("/api/shop/config")
+def obtener_configuracion_tienda():
+    return {"card_payment_enabled": configuracion_tienda["card_payment_enabled"]}
+
+imagenes_dir = os.path.join(BASE_DIR, "..", "imagenes")
+if os.path.exists(imagenes_dir):
+    app.mount("/static/imagenes", StaticFiles(directory=imagenes_dir), name="imagenes_externas")
+
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
+
+frontend_dir = os.path.join(BASE_DIR, "frontend")
+if os.path.exists(frontend_dir):
+    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+
+@app.get("/")
+def leer_index():
+    index_path = os.path.join(BASE_DIR, "frontend", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    index_raiz = os.path.join(BASE_DIR, "index.html")
+    if os.path.exists(index_raiz):
+        return FileResponse(index_raiz)
+    return {"mensaje": "Error: No se encontró index.html"}
+
+@app.get("/admin")
+def leer_admin():
+    admin_path = os.path.join(BASE_DIR, "frontend", "admin.html")
+    if os.path.exists(admin_path):
+        return FileResponse(admin_path)
+    admin_raiz = os.path.join(BASE_DIR, "..", "frontend", "admin.html")
+    if os.path.exists(admin_raiz):
+        return FileResponse(admin_raiz)
+    return {"mensaje": "Error: No se encontró admin.html"}
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class PaymentSchema(BaseModel):
+    order_id: int
+    client: str
+    method: str
+    amount: float
+    status: Optional[str] = "Completado"
+    receipt_url: Optional[str] = None
+    invoice_name: Optional[str] = "C/F"
+    invoice_nit: Optional[str] = "C/F"
+    invoice_number: Optional[str] = "Pendiente"
+    invoice_address: Optional[str] = "No especificada"
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+def get_db_connection():
+    if USING_TURSO and LIBSQL_DATABASE_URL:
+        conn = libsql.connect(
+            database="tienda.db",
+            sync_url=LIBSQL_DATABASE_URL,
+            auth_token=LIBSQL_AUTH_TOKEN
+        )
+        conn.row_factory = sqlite3.Row
+        return conn
+    else:
+        db_path = os.path.join(BASE_DIR, "tienda.db")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+def inicializar_base_datos():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            category TEXT NOT NULL,
+            price REAL NOT NULL,
+            stock INTEGER NOT NULL,
+            description TEXT,
+            image_url TEXT,
+            specs TEXT
+        )
+    """)
+    try:
+        cursor.execute("ALTER TABLE products ADD COLUMN specs TEXT")
+        conn.commit()
+    except Exception:
+        pass
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer TEXT,
+            total REAL NOT NULL,
+            items TEXT,
+            phone TEXT,
+            email TEXT,
+            address TEXT,
+            status TEXT DEFAULT 'pendiente',
+            invoice_name TEXT DEFAULT 'C/F',
+            invoice_nit TEXT DEFAULT 'C/F',
+            invoice_number TEXT DEFAULT 'Pendiente',
+            invoice_address TEXT DEFAULT 'No especificada',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'pendiente'")
+        conn.commit()
+    except Exception:
+        pass
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS payments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER,
+            client TEXT,
+            method TEXT,
+            amount REAL,
+            status TEXT,
+            receipt_url TEXT,
+            invoice_name TEXT DEFAULT 'C/F',
+            invoice_nit TEXT DEFAULT 'C/F',
+            invoice_number TEXT DEFAULT 'Pendiente',
+            invoice_address TEXT DEFAULT 'No especificada',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+inicializar_base_datos()
+
+@app.post("/api/admin/login")
+def admin_login(data: LoginRequest):
+    if data.username == "admind" and data.password == "DON-NICOLAS.03@GT":
+        return {"success": True, "message": "Autenticación exitosa"}
+    raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+
+@app.get("/api/admin/stats")
+def obtener_estadisticas():
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM products")
+    total_productos = cursor.fetchone()[0]
+    try:
+        cursor.execute("SELECT COUNT(*) FROM orders")
+        total_pedidos = cursor.fetchone()[0]
+    except:
+        total_pedidos = 0
+    try:
+        cursor.execute("SELECT SUM(total) FROM orders")
+        res_ingresos = cursor.fetchone()[0]
+        ingresos_totales = res_ingresos if res_ingresos else 0.0
+    except:
+        ingresos_totales = 0.0
+    conn.close()
+    return {"total_productos": total_productos, "total_pedidos": total_pedidos, "ingresos_totales": ingresos_totales}
+
+@app.get("/api/admin/products")
+def listar_productos():
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM products")
+    productos = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return productos
+
+@app.post("/api/admin/products")
+async def crear_producto(
+    name: str = Form(...),
+    category: str = Form(...),
+    price: str = Form(...),
+    stock: str = Form(...),
+    description: Optional[str] = Form(""),
+    specs: Optional[str] = Form(None),
+    image: UploadFile = File(None)
+):
+    try:
+        price_val = float(price)
+        stock_val = int(stock)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Precio o stock inválido.")
+
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    image_url = "/uploads/cafe-bourbon.jpg"
+    try:
+        if image and image.filename:
+            file_location = os.path.join(UPLOADS_DIR, image.filename)
+            with open(file_location, "wb+") as file_object:
+                file_object.write(await image.read())
+            image_url = f"/uploads/{image.filename}"
+
+        cursor.execute(
+            "INSERT INTO products (name, category, price, stock, description, image_url, specs) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (name, category, price_val, stock_val, description, image_url, specs)
+        )
+        conn.commit()
+        nuevo_id = cursor.lastrowid
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"message": "Producto creado con éxito", "id": nuevo_id, "image_url": image_url}
+
+@app.put("/api/admin/products/{producto_id}")
+async def actualizar_producto(
+    producto_id: int,
+    name: str = Form(...),
+    category: str = Form(...),
+    price: str = Form(...),
+    stock: str = Form(...),
+    description: Optional[str] = Form(""),
+    specs: Optional[str] = Form(None),
+    image: UploadFile = File(None)
+):
+    try:
+        price_val = float(price)
+        stock_val = int(stock)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Precio o stock inválido.")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        if image and image.filename:
+            file_location = os.path.join(UPLOADS_DIR, image.filename)
+            with open(file_location, "wb+") as file_object:
+                file_object.write(await image.read())
+            image_url = f"/uploads/{image.filename}"
+            cursor.execute(
+                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, image_url = ?, specs = ? WHERE id = ?",
+                (name, category, price_val, stock_val, description, image_url, specs, producto_id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, specs = ? WHERE id = ?",
+                (name, category, price_val, stock_val, description, specs, producto_id)
+            )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"message": "Producto actualizado con éxito"}
+
+@app.delete("/api/admin/products/{producto_id}")
+def eliminar_producto(producto_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM products WHERE id = ?", (producto_id,))
+    conn.commit()
+    conn.close()
+    return {"message": "Producto eliminado con éxito"}
+
+@app.post("/api/orders")
+async def crear_pedido_cliente(
+    customer: str = Form("Cliente General"),
+    total: float = Form(...),
+    items: Optional[str] = Form(None),
+    phone: Optional[str] = Form(""),
+    email: Optional[str] = Form(""),
+    address: Optional[str] = Form(""),
+    payment_method_type: Optional[str] = Form("Transferencia Bancaria"),
+    invoice_name: Optional[str] = Form("C/F"),
+    invoice_nit: Optional[str] = Form("C/F"),
+    nit: Optional[str] = Form(None),
+    invoice_number: Optional[str] = Form("Pendiente"),
+    invoice_address: Optional[str] = Form("No especificada"),
+    receipt: UploadFile = File(None)
+):
+    nit_final = nit if nit and nit.strip() != "" else invoice_nit
+    if not nit_final:
+        nit_final = "C/F"
+
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        receipt_url = None
+        if receipt:
+            file_location = os.path.join(UPLOADS_DIR, receipt.filename)
+            with open(file_location, "wb+") as file_object:
+                file_object.write(await receipt.read())
+            receipt_url = f"/uploads/{receipt.filename}"
+
+        cursor.execute(
+            """INSERT INTO orders 
+               (customer, total, items, phone, email, address, status, invoice_name, invoice_nit, invoice_number, invoice_address) 
+               VALUES (?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)""",
+            (customer, total, items, phone, email, address, invoice_name, nit_final, invoice_number, invoice_address)
+        )
+        conn.commit()
+        pedido_id = cursor.lastrowid
+
+        cursor.execute(
+            """INSERT INTO payments 
+               (order_id, client, method, amount, status, receipt_url, invoice_name, invoice_nit, invoice_number, invoice_address) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (pedido_id, customer, payment_method_type, total, "Completado", receipt_url, invoice_name, nit_final, invoice_number, invoice_address)
+        )
+        conn.commit()
+
+        # Envío de alerta a WhatsApp en segundo plano para evitar bloqueos
+        threading.Thread(
+            target=enviar_alerta_whatsapp,
+            args=(pedido_id, customer, total, phone, address)
+        ).start()
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"message": "Pedido y comprobante de pago registrado con éxito", "id": pedido_id, "receipt_url": receipt_url}
+
+class OrderStatusUpdate(BaseModel):
+    status: str
+
+@app.patch("/api/admin/orders/{pedido_id}/status")
+def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (data.status, pedido_id))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"success": True, "message": "Estado del pedido actualizado correctamente"}
+
+@app.get("/api/admin/orders")
+def listar_pedidos():
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT * FROM orders")
+        filas = cursor.fetchall()
+        pedidos = []
+        for row in filas:
+            pedido_dict = dict(row)
+            pedido_dict["status"] = row["status"] if "status" in row.keys() and row["status"] else "pendiente"
+            pedido_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
+            pedido_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
+            pedido_dict["invoice_number"] = row["invoice_number"] if "invoice_number" in row.keys() and row["invoice_number"] else "Pendiente"
+            pedido_dict["invoice_address"] = row["invoice_address"] if "invoice_address" in row.keys() and row["invoice_address"] else "No especificada"
+            pedidos.append(pedido_dict)
+    except Exception:
+        pedidos = []
+    conn.close()
+    return pedidos
+
+@app.get("/api/admin/payments")
+def listar_pagos():
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT * FROM payments")
+        filas = cursor.fetchall()
+        pagos = []
+        for row in filas:
+            pago_dict = dict(row)
+            pago_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
+            pago_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
+            pago_dict["invoice_number"] = row["invoice_number"] if "invoice_number" in row.keys() and row["invoice_number"] else "Pendiente"
+            pago_dict["invoice_address"] = row["invoice_address"] if "invoice_address" in row.keys() and row["invoice_address"] else "No especificada"
+            pagos.append(pago_dict)
+    except Exception as e:
+        pagos = []
+    conn.close()
+    return pagos
+
+@app.post("/api/admin/payments")
+def registrar_pago(payment: PaymentSchema):
+    inicializar_base_datos()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """INSERT INTO payments 
+               (order_id, client, method, amount, status, receipt_url, invoice_name, invoice_nit, invoice_number, invoice_address) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (payment.order_id, payment.client, payment.method, payment.amount, payment.status, payment.receipt_url, payment.invoice_name, payment.invoice_nit, payment.invoice_number, payment.invoice_address)
+        )
+        conn.commit()
+        pago_id = cursor.lastrowid
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"message": "Pago registrado con éxito", "id": pago_id}
