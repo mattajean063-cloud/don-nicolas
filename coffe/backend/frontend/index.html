@@ -94,6 +94,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
             gap: 15px 25px;
             width: 100%;
             margin-bottom: 5px;
@@ -933,12 +934,17 @@
             background-color: var(--sidebar-bg);
             color: #d8cebc;
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             border-top: 2px solid var(--accent-gold);
             margin-top: 4rem;
             font-family: 'Montserrat', sans-serif;
             font-size: 0.85rem;
             letter-spacing: 1px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
         }
 
         footer p {
@@ -962,7 +968,7 @@
                 text-align: left;
             }
             nav {
-                justify-content: flex-end;
+                justify-content: center;
                 width: auto;
                 gap: 2rem;
                 margin-bottom: 0;
@@ -1437,7 +1443,8 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 Don Nicolás Coffee Shop. Todos los derechos reservados. | Esquipulas, Chiquimula, Guatemala.</p>
+        <p>&copy; 2026 Don Nicolás Coffee Shop. Todos los derechos reservados.</p>
+        <p>Esquipulas, Chiquimula, Guatemala.</p>
     </footer>
 
     <script>
@@ -2040,7 +2047,7 @@
             formData.append("receipt", archivoInput.files[0]);
 
             try {
-                const resPedido =await fetch(`${API_BACKEND}/orders`, {
+                const resPedido = await fetch(`${API_BACKEND}/orders`, {
                     method: 'POST',
                     body: formData
                 });
@@ -2062,3 +2069,4 @@
     </script>
 </body>
 </html>
+```[cite: 5]
