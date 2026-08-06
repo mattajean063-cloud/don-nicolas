@@ -68,6 +68,43 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
         traceback.print_exc()
         return False
 
+def enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
+    id_instance = os.getenv("GREEN_ID_INSTANCE")
+    api_token = os.getenv("GREEN_API_TOKEN")
+    
+    if not id_instance or not api_token or not telefono:
+        return False
+
+    # Limpiar número de teléfono obtenido de la información de envío
+    telefono_limpio = "".join(filter(str.isdigit, telefono))
+    if not telefono_limpio:
+        return False
+
+    estado_lower = nuevo_estado.strip().lower()
+    
+    # Mensajes personalizados, amables y de agradecimiento según el estado del pedido
+    if "pendiente" in estado_lower or "recibido" in estado_lower:
+        mensaje = f"☕ ¡Hola, *{cliente}*! Hemos recibido con mucha alegría tu pedido *#{pedido_id}*. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨"
+    elif "empaquetando" in estado_lower or "proceso" in estado_lower:
+        mensaje = f"📦 ¡Hola, *{cliente}*! Te contamos que tu pedido *#{pedido_id}* se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎"
+    elif "entregado" in estado_lower or "completado" in estado_lower:
+        mensaje = f"🎉 ¡Hola, *{cliente}*! Tu pedido *#{pedido_id}* ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨"
+    else:
+        mensaje = f"☕ ¡Hola, *{cliente}*! El estado de tu pedido *#{pedido_id}* ha cambiado a: *{nuevo_estado}*. Gracias por confiar en Don Nicolás."
+
+    url = f"https://api.green-api.com/waInstance{id_instance}/sendMessage/{api_token}"
+    payload = {
+        "chatId": f"{telefono_limpio}@c.us",
+        "message": mensaje
+    }
+    
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        return response.status_code == 200
+    except Exception as e:
+        print(f"Error enviando notificación al cliente: {e}")
+        return False
+
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
 X_LOGIN = "AQUI_TU_X_LOGIN"
 X_PRIVATE_KEY = "AQUI_TU_X_PRIVATE_KEY"
@@ -428,7 +465,7 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        # Envío de alerta a WhatsApp en segundo plano para evitar bloqueos
+        # Envío de alerta a WhatsApp del administrador en segundo plano
         threading.Thread(
             target=enviar_alerta_whatsapp,
             args=(pedido_id, customer, total, phone, address)
@@ -450,14 +487,33 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
+        # Obtenemos los datos del cliente y el teléfono que ingresó en la información de envío
+        cursor.execute("SELECT customer, phone FROM orders WHERE id = ?", (pedido_id,))
+        pedido = cursor.fetchone()
+        
+        if not pedido:
+            raise HTTPException(status_code=404, detail="Pedido no encontrado")
+            
+        cliente = pedido["customer"] or "Cliente"
+        telefono = pedido["phone"] or ""
+
+        # Actualizar el estado en la base de datos
         cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (data.status, pedido_id))
         conn.commit()
+        
+        # Enviar mensaje al número de teléfono del cliente en segundo plano
+        if telefono:
+            threading.Thread(
+                target=enviar_notificacion_estado_cliente,
+                args=(telefono, cliente, pedido_id, data.status)
+            ).start()
+
     except Exception as e:
         conn.rollback()
         conn.close()
         raise HTTPException(status_code=500, detail=str(e))
     conn.close()
-    return {"success": True, "message": "Estado del pedido actualizado correctamente"}
+    return {"success": True, "message": "Estado del pedido actualizado correctamente y notificación enviada al cliente"}
 
 @app.get("/api/admin/orders")
 def listar_pedidos():
