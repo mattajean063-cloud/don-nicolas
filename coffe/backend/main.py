@@ -68,7 +68,7 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
         traceback.print_exc()
         return False
 
-ddef enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
+def enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
     id_instance = os.getenv("GREEN_ID_INSTANCE")
     api_token = os.getenv("GREEN_API_TOKEN")
     
@@ -76,13 +76,10 @@ ddef enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: 
         print("DEBUG: Faltan credenciales de Green API o el teléfono del cliente está vacío.")
         return False
 
-    # Limpiar número de teléfono extrayendo solo los dígitos[cite: 5]
     telefono_limpio = "".join(filter(str.isdigit, telefono))
     if not telefono_limpio:
         return False
 
-    # Si el número no trae el código de país (por ejemplo, en Guatemala son 8 dígitos), se lo agregamos
-    # Ajusta "502" según tu país si es necesario
     if len(telefono_limpio) == 8:
         telefono_limpio = "502" + telefono_limpio
 
@@ -110,6 +107,7 @@ ddef enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: 
     except Exception as e:
         print(f"Error enviando notificación al cliente: {e}")
         return False
+
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
 X_LOGIN = "AQUI_TU_X_LOGIN"
 X_PRIVATE_KEY = "AQUI_TU_X_PRIVATE_KEY"
@@ -144,9 +142,6 @@ def crear_pago_qpaypro(data: PagoQPayProRequest):
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ==========================================
-# ENDPOINTS DE CONFIGURACIÓN DE TARJETA (ADMIN Y PÚBLICO)
-# ==========================================
 @app.get("/api/admin/card-payment-status")
 def obtener_estado_tarjeta():
     return {"enabled": configuracion_tienda["card_payment_enabled"]}
@@ -470,7 +465,6 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        # Envío de alerta a WhatsApp del administrador en segundo plano
         threading.Thread(
             target=enviar_alerta_whatsapp,
             args=(pedido_id, customer, total, phone, address)
@@ -492,7 +486,6 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        # Obtenemos los datos del cliente y el teléfono que ingresó en la información de envío
         cursor.execute("SELECT customer, phone FROM orders WHERE id = ?", (pedido_id,))
         pedido = cursor.fetchone()
         
@@ -502,11 +495,9 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
         cliente = pedido["customer"] or "Cliente"
         telefono = pedido["phone"] or ""
 
-        # Actualizar el estado en la base de datos
         cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (data.status, pedido_id))
         conn.commit()
         
-        # Enviar mensaje al número de teléfono del cliente en segundo plano
         if telefono:
             threading.Thread(
                 target=enviar_notificacion_estado_cliente,
