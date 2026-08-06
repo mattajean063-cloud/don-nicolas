@@ -942,7 +942,7 @@
             background-color: var(--sidebar-bg);
             color: #d8cebc;
             text-align: center;
-            padding: 3rem 2rem;
+            padding: 1.5rem 2rem;
             border-top: 2px solid var(--accent-gold);
             margin-top: auto;
             font-family: 'Montserrat', sans-serif;
@@ -963,7 +963,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.2rem;
+            gap: 0.8rem;
         }
 
         .footer-logo {
@@ -985,33 +985,6 @@
             color: #f7f4ed;
             letter-spacing: 2px;
             font-weight: 700;
-        }
-
-        .footer-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .footer-links a {
-            color: #d8cebc;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-gold);
-        }
-
-        .footer-divider {
-            width: 100%;
-            max-width: 400px;
-            height: 1px;
-            background-color: rgba(197, 160, 89, 0.3);
-            margin: 0.2rem 0;
         }
 
         footer p {
@@ -1516,16 +1489,6 @@
                 <img src="/static/imagenes/logo.png" alt="Logo Don Nicolás" onerror="this.style.display='none'">
                 <span>Don Nicolás</span>
             </div>
-            <div class="footer-links">
-                <a href="#" onclick="cambiarVista('inicio', null); return false;">Inicio</a>
-                <a href="#" onclick="cambiarVista('tienda', null); return false;">Tienda Online</a>
-                <a href="#" onclick="cambiarVista('finca', null); return false;">Nuestra Finca</a>
-                <a href="#" onclick="cambiarVista('mirador', null); return false;">Nuestras Instalaciones</a>
-                <a href="#" onclick="cambiarVista('menu', null); return false;">Menú</a>
-                <a href="#" onclick="cambiarVista('ubicanos', null); return false;">Ubícanos</a>
-                <a href="#" onclick="cambiarVista('contacto', null); return false;">Contacto</a>
-            </div>
-            <div class="footer-divider"></div>
             <p>&copy; 2026 Don Nicolás Coffee Shop. Todos los derechos reservados. Esquipulas, Chiquimula, Guatemala.</p>
         </div>
     </footer>
@@ -1587,7 +1550,6 @@
             if(elemento) {
                 elemento.classList.add('activo');
             } else {
-                // Si viene del footer o sin elemento, marcar el nav correspondiente si existe
                 document.querySelectorAll('nav a').forEach(nav => {
                     if(nav.getAttribute('onclick') && nav.getAttribute('onclick').includes(vistaId)) {
                         nav.classList.add('activo');
