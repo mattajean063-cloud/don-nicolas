@@ -69,8 +69,8 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
 # NOTIFICACIÓN DE ESTADO AL CLIENTE (META CLOUD)
 # ==========================================
 def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
-    access_token = os.getenv("META_ACCESS_TOKEN")
-    phone_number_id = os.getenv("META_PHONE_NUMBER_ID")
+    access_token = os.getenv("EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm")
+    phone_number_id = os.getenv("1261942240343175")
     
     if not access_token or not phone_number_id or not telefono:
         print("DEBUG: Faltan credenciales de Meta o el teléfono del cliente está vacío.")
