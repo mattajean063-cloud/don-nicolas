@@ -32,48 +32,48 @@ configuracion_tienda = {
 }
 
 # ==========================================
-# CONFIGURACIÓN DE ALERTA DE WHATSAPP (GREEN API Y EN SEGUNDO PLANO)
+# CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (META CLOUD)
 # ==========================================
 def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    id_instance = os.getenv("GREEN_ID_INSTANCE")
-    api_token = os.getenv("GREEN_API_TOKEN")
-    whatsapp_destino = os.getenv("WHATSAPP_PHONE")
+    access_token = os.getenv("META_ACCESS_TOKEN")
+    phone_number_id = os.getenv("META_PHONE_NUMBER_ID")
+    whatsapp_destino = os.getenv("WHATSAPP_PHONE") # Tu número personal con código de país
     
-    print(f"DEBUG: Intentando enviar WhatsApp para pedido #{pedido_id} a {whatsapp_destino}")
-    
-    if not id_instance or not api_token or not whatsapp_destino:
-        print("Aviso: Credenciales de Green API no configuradas. Se omite el envío de WhatsApp.")
+    if not access_token or not phone_number_id or not whatsapp_destino:
+        print("Aviso: Credenciales de Meta o teléfono de destino no configurados.")
         return False
 
-    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración para ver los detalles completos."
+    whatsapp_destino_limpio = "".join(filter(str.isdigit, whatsapp_destino))
+    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración."
     
-    url = f"https://api.green-api.com/waInstance{id_instance}/sendMessage/{api_token}"
+    url = f"https://graph.facebook.com/v17.0/{phone_number_id}/messages"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
     payload = {
-        "chatId": f"{whatsapp_destino}@c.us",
-        "message": mensaje
+        "messaging_product": "whatsapp",
+        "to": whatsapp_destino_limpio,
+        "type": "text",
+        "text": { "body": mensaje }
     }
     
     try:
-        response = requests.post(url, json=payload, timeout=10)
-        resultado = response.json()
-        if response.status_code == 200 and resultado.get("idMessage"):
-            print(f"Alerta de WhatsApp enviada con éxito para el pedido #{pedido_id}")
-            return True
-        else:
-            print(f"Error al enviar WhatsApp: {response.text}")
-            return False
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        return response.status_code == 200
     except Exception as e:
-        import traceback
-        print("--- ERROR DETALLADO DE WHATSAPP ---")
-        traceback.print_exc()
+        print(f"Error enviando alerta de admin por Meta: {e}")
         return False
 
-def enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
-    id_instance = os.getenv("GREEN_ID_INSTANCE")
-    api_token = os.getenv("GREEN_API_TOKEN")
+# ==========================================
+# NOTIFICACIÓN DE ESTADO AL CLIENTE (META CLOUD)
+# ==========================================
+def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
+    access_token = os.getenv("META_ACCESS_TOKEN")
+    phone_number_id = os.getenv("META_PHONE_NUMBER_ID")
     
-    if not id_instance or not api_token or not telefono:
-        print("DEBUG: Faltan credenciales de Green API o el teléfono del cliente está vacío.")
+    if not access_token or not phone_number_id or not telefono:
+        print("DEBUG: Faltan credenciales de Meta o el teléfono del cliente está vacío.")
         return False
 
     telefono_limpio = "".join(filter(str.isdigit, telefono))
@@ -86,26 +86,32 @@ def enviar_notificacion_estado_cliente(telefono: str, cliente: str, pedido_id: i
     estado_lower = nuevo_estado.strip().lower()
     
     if "pendiente" in estado_lower or "recibido" in estado_lower:
-        mensaje = f"☕ ¡Hola, *{cliente}*! Hemos recibido con mucha alegría tu pedido *#{pedido_id}*. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨"
+        mensaje = f"☕ ¡Hola, {cliente}! Hemos recibido con mucha alegría tu pedido #{pedido_id}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨"
     elif "empaquetando" in estado_lower or "proceso" in estado_lower:
-        mensaje = f"📦 ¡Hola, *{cliente}*! Te contamos que tu pedido *#{pedido_id}* se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎"
+        mensaje = f"📦 ¡Hola, {cliente}! Te contamos que tu pedido #{pedido_id} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎"
     elif "entregado" in estado_lower or "completado" in estado_lower:
-        mensaje = f"🎉 ¡Hola, *{cliente}*! Tu pedido *#{pedido_id}* ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨"
+        mensaje = f"🎉 ¡Hola, {cliente}! Tu pedido #{pedido_id} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨"
     else:
-        mensaje = f"☕ ¡Hola, *{cliente}*! El estado de tu pedido *#{pedido_id}* ha cambiado a: *{nuevo_estado}*. Gracias por confiar en Don Nicolás."
+        mensaje = f"☕ ¡Hola, {cliente}! El estado de tu pedido #{pedido_id} ha cambiado a: {nuevo_estado}. Gracias por confiar en Don Nicolás."
 
-    url = f"https://api.green-api.com/waInstance{id_instance}/sendMessage/{api_token}"
+    url = f"https://graph.facebook.com/v17.0/{phone_number_id}/messages"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
     payload = {
-        "chatId": f"{telefono_limpio}@c.us",
-        "message": mensaje
+        "messaging_product": "whatsapp",
+        "to": telefono_limpio,
+        "type": "text",
+        "text": { "body": mensaje }
     }
     
     try:
-        response = requests.post(url, json=payload, timeout=10)
-        print(f"DEBUG WhatsApp Cliente - Status: {response.status_code}, Response: {response.text}")
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        print(f"DEBUG Meta WhatsApp Cliente - Status: {response.status_code}, Response: {response.text}")
         return response.status_code == 200
     except Exception as e:
-        print(f"Error enviando notificación al cliente: {e}")
+        print(f"Error enviando notificación por Meta: {e}")
         return False
 
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
@@ -500,7 +506,7 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
         
         if telefono:
             threading.Thread(
-                target=enviar_notificacion_estado_cliente,
+                target=enviar_notificacion_estado_cliente_meta,
                 args=(telefono, cliente, pedido_id, data.status)
             ).start()
 
