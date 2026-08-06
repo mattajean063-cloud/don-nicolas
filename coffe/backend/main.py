@@ -35,14 +35,10 @@ configuracion_tienda = {
 # CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (META CLOUD)
 # ==========================================
 def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    access_token = os.getenv("EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm")
-    phone_number_id = os.getenv("1261942240343175")
-    whatsapp_destino = os.getenv("50246511325") # Tu número personal con código de país
+    access_token = "EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm"
+    phone_number_id = "1261942240343175"
+    whatsapp_destino = "50246511325"
     
-    if not access_token or not phone_number_id or not whatsapp_destino:
-        print("Aviso: Credenciales de Meta o teléfono de destino no configurados.")
-        return False
-
     whatsapp_destino_limpio = "".join(filter(str.isdigit, whatsapp_destino))
     mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración."
     
@@ -69,11 +65,11 @@ def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono:
 # NOTIFICACIÓN DE ESTADO AL CLIENTE (META CLOUD)
 # ==========================================
 def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
-    access_token = os.getenv("EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm")
-    phone_number_id = os.getenv("1261942240343175")
+    access_token = "EAATsCzqvHi4BSIaIKLZAFEMw1oVe4AFlsAgqU81zFSQyYpwPBMRvoeIQd9fXQiwwnpNDZAEUMUv4HXxjAQm8BtGMoEFxAPZAltdxwRZBvR5fmkGn0LVfUWjCaZB1GJ9DNEVbckkd4lt99FBEZC6cBlZB22Bm99ZB72Po5fZBo3prNa3p7HCCfUZBZApOVf07nVLgEYqLsCmRRyeSHHWRxHgENQROKbnyyBu3b3jXpzr3cLW5xi2vLFZCnbZADtq00JZCtz9xOZAjANeYMXvSBmYXMeo6Bbm"
+    phone_number_id = "1261942240343175"
     
-    if not access_token or not phone_number_id or not telefono:
-        print("DEBUG: Faltan credenciales de Meta o el teléfono del cliente está vacío.")
+    if not telefono:
+        print("DEBUG: El teléfono del cliente está vacío.")
         return False
 
     telefono_limpio = "".join(filter(str.isdigit, telefono))
