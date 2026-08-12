@@ -40,6 +40,32 @@
             font-family: 'Cormorant Garamond', serif;
         }
 
+        /* NOTIFICACIÓN FLASH FLOTANTE */
+        #flash-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 10000;
+            display: none;
+            font-weight: 600;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes flashAnim {
+            0% { background-color: rgba(197, 160, 89, 0.2); }
+            50% { background-color: rgba(197, 160, 89, 0.8); }
+            100% { background-color: rgba(197, 160, 89, 0.2); }
+        }
+
+        .tr-nuevo-flash {
+            animation: flashAnim 1.5s infinite;
+        }
+
         /* LOGIN OVERLAY */
         #login-overlay {
             position: fixed;
@@ -232,7 +258,6 @@
             font-weight: 700;
         }
 
-        /* TARJETA DE CONTROL DE PAGOS CON TARJETA */
         .config-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -265,7 +290,6 @@
             gap: 12px;
         }
 
-        /* Estilo Switch Personalizado */
         .switch {
             position: relative;
             display: inline-block;
@@ -400,7 +424,6 @@
             color: var(--primary-dark);
         }
 
-        /* PESTAÑAS DE PEDIDOS */
         .pedidos-tabs {
             display: flex;
             gap: 10px;
@@ -588,7 +611,6 @@
             font-weight: 500;
         }
 
-        /* BOTÓN MENÚ MÓVIL (HAMBURGUESA) */
         #menu-toggle-btn {
             display: none;
             background: var(--primary-dark);
@@ -601,7 +623,6 @@
             border-radius: 4px;
         }
 
-        /* MEDIA QUERIES PARA CELULARES Y TABLETS */
         @media (max-width: 768px) {
             body {
                 height: 100%;
@@ -670,6 +691,9 @@
 </head>
 <body>
 
+    <!-- NOTIFICACIÓN FLASH VISUAL -->
+    <div id="flash-notification">🚨 ¡Nuevo Pedido Recibido!</div>
+
     <!-- PANTALLA DE LOGIN ADMINISTRATIVO -->
     <div id="login-overlay">
         <div class="login-card">
@@ -722,7 +746,6 @@
                         </div>
                     </div>
 
-                    <!-- CONTROL DE PASARELA DE PAGO CON TARJETA -->
                     <div class="config-card">
                         <div>
                             <h3>Pasarela de Pagos con Tarjeta (QPayPro)</h3>
@@ -813,7 +836,6 @@
                             <textarea id="prod-desc" rows="2"></textarea>
                         </div>
                         
-                        <!-- SECCIÓN PARA SUBIR LA FOTO DEL GRANO DE CAFÉ -->
                         <div class="form-group">
                             <label>Fotografía del Grano de Café / Producto</label>
                             <input type="file" id="prod-archivo-img" accept="image/*" onchange="previsualizarImagen(event)">
@@ -866,7 +888,6 @@
                         </div>
                     </div>
 
-                    <!-- PESTAÑAS DE FILTRADO (PENDIENTES / EMPAQUE / ENTREGADOS) -->
                     <div id="pedidos-tabs-container" class="pedidos-tabs">
                         <button id="tab-pendientes-btn" class="tab-btn activo" onclick="filtrarTabPedidos('pendientes')">Pedidos Nuevos</button>
                         <button id="tab-empaque-btn" class="tab-btn" onclick="filtrarTabPedidos('empaque')">En Proceso de Empaque</button>
@@ -925,7 +946,6 @@
                             <tbody id="tabla-detalle-items"></tbody>
                         </table>
 
-                        <!-- SECCIÓN DE PAGO ASOCIADA AL PEDIDO -->
                         <div style="margin-top: 2rem; border-top: 2px solid var(--accent-gold); padding-top: 1.5rem;">
                             <h3 style="font-family: 'Cormorant Garamond', serif; color: var(--primary-dark); margin-top: 0; font-size: 1.5rem;">Detalle del Pago Asociado</h3>
                             <div class="detalle-grid-3">
@@ -966,24 +986,26 @@
         let cachePagos = [];
         let cacheProductos = []; 
         let imagenBase64Actual = ''; 
-        let tabActualPedidos = 'pendientes'; // 'pendientes', 'empaque' o 'entregados'
+        let tabActualPedidos = 'pendientes';
         let pedidoIdEnVista = null;
+        let ultimoConteoPedidos = 0;
 
         document.addEventListener("DOMContentLoaded", () => {
             verificarEstadoTarjetaGuardado();
+            // Inicia sondeo automático cada 10 segundos para verificar nuevos pedidos en tiempo real
+            setInterval(verificarNuevosPedidosFondo, 10000);
         });
 
         // ==========================================
-        // FUNCIÓN INTEGRADA DE WHATSAPP
+        // WHATSAPP: ABRIR CHAT AUTOMÁTICO CON ESTADO
         // ==========================================
         function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
             if (!telefonoCliente || telefonoCliente.trim() === '') {
-                alert("Este pedido no tiene número de teléfono registrado. No se puede abrir WhatsApp.");
+                alert("Este pedido no tiene número de teléfono registrado.");
                 return;
             }
 
             let telefonoLimpio = telefonoCliente.replace(/\D/g, '');
-            // Se asume código de Guatemala (502) para números de 8 dígitos
             if (telefonoLimpio.length === 8) {
                 telefonoLimpio = "502" + telefonoLimpio; 
             }
@@ -1002,9 +1024,38 @@
             }
 
             const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
-            window.open(urlWhatsApp, '_blank'); // Abre WhatsApp en una pestaña nueva
+            window.open(urlWhatsApp, '_blank');
         }
+
         // ==========================================
+        // NOTIFICACIONES FLASH Y SONDEO EN TIEMPO REAL
+        // ==========================================
+        function mostrarNotificacionFlash() {
+            const flash = document.getElementById('flash-notification');
+            flash.style.display = 'block';
+            setTimeout(() => {
+                flash.style.display = 'none';
+            }, 5000);
+        }
+
+        async function verificarNuevosPedidosFondo() {
+            try {
+                const res = await fetch(`${API_URL}/orders`);
+                if (!res.ok) return;
+                const pedidosActuales = await res.json();
+                
+                if (ultimoConteoPedidos > 0 && pedidosActuales.length > ultimoConteoPedidos) {
+                    mostrarNotificacionFlash();
+                    // Si estamos en la sección de pedidos, actualizamos la tabla al instante
+                    if (document.getElementById('seccion-pedidos').classList.contains('activa')) {
+                        cargarPedidosYPagosUnificados();
+                    }
+                }
+                ultimoConteoPedidos = pedidosActuales.length;
+            } catch(e) {
+                // Modo offline / sin conexión omitido silenciosamente
+            }
+        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('app-sidebar');
@@ -1030,6 +1081,7 @@
                     document.getElementById('app-container').style.display = 'flex';
                     cargarEstadisticas();
                     verificarEstadoTarjetaGuardado();
+                    verificarNuevosPedidosFondo();
                 } else {
                     errorMsg.style.display = 'block';
                 }
@@ -1069,7 +1121,6 @@
             }
         }
 
-        // CONTROL DE HABILITACIÓN DE TARJETA
         async function verificarEstadoTarjetaGuardado() {
             try {
                 const res = await fetch(`${API_URL}/card-payment-status`).catch(() => null);
@@ -1102,7 +1153,7 @@
                     body: JSON.stringify({ enabled: habilitado })
                 });
             } catch (e) {
-                console.log("Estado guardado localmente (Modo offline/estático)");
+                console.log("Estado guardado localmente");
             }
         }
 
@@ -1160,6 +1211,7 @@
                 ]);
                 cachePedidos = await resPedidos.json();
                 cachePagos = await resPagos.json();
+                ultimoConteoPedidos = cachePedidos.length;
 
                 renderizarTablaPedidos();
             } catch (err) { console.error(err); }
@@ -1177,7 +1229,6 @@
             const tbody = document.getElementById('tabla-pedidos-body');
             tbody.innerHTML = '';
 
-            // Filtrar según la pestaña activa ('pendientes', 'empaque' o 'entregados')
             const pedidosFiltrados = cachePedidos.filter(o => {
                 const estado = (o.status || o.estado || 'pendiente').toLowerCase();
                 const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
@@ -1198,7 +1249,7 @@
                 return;
             }
 
-            pedidosFiltrados.forEach(o => {
+            pedidosFiltrados.forEach((o, index) => {
                 const idLimpio = String(o.id).replace('#', '');
                 const estado = (o.status || o.estado || 'pendiente').toLowerCase();
                 
@@ -1209,14 +1260,17 @@
                     etiquetaEstado = '<span style="color: #27ae60; font-weight: 600;">Entregado</span>';
                 }
 
+                // Efecto flash si es el primer pedido pendiente reciente
+                const claseFlash = (tabActualPedidos === 'pendientes' && index === 0) ? 'tr-nuevo-flash' : '';
+
                 tbody.innerHTML += `
-                    <tr>
+                    <tr class="${claseFlash}">
                         <td>#${o.id}</td>
                         <td>${o.customer || 'Cliente General'}</td>
                         <td>Q${Number(o.total).toFixed(2)}</td>
                         <td>${etiquetaEstado}</td>
                         <td>
-                            <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Detalle</button>
+                            <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Detalle / Chat</button>
                         </td>
                     </tr>
                 `;
@@ -1228,14 +1282,19 @@
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
 
             if (pedido) {
+                // Al abrir el detalle del pedido nuevo, abrimos automáticamente WhatsApp con "pedido recibido"
+                const estadoActual = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
+                if (estadoActual === 'pendiente' || estadoActual === 'recibido') {
+                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, 'recibido');
+                }
+
                 document.getElementById('det-id-pedido').innerText = `Detalle del Pedido: #${pedido.id}`;
                 document.getElementById('det-cliente').innerText = pedido.customer || 'No especificado';
                 document.getElementById('det-telefono').innerText = pedido.phone || 'No especificado';
                 document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
                 document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
 
-                // Gestionar visibilidad de botones de acción según el estado actual
-                const estado = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
+                const estado = estadoActual;
                 const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
                 const esEmpaque = estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing';
 
@@ -1301,26 +1360,23 @@
                     document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
                     document.getElementById('det-pago-fecha').innerText = pago.created_at || pago.date || 'No especificada';
 
-                    const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pago.numero_nit || pago.nit_factura || pago.documento_nit || pago.nit_cliente || pedido.invoice_nit;
-                    const rawNombre = pago.invoice_name || pago.billing_name || pago.nombre_factura || pago.factura_nombre || pago.client_nit_name || pedido.invoice_name;
-                    const rawNumero = pago.invoice_number || pago.factura_no || pago.numero_factura || pago.num_factura || pago.factura_id || pedido.invoice_number;
-                    const rawDireccion = pago.invoice_address || pago.billing_address || pago.direccion_fiscal || pago.address || pago.fiscal_address || pedido.invoice_address;
+                    const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pedido.invoice_nit;
+                    const rawNombre = pago.invoice_name || pago.billing_name || pedido.invoice_name;
+                    const rawNumero = pago.invoice_number || pago.factura_no || pedido.invoice_number;
+                    const rawDireccion = pago.invoice_address || pago.billing_address || pedido.invoice_address;
 
                     const nombreCliente = pago.client || pago.customer || pedido.customer || 'Cliente General';
-                    const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null' && rawNombre !== undefined) ? rawNombre : nombreCliente;
+                    const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null') ? rawNombre : nombreCliente;
                     
                     let nitLimpio = 'C/F';
-                    if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
+                    if (rawNit && rawNit !== '' && rawNit !== 'null' && String(rawNit).trim() !== '') {
                         nitLimpio = String(rawNit).trim();
                     }
 
-                    const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
-                    const direccionFiscalLimpio = (rawDireccion && rawDireccion !== '' && rawDireccion !== 'null' && rawDireccion !== undefined) ? rawDireccion : 'No especificada';
-
                     document.getElementById('det-factura-nombre').innerText = nombreFacturaLimpio;
                     document.getElementById('det-factura-nit').innerText = nitLimpio;
-                    document.getElementById('det-factura-numero').innerText = numeroFacturaLimpio;
-                    document.getElementById('det-factura-direccion').innerText = direccionFiscalLimpio;
+                    document.getElementById('det-factura-numero').innerText = (rawNumero && rawNumero !== 'null') ? rawNumero : 'Pendiente';
+                    document.getElementById('det-factura-direccion').innerText = (rawDireccion && rawDireccion !== 'null') ? rawDireccion : 'No especificada';
 
                     const imgElement = document.getElementById('det-pago-imagen');
                     const sinFotoElement = document.getElementById('det-pago-sin-foto');
@@ -1362,37 +1418,34 @@
             
             const mensajeConfirm = nuevoEstado === 'empaque' 
                 ? '¿Deseas pasar este pedido a "En Proceso de Empaque"?' 
-                : '¿Deseas marcar este pedido como entregado? Se moverá a la sección de entregados.';
+                : '¿Deseas marcar este pedido como entregado?';
             
             if (!confirm(mensajeConfirm)) return;
 
-            // Obtenemos los datos del pedido antes de actualizar para enviarlos a WhatsApp
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
 
             try {
-                const res = await fetch(`${API_URL}/orders/${pedidoIdEnVista}/status`, {
+                await fetch(`${API_URL}/orders/${pedidoIdEnVista}/status`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: nuevoEstado })
                 });
 
-                // Actualizamos localmente para reflejar el cambio al instante
                 if (pedido) {
                     pedido.status = nuevoEstado;
-                    // Llamamos a la función de WhatsApp (Se abre en pestaña nueva)
+                    // Abre automáticamente el chat de WhatsApp con el estado correspondiente (empaque / entregado)
                     abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 }
 
-                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a proceso de empaque!' : '¡Pedido marcado como entregado con éxito!');
+                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a empaque y chat listo!' : '¡Pedido entregado y chat listo!');
                 volverAListaPedidos();
                 cargarPedidosYPagosUnificados();
             } catch (err) {
-                // Fallback local si la API remota no está activa
                 if (pedido) {
                     pedido.status = nuevoEstado;
                     abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 }
-                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado localmente a empaque!' : '¡Pedido marcado como entregado localmente!');
+                alert('¡Actualizado localmente!');
                 volverAListaPedidos();
                 renderizarTablaPedidos();
             }
@@ -1428,10 +1481,7 @@
 
         function abrirFormularioEditar(id) {
             const p = cacheProductos.find(item => Number(item.id) === Number(id));
-            if (!p) {
-                alert('No se encontró el producto.');
-                return;
-            }
+            if (!p) return;
 
             document.getElementById('form-titulo').innerText = "Editar Producto #" + p.id;
             document.getElementById('prod-id').value = p.id;
@@ -1449,11 +1499,7 @@
                 } catch(e) { specsArray = []; }
             }
 
-            let valVariedad = "";
-            let valTueste = "";
-            let valAltura = "";
-            let valProceso = "";
-
+            let valVariedad = "", valTueste = "", valAltura = "", valProceso = "";
             if (Array.isArray(specsArray)) {
                 specsArray.forEach(s => {
                     const labelLower = (s.label || "").toLowerCase();
@@ -1462,10 +1508,6 @@
                     else if (labelLower.includes("altura")) valAltura = s.value || s.label;
                     else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
                 });
-                if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
-                if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
-                if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
-                if (!valProceso && specsArray[3]) valProceso = specsArray[3].label || specsArray[3];
             }
 
             document.getElementById('prod-variedad').value = valVariedad;
@@ -1474,7 +1516,6 @@
             document.getElementById('prod-proceso').value = valProceso;
             
             imagenBase64Actual = p.image_url || ''; 
-
             const imgPreview = document.getElementById('img-preview');
             const placeholder = document.getElementById('preview-placeholder');
 
@@ -1555,19 +1596,14 @@
             const method = id ? 'PUT' : 'POST';
 
             try {
-                const res = await fetch(url, {
-                    method: method,
-                    body: formData
-                });
-
+                const res = await fetch(url, { method: method, body: formData });
                 if (res.ok) {
                     alert('¡Operación realizada con éxito!');
                     ocultarFormulario();
                     cargarProductos();
                     cargarEstadisticas();
                 } else {
-                    const errData = await res.json().catch(() => ({}));
-                    alert('Error: ' + (errData.detail || 'Error desconocido'));
+                    alert('Error al guardar el producto.');
                 }
             } catch (err) { 
                 alert('No se pudo conectar con el servidor.');
@@ -1576,7 +1612,6 @@
 
         async function eliminarProducto(id) {
             if (!confirm('¿Estás seguro de eliminar este producto?')) return;
-
             try {
                 const res = await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
                 if (res.ok) {
