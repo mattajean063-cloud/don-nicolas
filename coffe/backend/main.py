@@ -6,16 +6,16 @@ from pydantic import BaseModel
 import sqlite3
 import os
 import requests
-import urllib.parse
-from typing import Optional, Any
+from typing import Optional
 
-# Intentamos importar libsql si está disponible para la nube (Turso)
+# Intentamos importar libsql si está disponible para la nube
 try:
     import libsql_experimental as libsql
     USING_TURSO = True
 except ImportError:
     USING_TURSO = False
 
+# Configuración de base de datos persistente local por defecto o Turso si se configura adecuadamente
 LIBSQL_DATABASE_URL = os.getenv("https://wrcuytrjherblpiyjlqj.supabase.co/rest/v1/", "")
 LIBSQL_AUTH_TOKEN = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM", "")
 
@@ -24,6 +24,9 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# Directorio persistente para la base de datos (asegura que tienda.db se guarde en BASE_DIR)
+DB_PATH = os.path.join(BASE_DIR, "tienda.db")
 
 # Estado global en memoria para controlar si el pago con tarjeta está habilitado desde el admin
 configuracion_tienda = {
@@ -134,15 +137,14 @@ class LoginRequest(BaseModel):
 def get_db_connection():
     if USING_TURSO and LIBSQL_DATABASE_URL:
         conn = libsql.connect(
-            database="tienda.db",
+            database=DB_PATH,
             sync_url=LIBSQL_DATABASE_URL,
             auth_token=LIBSQL_AUTH_TOKEN
         )
         conn.row_factory = sqlite3.Row
         return conn
     else:
-        db_path = os.path.join(BASE_DIR, "tienda.db")
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         return conn
 
@@ -209,6 +211,7 @@ def inicializar_base_datos():
     conn.commit()
     conn.close()
 
+# Inicializar base de datos al arrancar la aplicación
 inicializar_base_datos()
 
 @app.post("/api/admin/login")
@@ -219,7 +222,6 @@ def admin_login(data: LoginRequest):
 
 @app.get("/api/admin/stats")
 def obtener_estadisticas():
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM products")
@@ -240,7 +242,6 @@ def obtener_estadisticas():
 
 @app.get("/api/admin/products")
 def listar_productos():
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM products")
@@ -264,7 +265,6 @@ async def crear_producto(
     except ValueError:
         raise HTTPException(status_code=400, detail="Precio o stock inválido.")
 
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     image_url = "/uploads/cafe-bourbon.jpg"
@@ -359,7 +359,6 @@ async def crear_pedido_cliente(
     if not nit_final:
         nit_final = "C/F"
 
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -399,7 +398,6 @@ class OrderStatusUpdate(BaseModel):
 
 @app.patch("/api/admin/orders/{pedido_id}/status")
 def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -414,7 +412,6 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
 
 @app.get("/api/admin/orders")
 def listar_pedidos():
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -436,7 +433,6 @@ def listar_pedidos():
 
 @app.get("/api/admin/payments")
 def listar_pagos():
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -447,17 +443,16 @@ def listar_pagos():
             pago_dict = dict(row)
             pago_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
             pago_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
-            pago_dict["invoice_number"] = row["invoice_number"] if "invoice_number" in row.keys() and row["invoice_number"] else "Pendiente"
+            pago_dict["invoice_number"] = row["invoice_number"] if "invoice_number`" in row.keys() and row["invoice_number"] else "Pendiente"
             pago_dict["invoice_address"] = row["invoice_address"] if "invoice_address" in row.keys() and row["invoice_address"] else "No especificada"
             pagos.append(pago_dict)
-    except Exception as e:
+    except Exception:
         pagos = []
     conn.close()
     return pagos
 
 @app.post("/api/admin/payments")
 def registrar_pago(payment: PaymentSchema):
-    inicializar_base_datos()
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
