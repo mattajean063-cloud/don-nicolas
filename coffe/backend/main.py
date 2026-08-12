@@ -14,7 +14,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# Configuración correcta de Supabase (sin la barra / al final para evitar errores de ruta)
+# Configuración de Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wrcuytrjherblpiyjlqj.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM")
 
@@ -130,11 +130,24 @@ async def crear_producto(
         raise HTTPException(status_code=400, detail="Precio o stock inválido.")
 
     image_url = "/uploads/cafe-bourbon.jpg"
+    
+    # Subida de imagen persistente a Supabase Storage (Bucket llamado 'uploads')
     if image and image.filename:
-        file_location = os.path.join(UPLOADS_DIR, image.filename)
-        with open(file_location, "wb+") as file_object:
-            file_object.write(await image.read())
-        image_url = f"/uploads/{image.filename}"
+        try:
+            file_bytes = await image.read()
+            file_path = f"productos/{image.filename}"
+            supabase.storage.from_("uploads").upload(
+                file_path, 
+                file_bytes, 
+                file_options={"content-type": image.content_type, "upsert": "true"}
+            )
+            image_url = supabase.storage.from_("uploads").get_public_url(file_path)
+        except Exception as e:
+            # Fallback local en caso de error en storage
+            file_location = os.path.join(UPLOADS_DIR, image.filename)
+            with open(file_location, "wb+") as file_object:
+                file_object.write(file_bytes)
+            image_url = f"/uploads/{image.filename}"
 
     nuevo_producto = {
         "name": name,
@@ -176,10 +189,20 @@ async def actualizar_producto(
     }
 
     if image and image.filename:
-        file_location = os.path.join(UPLOADS_DIR, image.filename)
-        with open(file_location, "wb+") as file_object:
-            file_object.write(await image.read())
-        datos_actualizados["image_url"] = f"/uploads/{image.filename}"
+        try:
+            file_bytes = await image.read()
+            file_path = f"productos/{image.filename}"
+            supabase.storage.from_("uploads").upload(
+                file_path, 
+                file_bytes, 
+                file_options={"content-type": image.content_type, "upsert": "true"}
+            )
+            datos_actualizados["image_url"] = supabase.storage.from_("uploads").get_public_url(file_path)
+        except Exception as e:
+            file_location = os.path.join(UPLOADS_DIR, image.filename)
+            with open(file_location, "wb+") as file_object:
+                file_object.write(file_bytes)
+            datos_actualizados["image_url"] = f"/uploads/{image.filename}"
 
     response = supabase.table("products").update(datos_actualizados).eq("id", producto_id).execute()
     return {"message": "Producto actualizado con éxito", "data": response.data}
@@ -189,7 +212,6 @@ def eliminar_producto(producto_id: int):
     supabase.table("products").delete().eq("id", producto_id).execute()
     return {"message": "Producto eliminado con éxito"}
 
-# ENDPOINT CORREGIDO: Soluciona el error 404 al registrar pedidos y activa las notificaciones
 @app.post("/api/orders")
 async def crear_pedido_cliente(
     customer: str = Form("Cliente General"),
@@ -212,10 +234,20 @@ async def crear_pedido_cliente(
 
     receipt_url = None
     if receipt and receipt.filename:
-        file_location = os.path.join(UPLOADS_DIR, receipt.filename)
-        with open(file_location, "wb+") as file_object:
-            file_object.write(await receipt.read())
-        receipt_url = f"/uploads/{receipt.filename}"
+        try:
+            file_bytes = await receipt.read()
+            file_path = f"comprobantes/{receipt.filename}"
+            supabase.storage.from_("uploads").upload(
+                file_path, 
+                file_bytes, 
+                file_options={"content-type": receipt.content_type, "upsert": "true"}
+            )
+            receipt_url = supabase.storage.from_("uploads").get_public_url(file_path)
+        except Exception as e:
+            file_location = os.path.join(UPLOADS_DIR, receipt.filename)
+            with open(file_location, "wb+") as file_object:
+                file_object.write(file_bytes)
+            receipt_url = f"/uploads/{receipt.filename}"
 
     try:
         nuevo_pedido = {
