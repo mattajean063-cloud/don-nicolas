@@ -14,13 +14,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# Credenciales directas o mediante variables de entorno de Supabase
+# Configuración correcta de Supabase (sin la barra / al final para evitar errores de ruta)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wrcuytrjherblpiyjlqj.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Estado global para control de tarjeta
+# Estado global para control de pasarela de pago con tarjeta
 configuracion_tienda = {
     "card_payment_enabled": False
 }
@@ -43,17 +43,8 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-class PaymentSchema(BaseModel):
-    order_id: int
-    client: str
-    method: str
-    amount: float
-    status: Optional[str] = "Completado"
-    receipt_url: Optional[str] = None
-    invoice_name: Optional[str] = "C/F"
-    invoice_nit: Optional[str] = "C/F"
-    invoice_number: Optional[str] = "Pendiente"
-    invoice_address: Optional[str] = "No especificada"
+class OrderStatusUpdate(BaseModel):
+    status: str
 
 app.add_middleware(
     CORSMiddleware,
@@ -88,6 +79,19 @@ def admin_login(data: LoginRequest):
     if data.username == "admind" and data.password == "DON-NICOLAS.03@GT":
         return {"success": True, "message": "Autenticación exitosa"}
     raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+
+@app.get("/api/admin/card-payment-status")
+def obtener_estado_tarjeta():
+    return {"enabled": configuracion_tienda["card_payment_enabled"]}
+
+@app.post("/api/admin/card-payment-status")
+def actualizar_estado_tarjeta(data: CardStatusUpdate):
+    configuracion_tienda["card_payment_enabled"] = data.enabled
+    return {"success": True, "enabled": configuracion_tienda["card_payment_enabled"]}
+
+@app.get("/api/shop/config")
+def obtener_configuracion_tienda():
+    return {"card_payment_enabled": configuracion_tienda["card_payment_enabled"]}
 
 @app.get("/api/admin/stats")
 def obtener_estadisticas():
@@ -185,10 +189,85 @@ def eliminar_producto(producto_id: int):
     supabase.table("products").delete().eq("id", producto_id).execute()
     return {"message": "Producto eliminado con éxito"}
 
+# ENDPOINT CORREGIDO: Soluciona el error 404 al registrar pedidos y activa las notificaciones
+@app.post("/api/orders")
+async def crear_pedido_cliente(
+    customer: str = Form("Cliente General"),
+    total: float = Form(...),
+    items: Optional[str] = Form(None),
+    phone: Optional[str] = Form(""),
+    email: Optional[str] = Form(""),
+    address: Optional[str] = Form(""),
+    payment_method_type: Optional[str] = Form("Transferencia Bancaria"),
+    invoice_name: Optional[str] = Form("C/F"),
+    invoice_nit: Optional[str] = Form("C/F"),
+    nit: Optional[str] = Form(None),
+    invoice_number: Optional[str] = Form("Pendiente"),
+    invoice_address: Optional[str] = Form("No especificada"),
+    receipt: UploadFile = File(None)
+):
+    nit_final = nit if nit and nit.strip() != "" else invoice_nit
+    if not nit_final:
+        nit_final = "C/F"
+
+    receipt_url = None
+    if receipt and receipt.filename:
+        file_location = os.path.join(UPLOADS_DIR, receipt.filename)
+        with open(file_location, "wb+") as file_object:
+            file_object.write(await receipt.read())
+        receipt_url = f"/uploads/{receipt.filename}"
+
+    try:
+        nuevo_pedido = {
+            "customer": customer,
+            "total": total,
+            "items": items,
+            "phone": phone,
+            "email": email,
+            "address": address,
+            "status": "pendiente",
+            "invoice_name": invoice_name,
+            "invoice_nit": nit_final,
+            "invoice_number": invoice_number,
+            "invoice_address": invoice_address
+        }
+        res_order = supabase.table("orders").insert(nuevo_pedido).execute()
+        
+        pedido_id = None
+        if res_order.data and len(res_order.data) > 0:
+            pedido_id = res_order.data[0].get("id")
+
+        nuevo_pago = {
+            "order_id": pedido_id,
+            "client": customer,
+            "method": payment_method_type,
+            "amount": total,
+            "status": "Completado",
+            "receipt_url": receipt_url,
+            "invoice_name": invoice_name,
+            "invoice_nit": nit_final,
+            "invoice_number": invoice_number,
+            "invoice_address": invoice_address
+        }
+        supabase.table("payments").insert(nuevo_pago).execute()
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {"message": "Pedido y comprobante de pago registrado con éxito", "id": pedido_id, "receipt_url": receipt_url}
+
 @app.get("/api/admin/orders")
 def listar_pedidos():
     response = supabase.table("orders").select("*").execute()
     return response.data
+
+@app.patch("/api/admin/orders/{pedido_id}/status")
+def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
+    try:
+        supabase.table("orders").update({"status": data.status}).eq("id", pedido_id).execute()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"success": True, "message": "Estado del pedido actualizado correctamente"}
 
 @app.get("/api/admin/payments")
 def listar_pagos():
