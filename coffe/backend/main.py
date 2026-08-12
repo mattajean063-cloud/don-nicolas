@@ -31,69 +31,6 @@ configuracion_tienda = {
     "card_payment_enabled": False
 }
 
-# ==========================================
-# CONFIGURACIÓN DE ALERTA WHATSAPP ADMINISTRADOR (CALLMEBOT)
-# ==========================================
-def enviar_alerta_whatsapp(pedido_id: int, cliente: str, total: float, telefono: str, direccion: str):
-    apikey = "2288133"
-    whatsapp_destino = "50246511325" # Tu número personal con código de país
-    
-    if not apikey or not whatsapp_destino:
-        print("Aviso: Credenciales de CallMeBot o teléfono de destino no configurados.")
-        return False
-
-    whatsapp_destino_limpio = "".join(filter(str.isdigit, whatsapp_destino))
-    mensaje = f"🚨 *¡Nuevo Pedido Recibido!* \n\n👤 *Cliente:* {cliente}\n📞 *Teléfono:* {telefono}\n📍 *Dirección:* {direccion}\n💰 *Total:* Q{total:.2f}\n\nRevisa el panel de administración."
-    
-    mensaje_codificado = urllib.parse.quote(mensaje)
-    url = f"https://api.callmebot.com/whatsapp.php?phone={whatsapp_destino_limpio}&text={mensaje_codificado}&apikey={apikey}"
-    
-    try:
-        response = requests.get(url, timeout=10)
-        return response.status_code == 200
-    except Exception as e:
-        print(f"Error enviando alerta de admin por CallMeBot: {e}")
-        return False
-
-# ==========================================
-# NOTIFICACIÓN DE ESTADO AL CLIENTE (CALLMEBOT)
-# ==========================================
-def enviar_notificacion_estado_cliente_meta(telefono: str, cliente: str, pedido_id: int, nuevo_estado: str):
-    apikey = "2288133"
-    
-    if not apikey or not telefono:
-        print("DEBUG: Falta la APIKey de CallMeBot o el teléfono del cliente está vacío.")
-        return False
-
-    telefono_limpio = "".join(filter(str.isdigit, telefono))
-    if not telefono_limpio:
-        return False
-
-    if len(telefono_limpio) == 8:
-        telefono_limpio = "502" + telefono_limpio
-
-    estado_lower = nuevo_estado.strip().lower()
-    
-    if "pendiente" in estado_lower or "recibido" in estado_lower:
-        mensaje = f"☕ ¡Hola, {cliente}! Hemos recibido con mucha alegría tu pedido #{pedido_id}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨"
-    elif "empaquetando" in estado_lower or "proceso" in estado_lower:
-        mensaje = f"📦 ¡Hola, {cliente}! Te contamos que tu pedido #{pedido_id} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎"
-    elif "entregado" in estado_lower or "completado" in estado_lower:
-        mensaje = f"🎉 ¡Hola, {cliente}! Tu pedido #{pedido_id} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨"
-    else:
-        mensaje = f"☕ ¡Hola, {cliente}! El estado de tu pedido #{pedido_id} ha cambiado a: {nuevo_estado}. Gracias por confiar en Don Nicolás."
-
-    mensaje_codificado = urllib.parse.quote(mensaje)
-    url = f"https://api.callmebot.com/whatsapp.php?phone={telefono_limpio}&text={mensaje_codificado}&apikey={apikey}"
-    
-    try:
-        response = requests.get(url, timeout=10)
-        print(f"DEBUG CallMeBot WhatsApp Cliente - Status: {response.status_code}")
-        return response.status_code == 200
-    except Exception as e:
-        print(f"Error enviando notificación por CallMeBot: {e}")
-        return False
-
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
 X_LOGIN = "AQUI_TU_X_LOGIN"
 X_PRIVATE_KEY = "AQUI_TU_X_PRIVATE_KEY"
@@ -451,11 +388,6 @@ async def crear_pedido_cliente(
         )
         conn.commit()
 
-        threading.Thread(
-            target=enviar_alerta_whatsapp,
-            args=(pedido_id, customer, total, phone, address)
-        ).start()
-
     except Exception as e:
         conn.rollback()
         conn.close()
@@ -472,30 +404,14 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT customer, phone FROM orders WHERE id = ?", (pedido_id,))
-        pedido = cursor.fetchone()
-        
-        if not pedido:
-            raise HTTPException(status_code=404, detail="Pedido no encontrado")
-            
-        cliente = pedido["customer"] or "Cliente"
-        telefono = pedido["phone"] or ""
-
         cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (data.status, pedido_id))
         conn.commit()
-        
-        if telefono:
-            threading.Thread(
-                target=enviar_notificacion_estado_cliente_meta,
-                args=(telefono, cliente, pedido_id, data.status)
-            ).start()
-
     except Exception as e:
         conn.rollback()
         conn.close()
         raise HTTPException(status_code=500, detail=str(e))
     conn.close()
-    return {"success": True, "message": "Estado del pedido actualizado correctamente y notificación enviada al cliente"}
+    return {"success": True, "message": "Estado del pedido actualizado correctamente"}
 
 @app.get("/api/admin/orders")
 def listar_pedidos():
