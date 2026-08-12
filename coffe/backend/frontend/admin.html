@@ -714,6 +714,18 @@
         </aside>
 
         <main>
+            <!-- BARRA DE ACTIVACIÓN DE NOTIFICACIONES -->
+            <div style="background: var(--card-bg); border: 1px solid var(--accent-gold); padding: 12px 20px; border-radius: 8px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(27,18,12,0.03);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.2rem;">🔔</span>
+                    <div>
+                        <strong style="font-size: 0.9rem; color: var(--primary-dark);">Sistema de Alertas</strong>
+                        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">Activa las notificaciones sonoras para nuevos pedidos.</p>
+                    </div>
+                </div>
+                <button id="btn-activar-audio" class="btn-nuevo" style="padding: 8px 16px; font-size: 0.85rem;" onclick="activarSistemaNotificaciones()">Activar Notificaciones</button>
+            </div>
+
             <!-- 1. ESTADÍSTICAS -->
             <div id="seccion-estadisticas" class="seccion-panel activa">
                 <div class="panel-header">
@@ -974,13 +986,41 @@
         let imagenBase64Actual = ''; 
         let tabActualPedidos = 'pendientes';
         let pedidoIdEnVista = null;
-        let conteoPedidosAnterior = 0;
+        let conteoPedidosAnterior = -1;
+        let audioNotificacionPermitido = false;
 
         document.addEventListener("DOMContentLoaded", () => {
             verificarEstadoTarjetaGuardado();
             verificarNuevosPedidosYActualizarPestana();
-            setInterval(verificarNuevosPedidosYActualizarPestana, 8000);
+            setInterval(verificarNuevosPedidosYActualizarPestana, 7000);
         });
+
+        function activarSistemaNotificaciones() {
+            audioNotificacionPermitido = true;
+            const btn = document.getElementById('btn-activar-audio');
+            btn.innerText = "✓ Notificaciones Activas";
+            btn.style.background = "#27ae60";
+            btn.disabled = true;
+            reproducirAlertaSonora();
+        }
+
+        function reproducirAlertaSonora() {
+            if (!audioNotificacionPermitido) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota D5
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch(e) {
+                console.log("Audio no soportado o bloqueado");
+            }
+        }
 
         // ==========================================
         // WHATSAPP: ABRIR CHAT AUTOMÁTICO CON ESTADO
@@ -1000,13 +1040,13 @@
             let estadoLower = estado.trim().toLowerCase();
 
             if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido . Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
             } else if (estadoLower.includes("empaque") || estadoLower.includes("proceso") || estadoLower.includes("preparando")) {
-                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido  se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
             } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
-                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido  ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
             } else {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido  ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
             }
 
             const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
@@ -1014,7 +1054,7 @@
         }
 
         // ==========================================
-        // NOTIFICACIÓN WHATSAPP Y TÍTULO DE PESTAÑA
+        // NOTIFICACIÓN Y TÍTULO DE PESTAÑA CORREGIDOS
         // ==========================================
         async function verificarNuevosPedidosYActualizarPestana() {
             try {
@@ -1037,8 +1077,9 @@
                     document.title = `Panel Administrativo | Don Nicolás`;
                 }
 
-                // Alerta estilo WhatsApp si entra un pedido nuevo respecto al conteo anterior
-                if (conteoPedidosAnterior > 0 && cantidadPendientes > conteoPedidosAnterior) {
+                // Detectar nuevos pedidos para lanzar alerta y sonido
+                if (conteoPedidosAnterior !== -1 && cantidadPendientes > conteoPedidosAnterior) {
+                    reproducirAlertaSonora();
                     mostrarNotificacionWhatsAppEstilo(pendientes[pendientes.length - 1]);
                 }
                 
@@ -1083,7 +1124,7 @@
             
             setTimeout(() => {
                 alertaDiv.style.display = 'none';
-            }, 7000);
+            }, 8000);
         }
 
         function toggleSidebar() {
@@ -1309,6 +1350,11 @@
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
 
             if (pedido) {
+                // QUITAR EL CONTADOR DE LA PESTAÑA AL ENTRAR AL PEDIDO
+                document.title = `Panel Administrativo | Don Nicolás`;
+                const alertaDiv = document.getElementById('whatsapp-flash-toast');
+                if (alertaDiv) alertaDiv.style.display = 'none';
+
                 const estadoActual = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
                 if (estadoActual === 'pendiente' || estadoActual === 'recibido') {
                     abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, 'recibido');
@@ -1481,6 +1527,7 @@
             document.getElementById('detalle-pedido-container').style.display = 'none';
             document.getElementById('pedidos-tabs-container').style.display = 'flex';
             document.getElementById('lista-pedidos-container').style.display = 'block';
+            verificarNuevosPedidosYActualizarPestana();
         }
 
         function abrirFormularioNuevo() {
