@@ -973,6 +973,39 @@
             verificarEstadoTarjetaGuardado();
         });
 
+        // ==========================================
+        // FUNCIÓN INTEGRADA DE WHATSAPP
+        // ==========================================
+        function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
+            if (!telefonoCliente || telefonoCliente.trim() === '') {
+                alert("Este pedido no tiene número de teléfono registrado. No se puede abrir WhatsApp.");
+                return;
+            }
+
+            let telefonoLimpio = telefonoCliente.replace(/\D/g, '');
+            // Se asume código de Guatemala (502) para números de 8 dígitos
+            if (telefonoLimpio.length === 8) {
+                telefonoLimpio = "502" + telefonoLimpio; 
+            }
+
+            let mensaje = "";
+            let estadoLower = estado.trim().toLowerCase();
+
+            if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
+            } else if (estadoLower.includes("empaque") || estadoLower.includes("proceso") || estadoLower.includes("preparando")) {
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
+            } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
+            } else {
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
+            }
+
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
+            window.open(urlWhatsApp, '_blank'); // Abre WhatsApp en una pestaña nueva
+        }
+        // ==========================================
+
         function toggleSidebar() {
             const sidebar = document.getElementById('app-sidebar');
             sidebar.classList.toggle('abierto');
@@ -1333,6 +1366,9 @@
             
             if (!confirm(mensajeConfirm)) return;
 
+            // Obtenemos los datos del pedido antes de actualizar para enviarlos a WhatsApp
+            let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
+
             try {
                 const res = await fetch(`${API_URL}/orders/${pedidoIdEnVista}/status`, {
                     method: 'PATCH',
@@ -1341,9 +1377,10 @@
                 });
 
                 // Actualizamos localmente para reflejar el cambio al instante
-                let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
                 if (pedido) {
                     pedido.status = nuevoEstado;
+                    // Llamamos a la función de WhatsApp (Se abre en pestaña nueva)
+                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 }
 
                 alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a proceso de empaque!' : '¡Pedido marcado como entregado con éxito!');
@@ -1351,9 +1388,9 @@
                 cargarPedidosYPagosUnificados();
             } catch (err) {
                 // Fallback local si la API remota no está activa
-                let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
                 if (pedido) {
                     pedido.status = nuevoEstado;
+                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 }
                 alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado localmente a empaque!' : '¡Pedido marcado como entregado localmente!');
                 volverAListaPedidos();
