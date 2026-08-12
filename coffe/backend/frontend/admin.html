@@ -1014,13 +1014,13 @@
             let estadoLower = estado.trim().toLowerCase();
 
             if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido  Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
             } else if (estadoLower.includes("empaque") || estadoLower.includes("proceso") || estadoLower.includes("preparando")) {
-                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido  se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
             } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
-                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido # ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
             } else {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
             }
 
             const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
