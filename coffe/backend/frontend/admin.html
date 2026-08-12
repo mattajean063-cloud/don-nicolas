@@ -40,6 +40,16 @@
             font-family: 'Cormorant Garamond', serif;
         }
 
+        @keyframes flashAnim {
+            0% { background-color: rgba(197, 160, 89, 0.2); }
+            50% { background-color: rgba(197, 160, 89, 0.8); }
+            100% { background-color: rgba(197, 160, 89, 0.2); }
+        }
+
+        .tr-nuevo-flash {
+            animation: flashAnim 1.5s infinite;
+        }
+
         /* LOGIN OVERLAY */
         #login-overlay {
             position: fixed;
@@ -603,18 +613,68 @@
         }
 
         @media (max-width: 768px) {
-            body { height: 100%; overflow: auto; }
-            #app-container { height: 100%; display: flex; flex-direction: column; }
-            aside { position: fixed; height: 100vh; transform: translateX(-100%); }
-            aside.abierto { transform: translateX(0); box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
-            #menu-toggle-btn { display: inline-block; }
-            main { padding: 1.2rem; height: auto; overflow-y: visible; }
-            .stats-grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-            .detalle-grid, .detalle-grid-3 { grid-template-columns: 1fr; gap: 1rem; }
-            .panel-header h1 { font-size: 1.8rem; }
-            table { font-size: 0.85rem; display: block; overflow-x: auto; white-space: nowrap; }
-            th, td { padding: 0.7rem; }
-            .config-card { flex-direction: column; align-items: flex-start; }
+            body {
+                height: 100%;
+                overflow: auto;
+            }
+
+            #app-container {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            aside {
+                position: fixed;
+                height: 100vh;
+                transform: translateX(-100%);
+            }
+
+            aside.abierto {
+                transform: translateX(0);
+                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+            }
+
+            #menu-toggle-btn {
+                display: inline-block;
+            }
+
+            main {
+                padding: 1.2rem;
+                height: auto;
+                overflow-y: visible;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .detalle-grid, .detalle-grid-3 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .panel-header h1 {
+                font-size: 1.8rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th, td {
+                padding: 0.7rem;
+            }
+
+            .config-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -912,7 +972,7 @@
         let cachePagos = [];
         let cacheProductos = []; 
         let imagenBase64Actual = ''; 
-        let tabActualPedidos = 'pendientes'; 
+        let tabActualPedidos = 'pendientes';
         let pedidoIdEnVista = null;
         let conteoPedidosAnterior = 0;
 
@@ -921,6 +981,110 @@
             verificarNuevosPedidosYActualizarPestana();
             setInterval(verificarNuevosPedidosYActualizarPestana, 8000);
         });
+
+        // ==========================================
+        // WHATSAPP: ABRIR CHAT AUTOMÁTICO CON ESTADO
+        // ==========================================
+        function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
+            if (!telefonoCliente || telefonoCliente.trim() === '') {
+                alert("Este pedido no tiene número de teléfono registrado.");
+                return;
+            }
+
+            let telefonoLimpio = telefonoCliente.replace(/\D/g, '');
+            if (telefonoLimpio.length === 8) {
+                telefonoLimpio = "502" + telefonoLimpio; 
+            }
+
+            let mensaje = "";
+            let estadoLower = estado.trim().toLowerCase();
+
+            if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
+            } else if (estadoLower.includes("empaque") || estadoLower.includes("proceso") || estadoLower.includes("preparando")) {
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
+            } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
+            } else {
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
+            }
+
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
+            window.open(urlWhatsApp, '_blank');
+        }
+
+        // ==========================================
+        // NOTIFICACIÓN WHATSAPP Y TÍTULO DE PESTAÑA
+        // ==========================================
+        async function verificarNuevosPedidosYActualizarPestana() {
+            try {
+                const res = await fetch(`${API_URL}/orders`);
+                if (!res.ok) return;
+                const pedidos = await res.json();
+                cachePedidos = pedidos;
+
+                const pendientes = pedidos.filter(o => {
+                    const estado = (o.status || o.estado || 'pendiente').toLowerCase();
+                    return estado === 'pendiente' || estado === 'nuevo';
+                });
+
+                const cantidadPendientes = pendientes.length;
+
+                // Actualizar título de la pestaña con contador
+                if (cantidadPendientes > 0) {
+                    document.title = `(${cantidadPendientes}) Panel Administrativo | Don Nicolás`;
+                } else {
+                    document.title = `Panel Administrativo | Don Nicolás`;
+                }
+
+                // Alerta estilo WhatsApp si entra un pedido nuevo respecto al conteo anterior
+                if (conteoPedidosAnterior > 0 && cantidadPendientes > conteoPedidosAnterior) {
+                    mostrarNotificacionWhatsAppEstilo(pendientes[pendientes.length - 1]);
+                }
+                
+                conteoPedidosAnterior = cantidadPendientes;
+
+                if (document.getElementById('seccion-pedidos').classList.contains('activa')) {
+                    renderizarTablaPedidos();
+                }
+            } catch (e) {
+                console.error("Error al verificar notificaciones:", e);
+            }
+        }
+
+        function mostrarNotificacionWhatsAppEstilo(pedido) {
+            let alertaDiv = document.getElementById('whatsapp-flash-toast');
+            if (!alertaDiv) {
+                alertaDiv = document.createElement('div');
+                alertaDiv.id = 'whatsapp-flash-toast';
+                alertaDiv.style.cssText = `
+                    position: fixed; bottom: 25px; right: 25px; background: #25D366; color: #fff;
+                    padding: 16px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+                    z-index: 10000; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 12px;
+                    animation: slideInUp 0.4s ease; cursor: pointer;
+                `;
+                document.body.appendChild(alertaDiv);
+            }
+
+            alertaDiv.innerHTML = `
+                <div style="background: #fff; color: #25D366; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">🔔</div>
+                <div>
+                    <div style="font-weight: 700; font-size: 0.95rem;">¡Nuevo pedido de ${pedido.customer || 'Cliente'}!</div>
+                    <div style="font-size: 0.82rem; opacity: 0.9;">Total: Q${Number(pedido.total).toFixed(2)} - Clic para ver</div>
+                </div>
+            `;
+
+            alertaDiv.onclick = () => {
+                cambiarSeccion('pedidos', document.querySelector('.admin-menu li:nth-child(3) a'));
+                alertaDiv.style.display = 'none';
+            };
+
+            alertaDiv.style.display = 'flex';
+            
+            setTimeout(() => {
+                alertaDiv.style.display = 'none';
+            }, 7000);
+        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('app-sidebar');
@@ -984,77 +1148,6 @@
                 volverAListaPedidos();
                 cargarPedidosYPagosUnificados();
             }
-        }
-
-        // SISTEMA DE NOTIFICACIONES Y TÍTULO DE PESTAÑA
-        async function verificarNuevosPedidosYActualizarPestana() {
-            try {
-                const res = await fetch(`${API_URL}/orders`);
-                if (!res.ok) return;
-                const pedidos = await res.json();
-                cachePedidos = pedidos;
-
-                const pendientes = pedidos.filter(o => {
-                    const estado = (o.status || o.estado || 'pendiente').toLowerCase();
-                    return estado === 'pendiente' || estado === 'nuevo';
-                });
-
-                const cantidadPendientes = pendientes.length;
-
-                // Actualizar título de la pestaña con contador
-                if (cantidadPendientes > 0) {
-                    document.title = `(${cantidadPendientes}) Panel Administrativo | Don Nicolás`;
-                } else {
-                    document.title = `Panel Administrativo | Don Nicolás`;
-                }
-
-                // Alerta estilo WhatsApp si entra un pedido nuevo
-                if (conteoPedidosAnterior > 0 && cantidadPendientes > conteoPedidosAnterior) {
-                    mostrarNotificacionWhatsAppEstilo(pendientes[pendientes.length - 1]);
-                }
-                
-                conteoPedidosAnterior = cantidadPendientes;
-
-                if (document.getElementById('seccion-pedidos').classList.contains('activa')) {
-                    renderizarTablaPedidos();
-                }
-            } catch (e) {
-                console.error("Error al verificar notificaciones:", e);
-            }
-        }
-
-        function mostrarNotificacionWhatsAppEstilo(pedido) {
-            let alertaDiv = document.getElementById('whatsapp-flash-toast');
-            if (!alertaDiv) {
-                alertaDiv = document.createElement('div');
-                alertaDiv.id = 'whatsapp-flash-toast';
-                alertaDiv.style.cssText = `
-                    position: fixed; bottom: 25px; right: 25px; background: #25D366; color: #fff;
-                    padding: 16px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-                    z-index: 10000; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 12px;
-                    animation: slideInUp 0.4s ease; cursor: pointer;
-                `;
-                document.body.appendChild(alertaDiv);
-            }
-
-            alertaDiv.innerHTML = `
-                <div style="background: #fff; color: #25D366; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">🔔</div>
-                <div>
-                    <div style="font-weight: 700; font-size: 0.95rem;">¡Nuevo pedido de ${pedido.customer || 'Cliente'}!</div>
-                    <div style="font-size: 0.82rem; opacity: 0.9;">Total: Q${Number(pedido.total).toFixed(2)} - Clic para ver</div>
-                </div>
-            `;
-
-            alertaDiv.onclick = () => {
-                cambiarSeccion('pedidos', document.querySelector('.admin-menu li:nth-child(3) a'));
-                alertaDiv.style.display = 'none';
-            };
-
-            alertaDiv.style.display = 'flex';
-            
-            setTimeout(() => {
-                alertaDiv.style.display = 'none';
-            }, 7000);
         }
 
         async function verificarEstadoTarjetaGuardado() {
@@ -1184,7 +1277,7 @@
                 return;
             }
 
-            pedidosFiltrados.forEach(o => {
+            pedidosFiltrados.forEach((o, index) => {
                 const idLimpio = String(o.id).replace('#', '');
                 const estado = (o.status || o.estado || 'pendiente').toLowerCase();
                 
@@ -1195,14 +1288,16 @@
                     etiquetaEstado = '<span style="color: #27ae60; font-weight: 600;">Entregado</span>';
                 }
 
+                const claseFlash = (tabActualPedidos === 'pendientes' && index === 0) ? 'tr-nuevo-flash' : '';
+
                 tbody.innerHTML += `
-                    <tr>
+                    <tr class="${claseFlash}">
                         <td>#${o.id}</td>
                         <td>${o.customer || 'Cliente General'}</td>
                         <td>Q${Number(o.total).toFixed(2)}</td>
                         <td>${etiquetaEstado}</td>
                         <td>
-                            <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Detalle</button>
+                            <button class="btn-accion btn-ver" onclick="verDetallePedidoYPago('${idLimpio}')">Ver Detalle / Chat</button>
                         </td>
                     </tr>
                 `;
@@ -1214,13 +1309,18 @@
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
 
             if (pedido) {
+                const estadoActual = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
+                if (estadoActual === 'pendiente' || estadoActual === 'recibido') {
+                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, 'recibido');
+                }
+
                 document.getElementById('det-id-pedido').innerText = `Detalle del Pedido: #${pedido.id}`;
                 document.getElementById('det-cliente').innerText = pedido.customer || 'No especificado';
                 document.getElementById('det-telefono').innerText = pedido.phone || 'No especificado';
                 document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
                 document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
 
-                const estado = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
+                const estado = estadoActual;
                 const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
                 const esEmpaque = estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing';
 
@@ -1286,26 +1386,23 @@
                     document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
                     document.getElementById('det-pago-fecha').innerText = pago.created_at || pago.date || 'No especificada';
 
-                    const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pago.numero_nit || pago.nit_factura || pago.documento_nit || pago.nit_cliente || pedido.invoice_nit;
-                    const rawNombre = pago.invoice_name || pago.billing_name || pago.nombre_factura || pago.factura_nombre || pago.client_nit_name || pedido.invoice_name;
-                    const rawNumero = pago.invoice_number || pago.factura_no || pago.numero_factura || pago.num_factura || pago.factura_id || pedido.invoice_number;
-                    const rawDireccion = pago.invoice_address || pago.billing_address || pago.direccion_fiscal || pago.address || pago.fiscal_address || pedido.invoice_address;
+                    const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pedido.invoice_nit;
+                    const rawNombre = pago.invoice_name || pago.billing_name || pedido.invoice_name;
+                    const rawNumero = pago.invoice_number || pago.factura_no || pedido.invoice_number;
+                    const rawDireccion = pago.invoice_address || pago.billing_address || pedido.invoice_address;
 
                     const nombreCliente = pago.client || pago.customer || pedido.customer || 'Cliente General';
-                    const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null' && rawNombre !== undefined) ? rawNombre : nombreCliente;
+                    const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null') ? rawNombre : nombreCliente;
                     
                     let nitLimpio = 'C/F';
-                    if (rawNit && rawNit !== '' && rawNit !== 'null' && rawNit !== undefined && String(rawNit).trim() !== '') {
+                    if (rawNit && rawNit !== '' && rawNit !== 'null' && String(rawNit).trim() !== '') {
                         nitLimpio = String(rawNit).trim();
                     }
 
-                    const numeroFacturaLimpio = (rawNumero && rawNumero !== '' && rawNumero !== 'null' && rawNumero !== undefined) ? rawNumero : 'Pendiente';
-                    const direccionFiscalLimpio = (rawDireccion && rawDireccion !== '' && rawDireccion !== 'null' && rawDireccion !== undefined) ? rawDireccion : 'No especificada';
-
                     document.getElementById('det-factura-nombre').innerText = nombreFacturaLimpio;
                     document.getElementById('det-factura-nit').innerText = nitLimpio;
-                    document.getElementById('det-factura-numero').innerText = numeroFacturaLimpio;
-                    document.getElementById('det-factura-direccion').innerText = direccionFiscalLimpio;
+                    document.getElementById('det-factura-numero').innerText = (rawNumero && rawNumero !== 'null') ? rawNumero : 'Pendiente';
+                    document.getElementById('det-factura-direccion').innerText = (rawDireccion && rawDireccion !== 'null') ? rawDireccion : 'No especificada';
 
                     const imgElement = document.getElementById('det-pago-imagen');
                     const sinFotoElement = document.getElementById('det-pago-sin-foto');
@@ -1347,9 +1444,11 @@
             
             const mensajeConfirm = nuevoEstado === 'empaque' 
                 ? '¿Deseas pasar este pedido a "En Proceso de Empaque"?' 
-                : '¿Deseas marcar este pedido como entregado? Se moverá a la sección de entregados.';
+                : '¿Deseas marcar este pedido como entregado?';
             
             if (!confirm(mensajeConfirm)) return;
+
+            let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
 
             try {
                 await fetch(`${API_URL}/orders/${pedidoIdEnVista}/status`, {
@@ -1358,21 +1457,20 @@
                     body: JSON.stringify({ status: nuevoEstado })
                 });
 
-                let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
                 if (pedido) {
                     pedido.status = nuevoEstado;
+                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 }
 
-                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a proceso de empaque!' : '¡Pedido marcado como entregado con éxito!');
+                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a empaque y chat listo!' : '¡Pedido entregado y chat listo!');
                 volverAListaPedidos();
                 cargarPedidosYPagosUnificados();
-                verificarNuevosPedidosYActualizarPestana();
             } catch (err) {
-                let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
                 if (pedido) {
                     pedido.status = nuevoEstado;
+                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 }
-                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado localmente a empaque!' : '¡Pedido marcado como entregado localmente!');
+                alert('¡Actualizado localmente!');
                 volverAListaPedidos();
                 renderizarTablaPedidos();
             }
@@ -1408,10 +1506,7 @@
 
         function abrirFormularioEditar(id) {
             const p = cacheProductos.find(item => Number(item.id) === Number(id));
-            if (!p) {
-                alert('No se encontró el producto.');
-                return;
-            }
+            if (!p) return;
 
             document.getElementById('form-titulo').innerText = "Editar Producto #" + p.id;
             document.getElementById('prod-id').value = p.id;
@@ -1429,11 +1524,7 @@
                 } catch(e) { specsArray = []; }
             }
 
-            let valVariedad = "";
-            let valTueste = "";
-            let valAltura = "";
-            let valProceso = "";
-
+            let valVariedad = "", valTueste = "", valAltura = "", valProceso = "";
             if (Array.isArray(specsArray)) {
                 specsArray.forEach(s => {
                     const labelLower = (s.label || "").toLowerCase();
@@ -1442,10 +1533,6 @@
                     else if (labelLower.includes("altura")) valAltura = s.value || s.label;
                     else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
                 });
-                if (!valVariedad && specsArray[0]) valVariedad = specsArray[0].label || specsArray[0];
-                if (!valTueste && specsArray[1]) valTueste = specsArray[1].label || specsArray[1];
-                if (!valAltura && specsArray[2]) valAltura = specsArray[2].label || specsArray[2];
-                if (!valProceso && specsArray[3]) valProceso = specsArray[3].label || specsArray[3];
             }
 
             document.getElementById('prod-variedad').value = valVariedad;
@@ -1454,7 +1541,6 @@
             document.getElementById('prod-proceso').value = valProceso;
             
             imagenBase64Actual = p.image_url || ''; 
-
             const imgPreview = document.getElementById('img-preview');
             const placeholder = document.getElementById('preview-placeholder');
 
@@ -1535,19 +1621,14 @@
             const method = id ? 'PUT' : 'POST';
 
             try {
-                const res = await fetch(url, {
-                    method: method,
-                    body: formData
-                });
-
+                const res = await fetch(url, { method: method, body: formData });
                 if (res.ok) {
                     alert('¡Operación realizada con éxito!');
                     ocultarFormulario();
                     cargarProductos();
                     cargarEstadisticas();
                 } else {
-                    const errData = await res.json().catch(() => ({}));
-                    alert('Error: ' + (errData.detail || 'Error desconocido'));
+                    alert('Error al guardar el producto.');
                 }
             } catch (err) { 
                 alert('No se pudo conectar con el servidor.');
@@ -1556,7 +1637,6 @@
 
         async function eliminarProducto(id) {
             if (!confirm('¿Estás seguro de eliminar este producto?')) return;
-
             try {
                 const res = await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
                 if (res.ok) {
