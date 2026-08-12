@@ -15,7 +15,7 @@ UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 # Credenciales directas o mediante variables de entorno de Supabase
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wrcuytrjherblpiyjlqj.supabase.co")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wrcuytrjherblpiyjlqj.supabase.co/rest/v1/")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
