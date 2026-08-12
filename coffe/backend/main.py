@@ -7,7 +7,6 @@ import sqlite3
 import os
 import requests
 import urllib.parse
-import threading
 from typing import Optional, Any
 
 # Intentamos importar libsql si está disponible para la nube (Turso)
@@ -17,8 +16,8 @@ try:
 except ImportError:
     USING_TURSO = False
 
-LIBSQL_DATABASE_URL = os.getenv("libsql://don-nicolasdb-mattajean063-cloud.aws-us-west-2.turso.io")
-LIBSQL_AUTH_TOKEN = os.getenv("eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU5NDE0MzAsImlkIjoiMDE5ZmQyNjMtZDkwMS03NjQ4LWEwNjktNDdhMmFiM2ExNjcwIiwia2lkIjoiUVdJREtKTlc3QzhiVlV2N0stTzdPeDAxYkdnWEpuM1hmTWg5bWkzVkhOOCIsInJpZCI6IjkyMWJlM2FmLTkwZGQtNGNhMy04MmY4LTVkMTcwNTdhM2VmNiJ9.pCTY9PA87-cTs81mfQDLYj8XAnZlrGXRZf2OyvLillgrDW69zCUbOUPfZ9Et6BuQDN7CkV_JOg0rcfVkpnaOAg")
+LIBSQL_DATABASE_URL = os.getenv("https://wrcuytrjherblpiyjlqj.supabase.co/rest/v1/", "")
+LIBSQL_AUTH_TOKEN = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM", "")
 
 app = FastAPI()
 
@@ -32,9 +31,9 @@ configuracion_tienda = {
 }
 
 QPAYPRO_API_URL = "https://api-sandboxpayments.qpaypro.com/api/v1/checkout"
-X_LOGIN = "AQUI_TU_X_LOGIN"
-X_PRIVATE_KEY = "AQUI_TU_X_PRIVATE_KEY"
-X_API_SECRET = "AQUI_TU_X_API_SECRET"
+X_LOGIN = os.getenv("X_LOGIN", "AQUI_TU_X_LOGIN")
+X_PRIVATE_KEY = os.getenv("X_PRIVATE_KEY", "AQUI_TU_X_PRIVATE_KEY")
+X_API_SECRET = os.getenv("X_API_SECRET", "AQUI_TU_X_API_SECRET")
 
 class PagoQPayProRequest(BaseModel):
     amount: float
