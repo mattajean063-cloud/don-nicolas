@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo | Don Nicolás</title>
-    <!-- Tipografías de alta gama -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,655 +31,143 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        *, *:before, *:after {
-            box-sizing: border-box;
-        }
-
-        h1, h2, h3, h4, .serif {
-            font-family: 'Cormorant Garamond', serif;
-        }
+        *, *:before, *:after { box-sizing: border-box; }
+        h1, h2, h3, h4, .serif { font-family: 'Cormorant Garamond', serif; }
 
         @keyframes flashAnim {
             0% { background-color: rgba(197, 160, 89, 0.2); }
             50% { background-color: rgba(197, 160, 89, 0.8); }
             100% { background-color: rgba(197, 160, 89, 0.2); }
         }
+        .tr-nuevo-flash { animation: flashAnim 1.5s infinite; }
 
-        .tr-nuevo-flash {
-            animation: flashAnim 1.5s infinite;
-        }
-
-        /* LOGIN OVERLAY */
         #login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-colonial);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            padding: 1rem;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg-colonial); display: flex; justify-content: center;
+            align-items: center; z-index: 9999; padding: 1rem;
         }
-
         .login-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border: 2px solid var(--accent-gold);
-            box-shadow: 0 15px 35px rgba(27,18,12,0.15);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            border-radius: 8px;
+            background: var(--card-bg); padding: 2.5rem; border: 2px solid var(--accent-gold);
+            box-shadow: 0 15px 35px rgba(27,18,12,0.15); width: 100%; max-width: 400px;
+            text-align: center; border-radius: 8px;
         }
+        .login-card h2 { margin-top: 0; color: var(--primary-dark); font-size: 2rem; letter-spacing: 2px; }
+        .login-card span { font-size: 0.65rem; letter-spacing: 4px; color: var(--accent-gold); text-transform: uppercase; display: block; margin-bottom: 1.5rem; font-weight: 600; }
+        .login-error { color: #a93226; font-size: 0.85rem; margin-top: 1rem; display: none; font-weight: 500; }
 
-        .login-card h2 {
-            margin-top: 0;
-            color: var(--primary-dark);
-            font-size: 2rem;
-            letter-spacing: 2px;
-        }
-
-        .login-card span {
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: var(--accent-gold);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .login-error {
-            color: #a93226;
-            font-size: 0.85rem;
-            margin-top: 1rem;
-            display: none;
-            font-weight: 500;
-        }
-
-        /* APP LAYOUT PRINCIPAL */
-        #app-container {
-            display: none;
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
-
+        #app-container { display: none; width: 100vw; height: 100vh; position: relative; }
         aside {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            color: #f7f4ed;
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid var(--accent-gold);
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-            z-index: 100;
+            width: 260px; background-color: var(--sidebar-bg); color: #f7f4ed;
+            display: flex; flex-direction: column; border-right: 2px solid var(--accent-gold);
+            flex-shrink: 0; transition: transform 0.3s ease; z-index: 100;
         }
-
-        .admin-logo {
-            padding: 2rem 1.5rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-        }
-
-        .admin-logo h2 {
-            margin: 0;
-            font-size: 1.6rem;
-            letter-spacing: 2px;
-            color: #f7f4ed;
-        }
-
-        .admin-logo span {
-            font-size: 0.6rem;
-            letter-spacing: 4px;
-            color: var(--accent-gold);
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .admin-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
+        .admin-logo { padding: 2rem 1.5rem; text-align: center; border-bottom: 1px solid rgba(197, 160, 89, 0.3); }
+        .admin-logo h2 { margin: 0; font-size: 1.6rem; letter-spacing: 2px; color: #f7f4ed; }
+        .admin-logo span { font-size: 0.6rem; letter-spacing: 4px; color: var(--accent-gold); text-transform: uppercase; font-weight: 500; }
+        .admin-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
         .admin-menu li a {
-            display: block;
-            padding: 1.2rem 1.5rem;
-            color: #d8cebc;
-            text-decoration: none;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-weight: 600;
+            display: block; padding: 1.2rem 1.5rem; color: #d8cebc; text-decoration: none;
+            font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.03); transition: all 0.3s ease; cursor: pointer; font-weight: 600;
         }
+        .admin-menu li a:hover, .admin-menu li a.activo { background-color: var(--accent-gold); color: var(--primary-dark); }
 
-        .admin-menu li a:hover, .admin-menu li a.activo {
-            background-color: var(--accent-gold);
-            color: var(--primary-dark);
-        }
+        main { flex-grow: 1; padding: 2.5rem; overflow-y: auto; background-color: var(--bg-colonial); display: flex; flex-direction: column; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+        .panel-header h1 { font-size: 2.4rem; color: var(--primary-dark); margin: 0; font-weight: 700; }
 
-        main {
-            flex-grow: 1;
-            padding: 2.5rem;
-            overflow-y: auto;
-            background-color: var(--bg-colonial);
-            display: flex;
-            flex-direction: column;
-        }
+        .seccion-panel { display: none; }
+        .seccion-panel.activa { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-        }
-
-        .panel-header h1 {
-            font-size: 2.4rem;
-            color: var(--primary-dark);
-            margin: 0;
-            font-weight: 700;
-        }
-
-        .seccion-panel {
-            display: none;
-        }
-
-        .seccion-panel.activa {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 5px 15px rgba(27,18,12,0.03);
-            text-align: center;
-            border-radius: 8px;
-        }
-
-        .stat-card h3 {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-        }
-
-        .stat-card p {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.6rem;
-            color: var(--primary-dark);
-            margin: 0;
-            font-weight: 700;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 3rem; }
+        .stat-card { background: var(--card-bg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: 0 5px 15px rgba(27,18,12,0.03); text-align: center; border-radius: 8px; }
+        .stat-card h3 { font-size: 0.85rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600; }
+        .stat-card p { font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; color: var(--primary-dark); margin: 0; font-weight: 700; }
 
         .config-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 1.8rem;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(27,18,12,0.03);
-            margin-bottom: 2.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.8rem;
+            border-radius: 8px; box-shadow: 0 5px 15px rgba(27,18,12,0.03); margin-bottom: 2.5rem;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;
         }
+        .config-card h3 { margin: 0 0 0.3rem 0; color: var(--primary-dark); font-size: 1.3rem; }
+        .config-card p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
 
-        .config-card h3 {
-            margin: 0 0 0.3rem 0;
-            color: var(--primary-dark);
-            font-size: 1.3rem;
-        }
+        .switch-container { display: flex; align-items: center; gap: 12px; }
+        .switch { position: relative; display: inline-block; width: 56px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-gold); }
+        input:checked + .slider:before { transform: translateX(26px); }
 
-        .config-card p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border-color); box-shadow: 0 5px 15px rgba(27,18,12,0.03); margin-bottom: 2rem; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 1rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        th { font-family: 'Cormorant Garamond', serif; background-color: var(--primary-dark); color: #f7f4ed; font-size: 1rem; letter-spacing: 1px; font-weight: 700; }
+        tr:hover { background-color: #faf7f2; }
 
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 56px;
-            height: 30px;
-        }
-
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .3s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--accent-gold);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 5px 15px rgba(27,18,12,0.03);
-            margin-bottom: 2rem;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 1rem 1.2rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
-
-        th {
-            font-family: 'Cormorant Garamond', serif;
-            background-color: var(--primary-dark);
-            color: #f7f4ed;
-            font-size: 1rem;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        tr:hover {
-            background-color: #faf7f2;
-        }
-
-        .btn-accion {
-            padding: 6px 12px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: pointer;
-            border: none;
-            transition: opacity 0.2s;
-            margin-right: 5px;
-            margin-bottom: 4px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        .btn-editar {
-            background: var(--accent-gold);
-            color: var(--primary-dark);
-        }
-
-        .btn-eliminar {
-            background: #a93226;
-            color: #fff;
-        }
-
-        .btn-ver {
-            background: var(--primary-dark);
-            color: #f7f4ed;
-        }
-
-        .btn-empaque {
-            background: #d35400;
-            color: #fff;
-        }
-
-        .btn-entregar {
-            background: #27ae60;
-            color: #fff;
-        }
+        .btn-accion { padding: 6px 12px; font-family: 'Montserrat', sans-serif; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; transition: opacity 0.2s; margin-right: 5px; margin-bottom: 4px; border-radius: 4px; font-weight: 600; }
+        .btn-editar { background: var(--accent-gold); color: var(--primary-dark); }
+        .btn-eliminar { background: #a93226; color: #fff; }
+        .btn-ver { background: var(--primary-dark); color: #f7f4ed; }
+        .btn-empaque { background: #d35400; color: #fff; }
+        .btn-entregar { background: #27ae60; color: #fff; }
 
         .btn-nuevo {
-            background: var(--primary-dark);
-            color: #f7f4ed;
-            padding: 10px 20px;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            font-weight: 700;
-            box-shadow: 0 4px 10px rgba(27,18,12,0.1);
-            transition: background 0.2s;
+            background: var(--primary-dark); color: #f7f4ed; padding: 10px 20px;
+            font-family: 'Cormorant Garamond', serif; font-size: 1rem; letter-spacing: 1.5px;
+            text-transform: uppercase; cursor: pointer; border: none; border-radius: 4px;
+            font-weight: 700; box-shadow: 0 4px 10px rgba(27,18,12,0.1); transition: background 0.2s;
         }
+        .btn-nuevo:hover { background: var(--accent-gold); color: var(--primary-dark); }
 
-        .btn-nuevo:hover {
-            background: var(--accent-gold);
-            color: var(--primary-dark);
-        }
+        .pedidos-tabs { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-radius: 6px; color: var(--text-muted); transition: all 0.2s; }
+        .tab-btn.activo { background: var(--primary-dark); color: var(--accent-gold); border-color: var(--primary-dark); }
 
-        .pedidos-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
+        .form-container { background: var(--card-bg); padding: 2.5rem; border: 1px solid var(--border-color); max-width: 650px; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 10px 25px rgba(27,18,12,0.04); }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; font-family: 'Cormorant Garamond', serif; font-weight: 700; color: var(--primary-dark); }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); background: #faf7f2; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; border-radius: 6px; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--accent-gold); background: #fff; }
 
-        .tab-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 6px;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
+        .img-preview-container { margin-top: 0.8rem; display: flex; align-items: center; gap: 15px; }
+        .preview-box { width: 80px; height: 80px; border: 1px solid var(--border-color); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
 
-        .tab-btn.activo {
-            background: var(--primary-dark);
-            color: var(--accent-gold);
-            border-color: var(--primary-dark);
-        }
+        .detalle-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 2.5rem; margin-top: 1.5rem; border-radius: 8px; box-shadow: 0 10px 25px rgba(27,18,12,0.04); }
+        .detalle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .detalle-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .info-box h4 { font-family: 'Cormorant Garamond', serif; color: var(--primary-dark); border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem; margin-top: 0; font-size: 1.2rem; font-weight: 700; }
+        .comprobante-preview { max-width: 100%; max-height: 350px; border: 1px solid var(--border-color); background: #fff; padding: 5px; margin-top: 0.5rem; display: block; cursor: pointer; border-radius: 4px; }
 
-        .form-container {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border: 1px solid var(--border-color);
-            max-width: 650px;
-            margin-bottom: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
-        }
+        .contenido-bloque-principal { display: flex; flex-direction: column; width: 100%; }
+        .logo-bloque-superior { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(27,18,12,0.02); }
+        .logo-bloque-superior .logo-mini-circulo { width: 45px; height: 45px; background: var(--primary-dark); color: var(--accent-gold); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-weight: bold; font-size: 1.2rem; border: 1px solid var(--accent-gold); border-radius: 50%; }
+        .logo-bloque-superior .logo-textos h3 { margin: 0; font-size: 1.2rem; color: var(--primary-dark); letter-spacing: 1px; font-weight: 700; }
+        .logo-bloque-superior .logo-textos span { font-size: 0.65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
 
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.4rem;
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border-color);
-            background: #faf7f2;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            box-sizing: border-box;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: var(--accent-gold);
-            background: #fff;
-        }
-
-        .img-preview-container {
-            margin-top: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .preview-box {
-            width: 80px;
-            height: 80px;
-            border: 1px solid var(--border-color);
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border-radius: 4px;
-        }
-
-        .preview-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .detalle-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 2.5rem;
-            margin-top: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(27,18,12,0.04);
-        }
-
-        .detalle-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .detalle-grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-box h4 {
-            font-family: 'Cormorant Garamond', serif;
-            color: var(--primary-dark);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.4rem;
-            margin-top: 0;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .comprobante-preview {
-            max-width: 100%;
-            max-height: 350px;
-            border: 1px solid var(--border-color);
-            background: #fff;
-            padding: 5px;
-            margin-top: 0.5rem;
-            display: block;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .contenido-bloque-principal {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .logo-bloque-superior {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.2rem 1.5rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(27,18,12,0.02);
-        }
-
-        .logo-bloque-superior .logo-mini-circulo {
-            width: 45px;
-            height: 45px;
-            background: var(--primary-dark);
-            color: var(--accent-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: bold;
-            font-size: 1.2rem;
-            border: 1px solid var(--accent-gold);
-            border-radius: 50%;
-        }
-
-        .logo-bloque-superior .logo-textos h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--primary-dark);
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        .logo-bloque-superior .logo-textos span {
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        #menu-toggle-btn {
-            display: none;
-            background: var(--primary-dark);
-            color: var(--accent-gold);
-            border: 1px solid var(--accent-gold);
-            padding: 8px 12px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-right: 15px;
-            border-radius: 4px;
-        }
-
-        @keyframes slideInUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        #menu-toggle-btn { display: none; background: var(--primary-dark); color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 8px 12px; font-size: 1.2rem; cursor: pointer; margin-right: 15px; border-radius: 4px; }
 
         @media (max-width: 768px) {
-            body {
-                height: 100%;
-                overflow: auto;
-            }
-
-            #app-container {
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-            }
-
-            aside {
-                position: fixed;
-                height: 100vh;
-                transform: translateX(-100%);
-            }
-
-            aside.abierto {
-                transform: translateX(0);
-                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
-            }
-
-            #menu-toggle-btn {
-                display: inline-block;
-            }
-
-            main {
-                padding: 1.2rem;
-                height: auto;
-                overflow-y: visible;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .detalle-grid, .detalle-grid-3 {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .panel-header h1 {
-                font-size: 1.8rem;
-            }
-
-            table {
-                font-size: 0.85rem;
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-
-            th, td {
-                padding: 0.7rem;
-            }
-
-            .config-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            body { height: 100%; overflow: auto; }
+            #app-container { height: 100%; display: flex; flex-direction: column; }
+            aside { position: fixed; height: 100vh; transform: translateX(-100%); }
+            aside.abierto { transform: translateX(0); box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+            #menu-toggle-btn { display: inline-block; }
+            main { padding: 1.2rem; height: auto; overflow-y: visible; }
+            .stats-grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+            .detalle-grid, .detalle-grid-3 { grid-template-columns: 1fr; gap: 1rem; }
+            .panel-header h1 { font-size: 1.8rem; }
+            table { font-size: 0.85rem; display: block; overflow-x: auto; white-space: nowrap; }
+            th, td { padding: 0.7rem; }
+            .config-card { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE LOGIN ADMINISTRATIVO -->
+    <!-- LOGIN ADMINISTRATIVO -->
     <div id="login-overlay">
         <div class="login-card">
             <h2>Don Nicolás</h2>
@@ -698,7 +185,7 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DEL PANEL -->
+    <!-- PANEL PRINCIPAL -->
     <div id="app-container">
         <aside id="app-sidebar">
             <div class="admin-logo">
@@ -714,16 +201,16 @@
         </aside>
 
         <main>
-            <!-- BARRA DE ACTIVACIÓN DE NOTIFICACIONES -->
+            <!-- BARRA DE ACTIVACIÓN DE NOTIFICACIONES EN ESCRITORIO -->
             <div style="background: var(--card-bg); border: 1px solid var(--accent-gold); padding: 12px 20px; border-radius: 8px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(27,18,12,0.03);">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.2rem;">🔔</span>
                     <div>
-                        <strong style="font-size: 0.9rem; color: var(--primary-dark);">Sistema de Alertas</strong>
-                        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">Activa las notificaciones sonoras para nuevos pedidos.</p>
+                        <strong style="font-size: 0.9rem; color: var(--primary-dark);">Notificaciones de Esquina (Escritorio)</strong>
+                        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">Activa las alertas del sistema para que aparezcan aunque uses otra pestaña.</p>
                     </div>
                 </div>
-                <button id="btn-activar-audio" class="btn-nuevo" style="padding: 8px 16px; font-size: 0.85rem;" onclick="activarSistemaNotificaciones()">Activar Notificaciones</button>
+                <button id="btn-activar-audio" class="btn-nuevo" style="padding: 8px 16px; font-size: 0.85rem;" onclick="activarNotificacionesEscritorio()">Activar Alertas</button>
             </div>
 
             <!-- 1. ESTADÍSTICAS -->
@@ -747,7 +234,7 @@
                     <div class="config-card">
                         <div>
                             <h3>Pasarela de Pagos con Tarjeta (QPayPro)</h3>
-                            <p>Habilita o deshabilita instantáneamente el botón de pagos con tarjeta en la tienda de tus clientes.</p>
+                            <p>Habilita o deshabilita instantáneamente el botón de pagos con tarjeta en la tienda.</p>
                         </div>
                         <div class="switch-container">
                             <span id="label-estado-tarjeta" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Deshabilitado</span>
@@ -814,20 +301,20 @@
                             <input type="number" id="prod-stock" required>
                         </div>
                         <div class="form-group">
-                            <label>Variedad (1.ª Tasita)</label>
+                            <label>Variedad</label>
                             <input type="text" id="prod-variedad" placeholder="Ej. Arábica / Bourbon">
                         </div>
                         <div class="form-group">
-                            <label>Tueste (2.ª Tasita)</label>
+                            <label>Tueste</label>
                             <input type="text" id="prod-tueste" placeholder="Ej. Medio / Oscuro">
                         </div>
                         <div class="form-group">
-                            <label>Altura (3.ª Tasita)</label>
+                            <label>Altura</label>
                             <input type="text" id="prod-altura" placeholder="Ej. 1,350 msnm">
                         </div>
                         <div class="form-group">
-                            <label>Proceso (4.ª Tasita)</label>
-                            <input type="text" id="prod-proceso" placeholder="Ej. Lavado / Honey / Natural">
+                            <label>Proceso</label>
+                            <input type="text" id="prod-proceso" placeholder="Ej. Lavado / Honey">
                         </div>
                         <div class="form-group">
                             <label>Descripción</label>
@@ -835,7 +322,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Fotografía del Grano de Café / Producto</label>
+                            <label>Fotografía del Producto</label>
                             <input type="file" id="prod-archivo-img" accept="image/*" onchange="previsualizarImagen(event)">
                             <div class="img-preview-container">
                                 <div class="preview-box">
@@ -868,7 +355,7 @@
                 </div>
             </div>
 
-            <!-- 3. PEDIDOS Y PAGOS UNIFICADOS -->
+            <!-- 3. PEDIDOS Y PAGOS -->
             <div id="seccion-pedidos" class="seccion-panel">
                 <div class="panel-header">
                     <div style="display: flex; align-items: center;">
@@ -938,7 +425,7 @@
                                     <th>Producto</th>
                                     <th>Cantidad</th>
                                     <th>Precio Unitario</th>
-                                    <th>Detalles / Molienda</th>
+                                    <th>Molienda</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-detalle-items"></tbody>
@@ -987,7 +474,7 @@
         let tabActualPedidos = 'pendientes';
         let pedidoIdEnVista = null;
         let conteoPedidosAnterior = -1;
-        let audioNotificacionPermitido = false;
+        let notificacionesEscritorioHabilitadas = false;
 
         document.addEventListener("DOMContentLoaded", () => {
             verificarEstadoTarjetaGuardado();
@@ -995,67 +482,62 @@
             setInterval(verificarNuevosPedidosYActualizarPestana, 7000);
         });
 
-        function activarSistemaNotificaciones() {
-            audioNotificacionPermitido = true;
-            const btn = document.getElementById('btn-activar-audio');
-            btn.innerText = "✓ Notificaciones Activas";
-            btn.style.background = "#27ae60";
-            btn.disabled = true;
-            reproducirAlertaSonora();
+        async function activarNotificacionesEscritorio() {
+            if (!("Notification" in window)) {
+                alert("Tu navegador no soporta notificaciones de escritorio.");
+                return;
+            }
+
+            const permiso = await Notification.requestPermission();
+            if (permiso === "granted") {
+                notificacionesEscritorioHabilitadas = true;
+                const btn = document.getElementById('btn-activar-audio');
+                btn.innerText = "✓ Alertas Activas en Esquina";
+                btn.style.background = "#27ae60";
+                btn.disabled = true;
+                reproducirAlertaSonora();
+                new Notification("Don Nicolás", { body: "¡Notificaciones de esquina activadas con éxito!" });
+            } else {
+                alert("Has denegado los permisos de notificación en el navegador.");
+            }
         }
 
         function reproducirAlertaSonora() {
-            if (!audioNotificacionPermitido) return;
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota D5
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.start();
-                osc.stop(ctx.currentTime + 0.3);
-            } catch(e) {
-                console.log("Audio no soportado o bloqueado");
-            }
+                osc.stop(ctx.currentTime + 0.35);
+            } catch(e) { console.log("Audio bloqueado"); }
         }
 
-        // ==========================================
-        // WHATSAPP: ABRIR CHAT AUTOMÁTICO CON ESTADO
-        // ==========================================
         function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
-            if (!telefonoCliente || telefonoCliente.trim() === '') {
-                alert("Este pedido no tiene número de teléfono registrado.");
-                return;
-            }
-
+            if (!telefonoCliente || telefonoCliente.trim() === '') return;
             let telefonoLimpio = telefonoCliente.replace(/\D/g, '');
-            if (telefonoLimpio.length === 8) {
-                telefonoLimpio = "502" + telefonoLimpio; 
-            }
+            if (telefonoLimpio.length === 8) telefonoLimpio = "502" + telefonoLimpio; 
 
             let mensaje = "";
             let estadoLower = estado.trim().toLowerCase();
 
             if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con mucha alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación y tradición para ti. ¡Muchas gracias por elegirnos! ✨`;
-            } else if (estadoLower.includes("empaque") || estadoLower.includes("proceso") || estadoLower.includes("preparando")) {
-                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente para que llegue en perfecto estado. ¡Gracias por tu paciencia y confianza! 🤎`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación. ¡Muchas gracias! ✨`;
+            } else if (estadoLower.includes("empaque")) {
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente. ¡Gracias por tu confianza! 🤎`;
             } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
-                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que disfrutes al máximo cada sorbo y momento. ¡Fue un placer atenderte, vuelve pronto! ☕✨`;
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que lo disfrutes al máximo. ¡Vuelve pronto! ☕`;
             } else {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} ha cambiado a: ${estado}. Gracias por confiar en Don Nicolás.`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} cambió a: ${estado}.`;
             }
 
-            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
-            window.open(urlWhatsApp, '_blank');
+            window.open(`https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        // ==========================================
-        // NOTIFICACIÓN Y TÍTULO DE PESTAÑA CORREGIDOS
-        // ==========================================
         async function verificarNuevosPedidosYActualizarPestana() {
             try {
                 const res = await fetch(`${API_URL}/orders`);
@@ -1077,10 +559,22 @@
                     document.title = `Panel Administrativo | Don Nicolás`;
                 }
 
-                // Detectar nuevos pedidos para lanzar alerta y sonido
+                // Detectar nuevos pedidos para lanzar alerta sonora y notificación nativa en la esquina
                 if (conteoPedidosAnterior !== -1 && cantidadPendientes > conteoPedidosAnterior) {
                     reproducirAlertaSonora();
-                    mostrarNotificacionWhatsAppEstilo(pendientes[pendientes.length - 1]);
+                    const ultimoPedido = pendientes[pendientes.length - 1];
+                    
+                    // Notificación en la esquina del sistema operativo (funciona en otra pestaña/app)
+                    if (notificacionesEscritorioHabilitadas && Notification.permission === "granted") {
+                        const notif = new Notification("¡Nuevo Pedido Recibido! ☕", {
+                            body: `Cliente: ${ultimoPedido.customer || 'General'} - Total: Q${Number(ultimoPedido.total).toFixed(2)}`,
+                            icon: ""
+                        });
+                        notif.onclick = () => {
+                            window.focus();
+                            cambiarSeccion('pedidos', document.querySelector('.admin-menu li:nth-child(3) a'));
+                        };
+                    }
                 }
                 
                 conteoPedidosAnterior = cantidadPendientes;
@@ -1088,48 +582,11 @@
                 if (document.getElementById('seccion-pedidos').classList.contains('activa')) {
                     renderizarTablaPedidos();
                 }
-            } catch (e) {
-                console.error("Error al verificar notificaciones:", e);
-            }
-        }
-
-        function mostrarNotificacionWhatsAppEstilo(pedido) {
-            let alertaDiv = document.getElementById('whatsapp-flash-toast');
-            if (!alertaDiv) {
-                alertaDiv = document.createElement('div');
-                alertaDiv.id = 'whatsapp-flash-toast';
-                alertaDiv.style.cssText = `
-                    position: fixed; bottom: 25px; right: 25px; background: #25D366; color: #fff;
-                    padding: 16px 20px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-                    z-index: 10000; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 12px;
-                    animation: slideInUp 0.4s ease; cursor: pointer;
-                `;
-                document.body.appendChild(alertaDiv);
-            }
-
-            alertaDiv.innerHTML = `
-                <div style="background: #fff; color: #25D366; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">🔔</div>
-                <div>
-                    <div style="font-weight: 700; font-size: 0.95rem;">¡Nuevo pedido de ${pedido.customer || 'Cliente'}!</div>
-                    <div style="font-size: 0.82rem; opacity: 0.9;">Total: Q${Number(pedido.total).toFixed(2)} - Clic para ver</div>
-                </div>
-            `;
-
-            alertaDiv.onclick = () => {
-                cambiarSeccion('pedidos', document.querySelector('.admin-menu li:nth-child(3) a'));
-                alertaDiv.style.display = 'none';
-            };
-
-            alertaDiv.style.display = 'flex';
-            
-            setTimeout(() => {
-                alertaDiv.style.display = 'none';
-            }, 8000);
+            } catch (e) { console.error("Error al verificar notificaciones:", e); }
         }
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('app-sidebar');
-            sidebar.classList.toggle('abierto');
+            document.getElementById('app-sidebar').classList.toggle('abierto');
         }
 
         async function realizarLogin() {
@@ -1143,7 +600,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: usernameInput, password: passwordInput })
                 });
-
                 const data = await response.json();
 
                 if (response.ok && data.success) {
@@ -1152,9 +608,7 @@
                     cargarEstadisticas();
                     verificarEstadoTarjetaGuardado();
                     verificarNuevosPedidosYActualizarPestana();
-                } else {
-                    errorMsg.style.display = 'block';
-                }
+                } else { errorMsg.style.display = 'block'; }
             } catch (err) {
                 errorMsg.innerText = "Error de conexión con el servidor.";
                 errorMsg.style.display = 'block';
@@ -1180,15 +634,9 @@
                 document.getElementById('app-sidebar').classList.remove('abierto');
             }
 
-            if (seccionId === 'estadisticas') {
-                cargarEstadisticas();
-                verificarEstadoTarjetaGuardado();
-            }
+            if (seccionId === 'estadisticas') { cargarEstadisticas(); verificarEstadoTarjetaGuardado(); }
             if (seccionId === 'productos') cargarProductos();
-            if (seccionId === 'pedidos') {
-                volverAListaPedidos();
-                cargarPedidosYPagosUnificados();
-            }
+            if (seccionId === 'pedidos') { volverAListaPedidos(); cargarPedidosYPagosUnificados(); }
         }
 
         async function verificarEstadoTarjetaGuardado() {
@@ -1199,32 +647,20 @@
                     const habilitado = data.enabled || false;
                     document.getElementById('toggle-tarjeta-admin').checked = habilitado;
                     actualizarTextoEstadoTarjeta(habilitado);
-                } else {
-                    const localEstado = localStorage.getItem('don_nicolas_tarjeta_habilitada') === 'true';
-                    document.getElementById('toggle-tarjeta-admin').checked = localEstado;
-                    actualizarTextoEstadoTarjeta(localEstado);
                 }
-            } catch(e) {
-                const localEstado = localStorage.getItem('don_nicolas_tarjeta_habilitada') === 'true';
-                document.getElementById('toggle-tarjeta-admin').checked = localEstado;
-                actualizarTextoEstadoTarjeta(localEstado);
-            }
+            } catch(e) {}
         }
 
         async function cambiarEstadoTarjetaAdmin(checkbox) {
             const habilitado = checkbox.checked;
             actualizarTextoEstadoTarjeta(habilitado);
-            localStorage.setItem('don_nicolas_tarjeta_habilitada', habilitado);
-
             try {
                 await fetch(`${API_URL}/card-payment-status`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ enabled: habilitado })
                 });
-            } catch (e) {
-                console.log("Estado guardado localmente");
-            }
+            } catch (e) {}
         }
 
         function actualizarTextoEstadoTarjeta(habilitado) {
@@ -1281,7 +717,6 @@
                 ]);
                 cachePedidos = await resPedidos.json();
                 cachePagos = await resPagos.json();
-
                 renderizarTablaPedidos();
             } catch (err) { console.error(err); }
         }
@@ -1310,11 +745,7 @@
             });
 
             if (pedidosFiltrados.length === 0) {
-                let mensaje = 'No hay pedidos nuevos.';
-                if (tabActualPedidos === 'empaque') mensaje = 'No hay pedidos en proceso de empaque.';
-                if (tabActualPedidos === 'entregados') mensaje = 'No hay pedidos entregados.';
-                
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">${mensaje}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No hay pedidos en esta sección.</td></tr>`;
                 return;
             }
 
@@ -1323,11 +754,8 @@
                 const estado = (o.status || o.estado || 'pendiente').toLowerCase();
                 
                 let etiquetaEstado = '<span style="color: #d35400; font-weight: 600;">Nuevo / Pendiente</span>';
-                if (estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing') {
-                    etiquetaEstado = '<span style="color: #e67e22; font-weight: 600;">En Proceso de Empaque</span>';
-                } else if (estado === 'entregado' || estado === 'completado' || estado === 'delivered') {
-                    etiquetaEstado = '<span style="color: #27ae60; font-weight: 600;">Entregado</span>';
-                }
+                if (estado === 'empaque') etiquetaEstado = '<span style="color: #e67e22; font-weight: 600;">En Proceso de Empaque</span>';
+                if (estado === 'entregado' || estado === 'completado') etiquetaEstado = '<span style="color: #27ae60; font-weight: 600;">Entregado</span>';
 
                 const claseFlash = (tabActualPedidos === 'pendientes' && index === 0) ? 'tr-nuevo-flash' : '';
 
@@ -1352,8 +780,6 @@
             if (pedido) {
                 // QUITAR EL CONTADOR DE LA PESTAÑA AL ENTRAR AL PEDIDO
                 document.title = `Panel Administrativo | Don Nicolás`;
-                const alertaDiv = document.getElementById('whatsapp-flash-toast');
-                if (alertaDiv) alertaDiv.style.display = 'none';
 
                 const estadoActual = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
                 if (estadoActual === 'pendiente' || estadoActual === 'recibido') {
@@ -1366,31 +792,20 @@
                 document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
                 document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
 
-                const estado = estadoActual;
-                const esEntregado = estado === 'entregado' || estado === 'completado' || estado === 'delivered';
-                const esEmpaque = estado === 'empaque' || estado === 'en proceso de empaque' || estado === 'packing';
-
                 const btnEmpaque = document.getElementById('btn-marcar-empaque');
                 const btnEntregado = document.getElementById('btn-marcar-entregado');
 
-                if (esEntregado) {
+                if (estadoActual.includes('entregado') || estadoActual.includes('completado')) {
                     btnEmpaque.style.display = 'none';
                     btnEntregado.innerText = '✓ Pedido Entregado';
-                    btnEntregado.style.background = '#7f8c8d';
                     btnEntregado.disabled = true;
-                } else if (esEmpaque) {
+                } else if (estadoActual.includes('empaque')) {
                     btnEmpaque.style.display = 'none';
                     btnEntregado.innerText = '✓ Marcar como Entregado';
-                    btnEntregado.style.background = '#27ae60';
                     btnEntregado.disabled = false;
                 } else {
                     btnEmpaque.style.display = 'inline-block';
-                    btnEmpaque.innerText = '📦 Pasar a Empaque';
-                    btnEmpaque.style.background = '#d35400';
                     btnEmpaque.disabled = false;
-                    
-                    btnEntregado.innerText = '✓ Marcar como Entregado';
-                    btnEntregado.style.background = '#27ae60';
                     btnEntregado.disabled = false;
                 }
 
@@ -1399,100 +814,55 @@
                 
                 if (pedido.items) {
                     let itemsArray = [];
-                    try {
-                        itemsArray = typeof pedido.items === 'string' ? JSON.parse(pedido.items) : pedido.items;
-                    } catch(e) { itemsArray = []; }
+                    try { itemsArray = typeof pedido.items === 'string' ? JSON.parse(pedido.items) : pedido.items; } catch(e) {}
 
                     if (Array.isArray(itemsArray) && itemsArray.length > 0) {
                         itemsArray.forEach(item => {
-                            let moliendaTexto = item.molienda || item.grind || item.tipo_molienda || item.details || item.note || 'No especificada';
-                            
                             tbodyItems.innerHTML += `
                                 <tr>
                                     <td><strong>${item.name || item.nombre}</strong></td>
                                     <td>${item.quantity || item.cantidad}</td>
                                     <td>Q${Number(item.price || item.precio).toFixed(2)}</td>
-                                    <td><span style="color: var(--text-muted); font-size: 0.9rem;">${moliendaTexto}</span></td>
+                                    <td><span style="color: var(--text-muted);">${item.molienda || item.grind || 'Estándar'}</span></td>
                                 </tr>
                             `;
                         });
-                    } else {
-                        tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Total del pedido: Q${Number(pedido.total).toFixed(2)}</td></tr>`;
                     }
-                } else {
-                    tbodyItems.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin ítems detallados guardados.</td></tr>`;
                 }
 
                 let pago = cachePagos.find(p => String(p.order_id) === String(pedidoId) || String(p.id) === String(pedidoId));
-
                 if (pago) {
                     document.getElementById('det-pago-id').innerText = `#${pago.id}`;
                     document.getElementById('det-pago-metodo').innerText = pago.method || 'Efectivo';
                     document.getElementById('det-pago-monto').innerText = `Q${Number(pago.amount).toFixed(2)}`;
                     document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
-                    document.getElementById('det-pago-fecha').innerText = pago.created_at || pago.date || 'No especificada';
-
-                    const rawNit = pago.nit || pago.invoice_nit || pago.cedula || pago.tax_id || pedido.invoice_nit;
-                    const rawNombre = pago.invoice_name || pago.billing_name || pedido.invoice_name;
-                    const rawNumero = pago.invoice_number || pago.factura_no || pedido.invoice_number;
-                    const rawDireccion = pago.invoice_address || pago.billing_address || pedido.invoice_address;
-
-                    const nombreCliente = pago.client || pago.customer || pedido.customer || 'Cliente General';
-                    const nombreFacturaLimpio = (rawNombre && rawNombre !== '' && rawNombre !== 'null') ? rawNombre : nombreCliente;
-                    
-                    let nitLimpio = 'C/F';
-                    if (rawNit && rawNit !== '' && rawNit !== 'null' && String(rawNit).trim() !== '') {
-                        nitLimpio = String(rawNit).trim();
-                    }
-
-                    document.getElementById('det-factura-nombre').innerText = nombreFacturaLimpio;
-                    document.getElementById('det-factura-nit').innerText = nitLimpio;
-                    document.getElementById('det-factura-numero').innerText = (rawNumero && rawNumero !== 'null') ? rawNumero : 'Pendiente';
-                    document.getElementById('det-factura-direccion').innerText = (rawDireccion && rawDireccion !== 'null') ? rawDireccion : 'No especificada';
+                    document.getElementById('det-pago-fecha').innerText = pago.created_at || 'No especificada';
+                    document.getElementById('det-factura-nombre').innerText = pago.invoice_name || pedido.customer || 'C/F';
+                    document.getElementById('det-factura-nit').innerText = pago.nit || pago.invoice_nit || 'C/F';
+                    document.getElementById('det-factura-numero').innerText = pago.invoice_number || 'Pendiente';
+                    document.getElementById('det-factura-direccion').innerText = pago.invoice_address || 'No especificada';
 
                     const imgElement = document.getElementById('det-pago-imagen');
                     const sinFotoElement = document.getElementById('det-pago-sin-foto');
-                    const imgUrl = pago.receipt_url || pago.receipt || pago.image_url;
-
-                    if (imgUrl) {
-                        imgElement.src = imgUrl;
+                    if (pago.receipt_url) {
+                        imgElement.src = pago.receipt_url;
                         imgElement.style.display = 'block';
                         sinFotoElement.style.display = 'none';
                     } else {
                         imgElement.style.display = 'none';
                         sinFotoElement.style.display = 'block';
                     }
-                } else {
-                    document.getElementById('det-pago-id').innerText = `#${pedido.id}`;
-                    document.getElementById('det-pago-metodo').innerText = pedido.payment_method_type || 'Transferencia';
-                    document.getElementById('det-pago-monto').innerText = `Q${Number(pedido.total).toFixed(2)}`;
-                    document.getElementById('det-pago-estado').innerText = 'Completado';
-                    document.getElementById('det-pago-fecha').innerText = pedido.created_at || 'No especificada';
-                    document.getElementById('det-factura-nombre').innerText = pedido.invoice_name || pedido.customer || 'C/F';
-                    document.getElementById('det-factura-nit').innerText = pedido.invoice_nit || 'C/F';
-                    document.getElementById('det-factura-numero').innerText = pedido.invoice_number || 'Pendiente';
-                    document.getElementById('det-factura-direccion').innerText = pedido.invoice_address || 'No especificada';
-                    
-                    document.getElementById('det-pago-imagen').style.display = 'none';
-                    document.getElementById('det-pago-sin-foto').style.display = 'block';
                 }
 
                 document.getElementById('pedidos-tabs-container').style.display = 'none';
                 document.getElementById('lista-pedidos-container').style.display = 'none';
                 document.getElementById('detalle-pedido-container').style.display = 'block';
-            } else {
-                alert('No se pudieron encontrar los detalles de este pedido.');
             }
         }
 
         async function cambiarEstadoPedidoActual(nuevoEstado) {
             if (!pedidoIdEnVista) return;
-            
-            const mensajeConfirm = nuevoEstado === 'empaque' 
-                ? '¿Deseas pasar este pedido a "En Proceso de Empaque"?' 
-                : '¿Deseas marcar este pedido como entregado?';
-            
-            if (!confirm(mensajeConfirm)) return;
+            if (!confirm(`¿Deseas actualizar el estado a "${nuevoEstado}"?`)) return;
 
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoIdEnVista));
 
@@ -1502,23 +872,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: nuevoEstado })
                 });
-
-                if (pedido) {
-                    pedido.status = nuevoEstado;
-                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
-                }
-
-                alert(nuevoEstado === 'empaque' ? '¡Pedido actualizado a empaque y chat listo!' : '¡Pedido entregado y chat listo!');
+                if (pedido) abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
+                alert('¡Estado actualizado y chat listo!');
                 volverAListaPedidos();
                 cargarPedidosYPagosUnificados();
             } catch (err) {
-                if (pedido) {
-                    pedido.status = nuevoEstado;
-                    abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
-                }
-                alert('¡Actualizado localmente!');
+                if (pedido) abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, nuevoEstado);
                 volverAListaPedidos();
-                renderizarTablaPedidos();
             }
         }
 
@@ -1534,90 +894,32 @@
             document.getElementById('form-titulo').innerText = "Agregar Nuevo Producto";
             document.getElementById('prod-id').value = "";
             document.getElementById('prod-nombre').value = "";
-            document.getElementById('prod-categoria').value = "Clásicos";
             document.getElementById('prod-precio').value = "";
             document.getElementById('prod-stock').value = "";
-            document.getElementById('prod-variedad').value = "";
-            document.getElementById('prod-tueste').value = "";
-            document.getElementById('prod-altura').value = "";
-            document.getElementById('prod-proceso').value = "";
-            document.getElementById('prod-desc').value = "";
-            document.getElementById('prod-archivo-img').value = "";
-            imagenBase64Actual = '';
-            
-            document.getElementById('img-preview').style.display = 'none';
-            document.getElementById('preview-placeholder').style.display = 'block';
-            document.getElementById('nombre-archivo-txt').innerText = 'Ningún archivo seleccionado';
             document.getElementById('form-producto-container').style.display = "block";
         }
 
         function abrirFormularioEditar(id) {
             const p = cacheProductos.find(item => Number(item.id) === Number(id));
             if (!p) return;
-
             document.getElementById('form-titulo').innerText = "Editar Producto #" + p.id;
             document.getElementById('prod-id').value = p.id;
             document.getElementById('prod-nombre').value = p.name || '';
-            document.getElementById('prod-categoria').value = p.category || 'Clásicos';
             document.getElementById('prod-precio').value = p.price || 0;
             document.getElementById('prod-stock').value = p.stock || 0;
-            document.getElementById('prod-desc').value = p.description || '';
-            document.getElementById('prod-archivo-img').value = "";
-
-            let specsArray = [];
-            if (p.specs) {
-                try {
-                    specsArray = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
-                } catch(e) { specsArray = []; }
-            }
-
-            let valVariedad = "", valTueste = "", valAltura = "", valProceso = "";
-            if (Array.isArray(specsArray)) {
-                specsArray.forEach(s => {
-                    const labelLower = (s.label || "").toLowerCase();
-                    if (labelLower.includes("variedad")) valVariedad = s.value || s.label;
-                    else if (labelLower.includes("tueste")) valTueste = s.value || s.label;
-                    else if (labelLower.includes("altura")) valAltura = s.value || s.label;
-                    else if (labelLower.includes("proceso")) valProceso = s.value || s.label;
-                });
-            }
-
-            document.getElementById('prod-variedad').value = valVariedad;
-            document.getElementById('prod-tueste').value = valTueste;
-            document.getElementById('prod-altura').value = valAltura;
-            document.getElementById('prod-proceso').value = valProceso;
-            
-            imagenBase64Actual = p.image_url || ''; 
-            const imgPreview = document.getElementById('img-preview');
-            const placeholder = document.getElementById('preview-placeholder');
-
-            if (imagenBase64Actual) {
-                imgPreview.src = imagenBase64Actual;
-                imgPreview.style.display = 'block';
-                placeholder.style.display = 'none';
-                document.getElementById('nombre-archivo-txt').innerText = 'Imagen actual cargada';
-            } else {
-                imgPreview.style.display = 'none';
-                placeholder.style.display = 'block';
-                document.getElementById('nombre-archivo-txt').innerText = 'Ningún archivo seleccionado';
-            }
-
             document.getElementById('form-producto-container').style.display = "block";
         }
 
         function previsualizarImagen(event) {
             const archivo = event.target.files[0];
-            const imgPreview = document.getElementById('img-preview');
-            const placeholder = document.getElementById('preview-placeholder');
-            const textoArchivo = document.getElementById('nombre-archivo-txt');
-
             if (archivo) {
-                textoArchivo.innerText = archivo.name;
+                document.getElementById('nombre-archivo-txt').innerText = archivo.name;
                 const lector = new FileReader();
                 lector.onload = function(e) {
-                    imgPreview.src = e.target.result;
-                    imgPreview.style.display = 'block';
-                    placeholder.style.display = 'none';
+                    const img = document.getElementById('img-preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('preview-placeholder').style.display = 'none';
                 }
                 lector.readAsDataURL(archivo);
             }
@@ -1630,35 +932,29 @@
         async function guardarProducto() {
             const id = document.getElementById('prod-id').value;
             const nombre = document.getElementById('prod-nombre').value.trim();
-            const categoria = document.getElementById('prod-categoria').value.trim();
             const precioStr = document.getElementById('prod-precio').value;
             const stockStr = document.getElementById('prod-stock').value;
-            const variedad = document.getElementById('prod-variedad').value.trim();
-            const tueste = document.getElementById('prod-tueste').value.trim();
-            const altura = document.getElementById('prod-altura').value.trim();
-            const proceso = document.getElementById('prod-proceso').value.trim();
-            const desc = document.getElementById('prod-desc').value;
             const archivoInput = document.getElementById('prod-archivo-img');
 
-            if (!nombre || !categoria || precioStr === '' || stockStr === '') {
-                alert('Por favor, completa todos los campos obligatorios.');
+            if (!nombre || precioStr === '' || stockStr === '') {
+                alert('Completa los campos obligatorios.');
                 return;
             }
 
-            const specsArray = [
-                { label: variedad || "Arábica" },
-                { label: tueste || "Medio" },
-                { label: altura || "1,350 msnm" },
-                { label: proceso || "Lavado" }
-            ];
-
             const formData = new FormData();
             formData.append('name', nombre);
-            formData.append('category', categoria);
+            formData.append('category', document.getElementById('prod-categoria').value);
             formData.append('price', precioStr);
             formData.append('stock', stockStr);
-            formData.append('description', desc);
-            formData.append('specs', JSON.stringify(specsArray));
+            formData.append('description', document.getElementById('prod-desc').value);
+            
+            const specs = [
+                { label: document.getElementById('prod-variedad').value || "Arábica" },
+                { label: document.getElementById('prod-tueste').value || "Medio" },
+                { label: document.getElementById('prod-altura').value || "1,350 msnm" },
+                { label: document.getElementById('prod-proceso').value || "Lavado" }
+            ];
+            formData.append('specs', JSON.stringify(specs));
 
             if (archivoInput.files && archivoInput.files[0]) {
                 formData.append('image', archivoInput.files[0]);
@@ -1670,27 +966,20 @@
             try {
                 const res = await fetch(url, { method: method, body: formData });
                 if (res.ok) {
-                    alert('¡Operación realizada con éxito!');
+                    alert('¡Operación exitosa!');
                     ocultarFormulario();
                     cargarProductos();
                     cargarEstadisticas();
-                } else {
-                    alert('Error al guardar el producto.');
                 }
-            } catch (err) { 
-                alert('No se pudo conectar con el servidor.');
-            }
+            } catch (err) { alert('Error de conexión.'); }
         }
 
         async function eliminarProducto(id) {
-            if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+            if (!confirm('¿Eliminar producto?')) return;
             try {
-                const res = await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    alert('Producto eliminado');
-                    cargarProductos();
-                    cargarEstadisticas();
-                }
+                await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+                cargarProductos();
+                cargarEstadisticas();
             } catch (err) { console.error(err); }
         }
     </script>
