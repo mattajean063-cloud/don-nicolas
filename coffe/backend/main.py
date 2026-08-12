@@ -3,21 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import sqlite3
 import os
 import requests
 from typing import Optional
-
-# Intentamos importar libsql si está disponible para la nube
-try:
-    import libsql_experimental as libsql
-    USING_TURSO = True
-except ImportError:
-    USING_TURSO = False
-
-# Configuración de base de datos persistente local por defecto o Turso si se configura adecuadamente
-LIBSQL_DATABASE_URL = os.getenv("https://wrcuytrjherblpiyjlqj.supabase.co/rest/v1/", "")
-LIBSQL_AUTH_TOKEN = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM", "")
+from supabase import create_client, Client
 
 app = FastAPI()
 
@@ -25,10 +14,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# Directorio persistente para la base de datos (asegura que tienda.db se guarde en BASE_DIR)
-DB_PATH = os.path.join(BASE_DIR, "tienda.db")
+# Credenciales directas o mediante variables de entorno de Supabase
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wrcuytrjherblpiyjlqj.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyY3V5dHJqaGVyYmxwaXlqbHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTgwNDcsImV4cCI6MjEwMjA3NDA0N30.r-EwejBxsAzSgIyE39HieUqHo36Cpya__dNl--gg4WM")
 
-# Estado global en memoria para controlar si el pago con tarjeta está habilitado desde el admin
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# Estado global para control de tarjeta
 configuracion_tienda = {
     "card_payment_enabled": False
 }
@@ -47,76 +39,9 @@ class PagoQPayProRequest(BaseModel):
 class CardStatusUpdate(BaseModel):
     enabled: bool
 
-@app.post("/api/create-payment-intent")
-def crear_pago_qpaypro(data: PagoQPayProRequest):
-    if not configuracion_tienda["card_payment_enabled"]:
-        raise HTTPException(status_code=403, detail="El pago con tarjeta se encuentra deshabilitado temporalmente.")
-    
-    headers = {
-        "Content-Type": "application/json",
-        "x-login": X_LOGIN,
-        "x-private-key": X_PRIVATE_KEY,
-        "x-api-secret": X_API_SECRET
-    }
-    payload = {"amount": data.amount, "nombre": data.customer_name, "email": data.customer_email}
-    try:
-        response = requests.post(QPAYPRO_API_URL, json=payload, headers=headers)
-        if response.status_code not in [200, 201]:
-            raise HTTPException(status_code=400, detail="Error al procesar el pago con QPayPro")
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/admin/card-payment-status")
-def obtener_estado_tarjeta():
-    return {"enabled": configuracion_tienda["card_payment_enabled"]}
-
-@app.post("/api/admin/card-payment-status")
-def actualizar_estado_tarjeta(data: CardStatusUpdate):
-    configuracion_tienda["card_payment_enabled"] = data.enabled
-    return {"success": True, "enabled": configuracion_tienda["card_payment_enabled"]}
-
-@app.get("/api/shop/config")
-def obtener_configuracion_tienda():
-    return {"card_payment_enabled": configuracion_tienda["card_payment_enabled"]}
-
-imagenes_dir = os.path.join(BASE_DIR, "..", "imagenes")
-if os.path.exists(imagenes_dir):
-    app.mount("/static/imagenes", StaticFiles(directory=imagenes_dir), name="imagenes_externas")
-
-app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
-
-frontend_dir = os.path.join(BASE_DIR, "frontend")
-if os.path.exists(frontend_dir):
-    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
-
-@app.get("/")
-def leer_index():
-    index_path = os.path.join(BASE_DIR, "frontend", "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    index_raiz = os.path.join(BASE_DIR, "index.html")
-    if os.path.exists(index_raiz):
-        return FileResponse(index_raiz)
-    return {"mensaje": "Error: No se encontró index.html"}
-
-@app.get("/admin")
-def leer_admin():
-    admin_path = os.path.join(BASE_DIR, "frontend", "admin.html")
-    if os.path.exists(admin_path):
-        return FileResponse(admin_path)
-    admin_raiz = os.path.join(BASE_DIR, "..", "frontend", "admin.html")
-    if os.path.exists(admin_raiz):
-        return FileResponse(admin_raiz)
-    return {"mensaje": "Error: No se encontró admin.html"}
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 class PaymentSchema(BaseModel):
     order_id: int
@@ -130,89 +55,33 @@ class PaymentSchema(BaseModel):
     invoice_number: Optional[str] = "Pendiente"
     invoice_address: Optional[str] = "No especificada"
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def get_db_connection():
-    if USING_TURSO and LIBSQL_DATABASE_URL:
-        conn = libsql.connect(
-            database=DB_PATH,
-            sync_url=LIBSQL_DATABASE_URL,
-            auth_token=LIBSQL_AUTH_TOKEN
-        )
-        conn.row_factory = sqlite3.Row
-        return conn
-    else:
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        return conn
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
-def inicializar_base_datos():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL,
-            price REAL NOT NULL,
-            stock INTEGER NOT NULL,
-            description TEXT,
-            image_url TEXT,
-            specs TEXT
-        )
-    """)
-    try:
-        cursor.execute("ALTER TABLE products ADD COLUMN specs TEXT")
-        conn.commit()
-    except Exception:
-        pass
+frontend_dir = os.path.join(BASE_DIR, "frontend")
+if os.path.exists(frontend_dir):
+    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            customer TEXT,
-            total REAL NOT NULL,
-            items TEXT,
-            phone TEXT,
-            email TEXT,
-            address TEXT,
-            status TEXT DEFAULT 'pendiente',
-            invoice_name TEXT DEFAULT 'C/F',
-            invoice_nit TEXT DEFAULT 'C/F',
-            invoice_number TEXT DEFAULT 'Pendiente',
-            invoice_address TEXT DEFAULT 'No especificada',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    try:
-        cursor.execute("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'pendiente'")
-        conn.commit()
-    except Exception:
-        pass
+@app.get("/")
+def leer_index():
+    index_path = os.path.join(BASE_DIR, "frontend", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"mensaje": "Error: No se encontró index.html"}
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS payments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_id INTEGER,
-            client TEXT,
-            method TEXT,
-            amount REAL,
-            status TEXT,
-            receipt_url TEXT,
-            invoice_name TEXT DEFAULT 'C/F',
-            invoice_nit TEXT DEFAULT 'C/F',
-            invoice_number TEXT DEFAULT 'Pendiente',
-            invoice_address TEXT DEFAULT 'No especificada',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-# Inicializar base de datos al arrancar la aplicación
-inicializar_base_datos()
+@app.get("/admin")
+def leer_admin():
+    admin_path = os.path.join(BASE_DIR, "frontend", "admin.html")
+    if os.path.exists(admin_path):
+        return FileResponse(admin_path)
+    return {"mensaje": "Error: No se encontró admin.html"}
 
 @app.post("/api/admin/login")
 def admin_login(data: LoginRequest):
@@ -222,32 +91,23 @@ def admin_login(data: LoginRequest):
 
 @app.get("/api/admin/stats")
 def obtener_estadisticas():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM products")
-    total_productos = cursor.fetchone()[0]
     try:
-        cursor.execute("SELECT COUNT(*) FROM orders")
-        total_pedidos = cursor.fetchone()[0]
-    except:
-        total_pedidos = 0
-    try:
-        cursor.execute("SELECT SUM(total) FROM orders")
-        res_ingresos = cursor.fetchone()[0]
-        ingresos_totales = res_ingresos if res_ingresos else 0.0
-    except:
-        ingresos_totales = 0.0
-    conn.close()
+        prod_res = supabase.table("products").select("id", count="exact").execute()
+        total_productos = prod_res.count if prod_res.count is not None else len(prod_res.data)
+
+        order_res = supabase.table("orders").select("total", count="exact").execute()
+        total_pedidos = order_res.count if order_res.count is not None else len(order_res.data)
+
+        ingresos_totales = sum([float(o.get("total", 0)) for o in order_res.data])
+    except Exception as e:
+        total_productos, total_pedidos, ingresos_totales = 0, 0, 0.0
+
     return {"total_productos": total_productos, "total_pedidos": total_pedidos, "ingresos_totales": ingresos_totales}
 
 @app.get("/api/admin/products")
 def listar_productos():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM products")
-    productos = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return productos
+    response = supabase.table("products").select("*").execute()
+    return response.data
 
 @app.post("/api/admin/products")
 async def crear_producto(
@@ -265,28 +125,25 @@ async def crear_producto(
     except ValueError:
         raise HTTPException(status_code=400, detail="Precio o stock inválido.")
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
     image_url = "/uploads/cafe-bourbon.jpg"
-    try:
-        if image and image.filename:
-            file_location = os.path.join(UPLOADS_DIR, image.filename)
-            with open(file_location, "wb+") as file_object:
-                file_object.write(await image.read())
-            image_url = f"/uploads/{image.filename}"
+    if image and image.filename:
+        file_location = os.path.join(UPLOADS_DIR, image.filename)
+        with open(file_location, "wb+") as file_object:
+            file_object.write(await image.read())
+        image_url = f"/uploads/{image.filename}"
 
-        cursor.execute(
-            "INSERT INTO products (name, category, price, stock, description, image_url, specs) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (name, category, price_val, stock_val, description, image_url, specs)
-        )
-        conn.commit()
-        nuevo_id = cursor.lastrowid
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        raise HTTPException(status_code=500, detail=str(e))
-    conn.close()
-    return {"message": "Producto creado con éxito", "id": nuevo_id, "image_url": image_url}
+    nuevo_producto = {
+        "name": name,
+        "category": category,
+        "price": price_val,
+        "stock": stock_val,
+        "description": description,
+        "image_url": image_url,
+        "specs": specs
+    }
+
+    response = supabase.table("products").insert(nuevo_producto).execute()
+    return {"message": "Producto creado con éxito", "data": response.data}
 
 @app.put("/api/admin/products/{producto_id}")
 async def actualizar_producto(
@@ -305,168 +162,35 @@ async def actualizar_producto(
     except ValueError:
         raise HTTPException(status_code=400, detail="Precio o stock inválido.")
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        if image and image.filename:
-            file_location = os.path.join(UPLOADS_DIR, image.filename)
-            with open(file_location, "wb+") as file_object:
-                file_object.write(await image.read())
-            image_url = f"/uploads/{image.filename}"
-            cursor.execute(
-                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, image_url = ?, specs = ? WHERE id = ?",
-                (name, category, price_val, stock_val, description, image_url, specs, producto_id)
-            )
-        else:
-            cursor.execute(
-                "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, specs = ? WHERE id = ?",
-                (name, category, price_val, stock_val, description, specs, producto_id)
-            )
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        raise HTTPException(status_code=500, detail=str(e))
-    conn.close()
-    return {"message": "Producto actualizado con éxito"}
+    datos_actualizados = {
+        "name": name,
+        "category": category,
+        "price": price_val,
+        "stock": stock_val,
+        "description": description,
+        "specs": specs
+    }
+
+    if image and image.filename:
+        file_location = os.path.join(UPLOADS_DIR, image.filename)
+        with open(file_location, "wb+") as file_object:
+            file_object.write(await image.read())
+        datos_actualizados["image_url"] = f"/uploads/{image.filename}"
+
+    response = supabase.table("products").update(datos_actualizados).eq("id", producto_id).execute()
+    return {"message": "Producto actualizado con éxito", "data": response.data}
 
 @app.delete("/api/admin/products/{producto_id}")
 def eliminar_producto(producto_id: int):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM products WHERE id = ?", (producto_id,))
-    conn.commit()
-    conn.close()
+    supabase.table("products").delete().eq("id", producto_id).execute()
     return {"message": "Producto eliminado con éxito"}
-
-@app.post("/api/orders")
-async def crear_pedido_cliente(
-    customer: str = Form("Cliente General"),
-    total: float = Form(...),
-    items: Optional[str] = Form(None),
-    phone: Optional[str] = Form(""),
-    email: Optional[str] = Form(""),
-    address: Optional[str] = Form(""),
-    payment_method_type: Optional[str] = Form("Transferencia Bancaria"),
-    invoice_name: Optional[str] = Form("C/F"),
-    invoice_nit: Optional[str] = Form("C/F"),
-    nit: Optional[str] = Form(None),
-    invoice_number: Optional[str] = Form("Pendiente"),
-    invoice_address: Optional[str] = Form("No especificada"),
-    receipt: UploadFile = File(None)
-):
-    nit_final = nit if nit and nit.strip() != "" else invoice_nit
-    if not nit_final:
-        nit_final = "C/F"
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        receipt_url = None
-        if receipt:
-            file_location = os.path.join(UPLOADS_DIR, receipt.filename)
-            with open(file_location, "wb+") as file_object:
-                file_object.write(await receipt.read())
-            receipt_url = f"/uploads/{receipt.filename}"
-
-        cursor.execute(
-            """INSERT INTO orders 
-               (customer, total, items, phone, email, address, status, invoice_name, invoice_nit, invoice_number, invoice_address) 
-               VALUES (?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)""",
-            (customer, total, items, phone, email, address, invoice_name, nit_final, invoice_number, invoice_address)
-        )
-        conn.commit()
-        pedido_id = cursor.lastrowid
-
-        cursor.execute(
-            """INSERT INTO payments 
-               (order_id, client, method, amount, status, receipt_url, invoice_name, invoice_nit, invoice_number, invoice_address) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (pedido_id, customer, payment_method_type, total, "Completado", receipt_url, invoice_name, nit_final, invoice_number, invoice_address)
-        )
-        conn.commit()
-
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        raise HTTPException(status_code=500, detail=str(e))
-    conn.close()
-    return {"message": "Pedido y comprobante de pago registrado con éxito", "id": pedido_id, "receipt_url": receipt_url}
-
-class OrderStatusUpdate(BaseModel):
-    status: str
-
-@app.patch("/api/admin/orders/{pedido_id}/status")
-def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (data.status, pedido_id))
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        raise HTTPException(status_code=500, detail=str(e))
-    conn.close()
-    return {"success": True, "message": "Estado del pedido actualizado correctamente"}
 
 @app.get("/api/admin/orders")
 def listar_pedidos():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT * FROM orders")
-        filas = cursor.fetchall()
-        pedidos = []
-        for row in filas:
-            pedido_dict = dict(row)
-            pedido_dict["status"] = row["status"] if "status" in row.keys() and row["status"] else "pendiente"
-            pedido_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
-            pedido_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
-            pedido_dict["invoice_number"] = row["invoice_number"] if "invoice_number" in row.keys() and row["invoice_number"] else "Pendiente"
-            pedido_dict["invoice_address"] = row["invoice_address"] if "invoice_address" in row.keys() and row["invoice_address"] else "No especificada"
-            pedidos.append(pedido_dict)
-    except Exception:
-        pedidos = []
-    conn.close()
-    return pedidos
+    response = supabase.table("orders").select("*").execute()
+    return response.data
 
 @app.get("/api/admin/payments")
 def listar_pagos():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT * FROM payments")
-        filas = cursor.fetchall()
-        pagos = []
-        for row in filas:
-            pago_dict = dict(row)
-            pago_dict["invoice_name"] = row["invoice_name"] if "invoice_name" in row.keys() and row["invoice_name"] else "C/F"
-            pago_dict["invoice_nit"] = row["invoice_nit"] if "invoice_nit" in row.keys() and row["invoice_nit"] else "C/F"
-            pago_dict["invoice_number"] = row["invoice_number"] if "invoice_number`" in row.keys() and row["invoice_number"] else "Pendiente"
-            pago_dict["invoice_address"] = row["invoice_address"] if "invoice_address" in row.keys() and row["invoice_address"] else "No especificada"
-            pagos.append(pago_dict)
-    except Exception:
-        pagos = []
-    conn.close()
-    return pagos
-
-@app.post("/api/admin/payments")
-def registrar_pago(payment: PaymentSchema):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            """INSERT INTO payments 
-               (order_id, client, method, amount, status, receipt_url, invoice_name, invoice_nit, invoice_number, invoice_address) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (payment.order_id, payment.client, payment.method, payment.amount, payment.status, payment.receipt_url, payment.invoice_name, payment.invoice_nit, payment.invoice_number, payment.invoice_address)
-        )
-        conn.commit()
-        pago_id = cursor.lastrowid
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        raise HTTPException(status_code=500, detail=str(e))
-    conn.close()
-    return {"message": "Pago registrado con éxito", "id": pago_id}
+    response = supabase.table("payments").select("*").execute()
+    return response.data
