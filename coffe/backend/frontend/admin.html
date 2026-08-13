@@ -526,13 +526,13 @@
             let estadoLower = estado.trim().toLowerCase();
 
             if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación. ¡Muchas gracias! ✨`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con alegría tu pedido #. Ya estamos preparando todo con dedicación. ¡Muchas gracias! ✨`;
             } else if (estadoLower.includes("empaque")) {
-                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente. ¡Gracias por tu confianza! 🤎`;
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido  se está empaquetando cuidadosamente. ¡Gracias por tu confianza! 🤎`;
             } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
-                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que lo disfrutes al máximo. ¡Vuelve pronto! ☕`;
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido ha sido entregado con éxito. Esperamos que lo disfrutes al máximo. ¡Vuelve pronto! ☕`;
             } else {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} cambió a: ${estado}.`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido  cambió a: ${estado}.`;
             }
 
             window.open(`https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`, '_blank');
