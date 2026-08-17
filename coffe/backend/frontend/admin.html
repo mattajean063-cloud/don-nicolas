@@ -55,6 +55,31 @@
         .login-card span { font-size: 0.65rem; letter-spacing: 4px; color: var(--accent-gold); text-transform: uppercase; display: block; margin-bottom: 1.5rem; font-weight: 600; }
         .login-error { color: #a93226; font-size: 0.85rem; margin-top: 1rem; display: none; font-weight: 500; }
 
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+        .password-container input {
+            width: 100%;
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            user-select: none;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .toggle-password:hover {
+            color: var(--primary-dark);
+        }
+
         #app-container { display: none; width: 100vw; height: 100vh; position: relative; }
         aside {
             width: 260px; background-color: var(--sidebar-bg); color: #f7f4ed;
@@ -178,7 +203,10 @@
             </div>
             <div class="form-group" style="text-align: left;">
                 <label>Contraseña</label>
-                <input type="password" id="login-pass" placeholder="Ingrese contraseña">
+                <div class="password-container">
+                    <input type="password" id="login-pass" placeholder="Ingrese contraseña">
+                    <button type="button" class="toggle-password" onclick="alternarVisibilidadPassword()" title="Ver contraseña">👁️</button>
+                </div>
             </div>
             <button class="btn-nuevo" style="width: 100%; margin-top: 1rem;" onclick="realizarLogin()">Ingresar</button>
             <div id="login-error-msg" class="login-error">Usuario o contraseña incorrectos.</div>
@@ -480,7 +508,35 @@
             verificarEstadoTarjetaGuardado();
             verificarNuevosPedidosYActualizarPestana();
             setInterval(verificarNuevosPedidosYActualizarPestana, 7000);
+
+            // Escuchar la tecla Enter en los inputs del login para iniciar sesión automáticamente
+            const inputUser = document.getElementById('login-user');
+            const inputPass = document.getElementById('login-pass');
+
+            inputUser.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    realizarLogin();
+                }
+            });
+
+            inputPass.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    realizarLogin();
+                }
+            });
         });
+
+        function alternarVisibilidadPassword() {
+            const inputPass = document.getElementById('login-pass');
+            const btnToggle = document.querySelector('.toggle-password');
+            if (inputPass.type === 'password') {
+                inputPass.type = 'text';
+                btnToggle.innerText = ' ocultar'; // o cambiar icono si se prefiere
+            } else {
+                inputPass.type = 'password';
+                btnToggle.innerText = '👁️';
+            }
+        }
 
         async function activarNotificacionesEscritorio() {
             if (!("Notification" in window)) {
@@ -526,13 +582,13 @@
             let estadoLower = estado.trim().toLowerCase();
 
             if (estadoLower.includes("pendiente") || estadoLower.includes("recibido")) {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con alegría tu pedido #. Ya estamos preparando todo con dedicación. ¡Muchas gracias! ✨`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! Hemos recibido con alegría tu pedido #${pedidoId}. Ya estamos preparando todo con dedicación. ¡Muchas gracias! ✨`;
             } else if (estadoLower.includes("empaque")) {
-                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido  se está empaquetando cuidadosamente. ¡Gracias por tu confianza! 🤎`;
+                mensaje = `📦 ¡Hola, ${nombreCliente}! Te contamos que tu pedido #${pedidoId} se está empaquetando cuidadosamente. ¡Gracias por tu confianza! 🤎`;
             } else if (estadoLower.includes("entregado") || estadoLower.includes("completado")) {
-                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido ha sido entregado con éxito. Esperamos que lo disfrutes al máximo. ¡Vuelve pronto! ☕`;
+                mensaje = `🎉 ¡Hola, ${nombreCliente}! Tu pedido #${pedidoId} ha sido entregado con éxito. Esperamos que lo disfrutes al máximo. ¡Vuelve pronto! ☕`;
             } else {
-                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido  cambió a: ${estado}.`;
+                mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} cambió a: ${estado}.`;
             }
 
             window.open(`https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`, '_blank');
@@ -552,19 +608,16 @@
 
                 const cantidadPendientes = pendientes.length;
 
-                // Actualizar título de la pestaña con contador
                 if (cantidadPendientes > 0) {
                     document.title = `(${cantidadPendientes}) Panel Administrativo | Don Nicolás`;
                 } else {
                     document.title = `Panel Administrativo | Don Nicolás`;
                 }
 
-                // Detectar nuevos pedidos para lanzar alerta sonora y notificación nativa en la esquina
                 if (conteoPedidosAnterior !== -1 && cantidadPendientes > conteoPedidosAnterior) {
                     reproducirAlertaSonora();
                     const ultimoPedido = pendientes[pendientes.length - 1];
                     
-                    // Notificación en la esquina del sistema operativo (funciona en otra pestaña/app)
                     if (notificacionesEscritorioHabilitadas && Notification.permission === "granted") {
                         const notif = new Notification("¡Nuevo Pedido Recibido! ☕", {
                             body: `Cliente: ${ultimoPedido.customer || 'General'} - Total: Q${Number(ultimoPedido.total).toFixed(2)}`,
@@ -778,7 +831,6 @@
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
 
             if (pedido) {
-                // QUITAR EL CONTADOR DE LA PESTAÑA AL ENTRAR AL PEDIDO
                 document.title = `Panel Administrativo | Don Nicolás`;
 
                 const estadoActual = (pedido.status || pedido.estado || 'pendiente').toLowerCase();
