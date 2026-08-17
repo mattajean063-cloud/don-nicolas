@@ -896,7 +896,10 @@
                     
                     document.getElementById('det-factura-nit').innerText = pago.invoice_nit || pago.nit || pedido.invoice_nit || 'C/F';
                     document.getElementById('det-factura-numero').innerText = pago.invoice_number || pedido.invoice_number || 'Pendiente';
-                    document.getElementById('det-factura-direccion').innerText = pago.invoice_address || pago.address || pedido.invoice_address || 'No especificada';
+                    
+                    // Rastreo exhaustivo de la dirección de facturación con respaldo a la dirección de entrega
+                    const direccionFacturaEncontrada = pago.invoice_address || pago.billing_address || pago.direccion_factura || pago.address || pedido.invoice_address || pedido.address;
+                    document.getElementById('det-factura-direccion').innerText = direccionFacturaEncontrada && direccionFacturaEncontrada.trim() !== '' ? direccionFacturaEncontrada : 'No especificada';
 
                     const imgElement = document.getElementById('det-pago-imagen');
                     const sinFotoElement = document.getElementById('det-pago-sin-foto');
