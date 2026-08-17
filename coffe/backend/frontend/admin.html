@@ -503,26 +503,22 @@
         let pedidoIdEnVista = null;
         let conteoPedidosAnterior = -1;
         let notificacionesEscritorioHabilitadas = false;
+        let whatsappWindowRef = null; // Referencia para reutilizar la misma pestaña de WhatsApp
 
         document.addEventListener("DOMContentLoaded", () => {
             verificarEstadoTarjetaGuardado();
             verificarNuevosPedidosYActualizarPestana();
             setInterval(verificarNuevosPedidosYActualizarPestana, 7000);
 
-            // Escuchar la tecla Enter en los inputs del login para iniciar sesión automáticamente
             const inputUser = document.getElementById('login-user');
             const inputPass = document.getElementById('login-pass');
 
             inputUser.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    realizarLogin();
-                }
+                if (e.key === 'Enter') { realizarLogin(); }
             });
 
             inputPass.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    realizarLogin();
-                }
+                if (e.key === 'Enter') { realizarLogin(); }
             });
         });
 
@@ -531,7 +527,7 @@
             const btnToggle = document.querySelector('.toggle-password');
             if (inputPass.type === 'password') {
                 inputPass.type = 'text';
-                btnToggle.innerText = ' ocultar'; // o cambiar icono si se prefiere
+                btnToggle.innerText = ' ocultar'; 
             } else {
                 inputPass.type = 'password';
                 btnToggle.innerText = '👁️';
@@ -591,7 +587,15 @@
                 mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} cambió a: ${estado}.`;
             }
 
-            window.open(`https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`, '_blank');
+            const urlWhatsapp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
+            
+            // Reutiliza la misma pestaña abierta previamente para no abrir ventanas adicionales
+            if (whatsappWindowRef && !whatsappWindowRef.closed) {
+                whatsappWindowRef.location.href = urlWhatsapp;
+                whatsappWindowRef.focus();
+            } else {
+                whatsappWindowRef = window.open(urlWhatsapp, 'whatsapp_chat_window');
+            }
         }
 
         async function verificarNuevosPedidosYActualizarPestana() {
@@ -890,9 +894,11 @@
                     document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
                     document.getElementById('det-pago-fecha').innerText = pago.created_at || 'No especificada';
                     document.getElementById('det-factura-nombre').innerText = pago.invoice_name || pedido.customer || 'C/F';
+                    
+                    // Se muestra el NIT y la dirección de facturación correctamente
                     document.getElementById('det-factura-nit').innerText = pago.nit || pago.invoice_nit || 'C/F';
                     document.getElementById('det-factura-numero').innerText = pago.invoice_number || 'Pendiente';
-                    document.getElementById('det-factura-direccion').innerText = pago.invoice_address || 'No especificada';
+                    document.getElementById('det-factura-direccion').innerText = pago.invoice_address || pago.address || 'No especificada';
 
                     const imgElement = document.getElementById('det-pago-imagen');
                     const sinFotoElement = document.getElementById('det-pago-sin-foto');
