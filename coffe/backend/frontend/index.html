@@ -1552,16 +1552,39 @@
                 </form>
             </div>
 
-            <!-- FORMULARIO TRANSFERENCIA BANCARIA -->
-            <div id="form-transferencia" class="formulario-metodo">
-                <form onsubmit="procesarPagoTransferencia(event)">
-                    <div class="cuentas-banco-box">
-                        <img src="WhatsApp Image 2026-08-13 at 3.41.49 PM.jpeg" alt="Cuentas Bancarias BAC y Bi" class="cuentas-banco-img">
-                        <div style="margin-top: 15px; font-size: 0.9rem; color: var(--primary-dark); text-align: left;">
-                            <p style="margin: 4px 0;"><strong>Banco Industrial (BI):</strong> Cuenta Monetaria No. 012-345678-9 a nombre de Don Nicolás</p>
-                            <p style="margin: 4px 0;"><strong>BAC Credomatic:</strong> Cuenta Monetaria No. 987-654321-0 a nombre de Don Nicolás</p>
-                        </div>
-                    </div>
+           <div style="border: 2px dashed #d4af37; border-radius: 12px; padding: 20px; background-color: #fffdf9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    
+    <h3 style="text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; border-bottom: 2px solid #f0e6d2; padding-bottom: 10px;">
+        💳 Cuentas Bancarias para Depósito o Transferencia
+    </h3>
+
+    <!-- Banco Industrial -->
+    <div style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 12px;">
+        <div style="background-color: #00512b; color: white; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; min-width: 60px; text-align: center;">
+            BI
+        </div>
+        <div>
+            <div style="font-weight: bold; color: #222; font-size: 0.95rem;">Banco Industrial (BI)</div>
+            <div style="color: #555; font-size: 0.9rem;">Cuenta Monetaria: <span style="font-family: monospace; font-weight: bold; color: #000;">0330052366</span></div>
+            <div style="color: #666; font-size: 0.85rem; margin-top: 2px;">A nombre de: <b>GRUPO LA MOLIENDA, SOCIEDAD ANÓNIMA</b></div>
+        </div>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
+
+    <!-- BAC Credomatic -->
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+        <div style="background-color: #da291c; color: white; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; min-width: 60px; text-align: center;">
+            BAC
+        </div>
+        <div>
+            <div style="font-weight: bold; color: #222; font-size: 0.95rem;">BAC Credomatic</div>
+            <div style="color: #555; font-size: 0.9rem;">Cuenta Monetaria: <span style="font-family: monospace; font-weight: bold; color: #000;">905147369</span></div>
+            <div style="color: #666; font-size: 0.85rem; margin-top: 2px;">A nombre de: <b>GRUPO LA MOLIENDA, SOCIEDAD ANÓNIMA</b></div>
+        </div>
+    </div>
+
+</div>
                     <div class="form-group">
                         <label>Banco de Origen</label>
                         <select id="trans-banco" required>
