@@ -131,6 +131,7 @@ async def crear_producto(
 
     image_url = "/uploads/cafe-bourbon.jpg"
     
+    # Subida de imagen persistente a Supabase Storage (Bucket llamado 'uploads')
     if image and image.filename:
         try:
             file_bytes = await image.read()
@@ -142,6 +143,7 @@ async def crear_producto(
             )
             image_url = supabase.storage.from_("uploads").get_public_url(file_path)
         except Exception as e:
+            # Fallback local en caso de error en storage
             file_location = os.path.join(UPLOADS_DIR, image.filename)
             with open(file_location, "wb+") as file_object:
                 file_object.write(file_bytes)
@@ -238,7 +240,7 @@ async def crear_pedido_cliente(
             supabase.storage.from_("uploads").upload(
                 file_path, 
                 file_bytes, 
-                file_options={"content-type": receipt.content_type, "upsert": "true"}
+                file_options={"content-type": image.content_type if hasattr(image, 'content_type') else "image/jpeg", "upsert": "true"}
             )
             receipt_url = supabase.storage.from_("uploads").get_public_url(file_path)
         except Exception as e:
@@ -303,8 +305,9 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
 def listar_pagos():
     response = supabase.table("payments").select("*").execute()
     
+    # Enriquecer cada pago con la dirección y NIT de la orden correspondiente si están vacíos o faltantes en payments
     try:
-        orders_response = supabase.table("orders").select("id, address, invoice_address").execute()
+        orders_response = supabase.table("orders").select("id, address, invoice_address, invoice_nit").execute()
         orders_map = {o["id"]: o for o in orders_response.data}
         
         for pago in response.data:
@@ -313,6 +316,9 @@ def listar_pagos():
                 ord_data = orders_map[order_id]
                 if not pago.get("invoice_address") or pago.get("invoice_address") == "No especificada":
                     pago["invoice_address"] = ord_data.get("invoice_address") or ord_data.get("address") or "No especificada"
+                if not pago.get("invoice_nit") or pago.get("invoice_nit") == "C/F":
+                    if ord_data.get("invoice_nit"):
+                        pago["invoice_nit"] = ord_data.get("invoice_nit")
     except Exception as e:
         pass
 
