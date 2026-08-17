@@ -866,9 +866,17 @@
             border: 1px dashed var(--accent-gold);
             padding: 1rem;
             margin-bottom: 1rem;
-            font-size: 0.85rem;
+            font-size: 0.85ln;
             line-height: 1.5;
             border-radius: 6px;
+            text-align: center;
+        }
+
+        .cuentas-banco-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .form-group {
@@ -1374,12 +1382,16 @@
                 <input type="text" id="envio-telefono" required placeholder="Ej. 5512-3456">
             </div>
             <div class="form-group">
-                <label>NIT / Datos de Facturación</label>
-                <input type="text" id="envio-nit" value="C/F" placeholder="C/F o número de NIT">
+                <label>NIT / Datos de Facturación *</label>
+                <input type="text" id="envio-nit" required placeholder="C/F o número de NIT" oninput="validarNitDireccion()">
+            </div>
+            <div class="form-group" id="grupo-direccion-nit" style="display: none;">
+                <label>Dirección del NIT *</label>
+                <input type="text" id="envio-direccion-nit" placeholder="Dirección fiscal registrada para el NIT">
             </div>
             <div class="form-group">
                 <label>Nombre para Factura</label>
-                <input type="text" id="envio-nombre-factura" value="C/F" placeholder=" C/F o nombre">
+                <input type="text" id="envio-nombre-factura" value="C/F" placeholder="C/F o nombre">
             </div>
 
             <div class="form-group">
@@ -1438,24 +1450,19 @@
             </div>
 
             <!-- FORMULARIO TRANSFERENCIA BANCARIA -->
-          <div id="form-transferencia" class="formulario-metodo">
+            <div id="form-transferencia" class="formulario-metodo">
                 <form onsubmit="procesarPagoTransferencia(event)">
                     <div class="cuentas-banco-box">
-                        <strong>BANCO INDUSTRIAL (Monetaria)</strong><br>
-                        Cuenta: 123-456789-0<br><br>
-                        <strong>BANCO G&T CONTINENTAL (Monetaria)</strong><br>
-                        Cuenta: 987-654321-0<br><br>
-                        <strong>BAC CREDOMATIC (Monetaria)</strong><br>
-                        Cuenta: 456-123789-9
+                        <img src="WhatsApp Image 2026-08-13 at 3.41.49 PM.jpeg" alt="Cuentas Bancarias BAC y Bi" class="cuentas-banco-img">
                     </div>
                     <div class="form-group">
                         <label>Banco de Origen</label>
                         <select id="trans-banco" required>
                             <option value="">Selecciona el banco...</option>
                             <option value="BI">Banco Industrial</option>
+                            <option value="BAC">BAC Credomatic</option>
                             <option value="GYT">Banco G&T Continental</option>
                             <option value="BANRURAL">Banrural</option>
-                            <option value="BAC">BAC Credomatic</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1836,6 +1843,20 @@
             actualizarCarritoUI();
         }
 
+        function validarNitDireccion() {
+            const nitInput = document.getElementById('envio-nit').value.trim().toUpperCase();
+            const grupoDirNit = document.getElementById('grupo-direccion-nit');
+            const inputDirNit = document.getElementById('envio-direccion-nit');
+
+            if (nitInput === '' || nitInput === 'C/F' || nitInput === 'CF') {
+                grupoDirNit.style.display = 'none';
+                inputDirNit.removeAttribute('required');
+            } else {
+                grupoDirNit.style.display = 'block';
+                inputDirNit.setAttribute('required', 'true');
+            }
+        }
+
         function abrirMenuPago() {
             if (carrito.length === 0) {
                 alert('Tu carrito está vacío.');
@@ -1863,6 +1884,8 @@
             });
 
             document.getElementById('tipo-entrega').value = 'tienda';
+            document.getElementById('envio-nit').value = 'C/F';
+            validarNitDireccion();
             actualizarCalculoTotal();
 
             toggleCarrito(); 
@@ -1958,8 +1981,14 @@
             const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
+            const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
+
+            if (nit !== 'C/F' && nit !== 'CF' && nit !== '' && !direccionNit) {
+                alert('Por favor ingrese la dirección del NIT.');
+                return;
+            }
 
             if (!correo || !telefono) {
                 alert('Por favor ingrese su correo electrónico y teléfono de contacto.');
@@ -1974,6 +2003,7 @@
             formData.append("phone", telefono);
             formData.append("email", correo);
             formData.append("invoice_nit", nit);
+            formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
             formData.append("address", "Recoger en Tienda (Esquipulas)");
             formData.append("total", subtotal);
@@ -2006,11 +2036,17 @@
             const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
+            const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
             const direccion = document.getElementById('envio-direccion').value.trim();
             const tarjeta = document.getElementById('qpay-card-number').value.trim();
+
+            if (nit !== 'C/F' && nit !== 'CF' && nit !== '' && !direccionNit) {
+                alert('Por favor ingrese la dirección del NIT.');
+                return;
+            }
 
             if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion)) {
                 alert('Complete los campos obligatorios (Correo, Teléfono y Dirección si aplica).');
@@ -2038,6 +2074,7 @@
                 formData.append("phone", telefono);
                 formData.append("email", correo);
                 formData.append("invoice_nit", nit);
+                formData.append("invoice_nit_address", direccionNit);
                 formData.append("invoice_name", nombreFactura);
                 formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
                 formData.append("total", totalGeneral);
@@ -2074,6 +2111,7 @@
             const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
+            const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
@@ -2081,6 +2119,11 @@
             const banco = document.getElementById('trans-banco').value;
             const referencia = document.getElementById('trans-referencia').value.trim();
             const archivoInput = document.getElementById('trans-archivo-img');
+
+            if (nit !== 'C/F' && nit !== 'CF' && nit !== '' && !direccionNit) {
+                alert('Por favor ingrese la dirección del NIT.');
+                return;
+            }
 
             if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion) || !archivoInput.files[0]) {
                 alert('Complete los campos requeridos (Correo, Teléfono, Dirección si es domicilio) y adjunte su comprobante.');
@@ -2097,6 +2140,7 @@
             formData.append("phone", telefono);
             formData.append("email", correo);
             formData.append("invoice_nit", nit);
+            formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
             formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
             formData.append("total", totalGeneral);
