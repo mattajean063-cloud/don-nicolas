@@ -866,16 +866,9 @@
             border: 1px dashed var(--accent-gold);
             padding: 1rem;
             margin-bottom: 1rem;
+            font-size: 0.85rem;
             line-height: 1.5;
             border-radius: 6px;
-            text-align: center;
-        }
-
-        .cuentas-banco-img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .form-group {
@@ -1200,31 +1193,9 @@
                     <p>Extracción en frío durante 14 horas, ofreciendo una bebida refrescante con baja acidez.</p>
                 </div>
             </div>
-            <!-- 3 Nuevas Bebidas Agregadas -->
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400" alt="Capuchino Artesanal" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Capuchino Artesanal</h3>
-                    <p>Espresso de la casa con leche texturizada al punto exacto y una delicada capa de espuma espolvoreada con cacao fino.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400" alt="Mocha Tradicional" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Mocha Tradicional</h3>
-                    <p>Fusión perfecta de espresso, chocolate artesanal de la región y leche vaporizada, coronada con un toque de crema batida.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400" alt="Matcha Latte" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Matcha Latte</h3>
-                    <p>Té verde matcha ceremonial mezclado con leche caliente o fría, ofreciendo un sabor herbal equilibrado, cremoso y lleno de antioxidantes.</p>
-                </div>
-            </div>
         </div>
 
-        <h2 class="titulo-seccion" style="margin-top: 40px;">Nuestros Alimentos y Postres</h2>
+        <h2 class="titulo-seccion" style="margin-top: 40px;">Nuestros Alimentos</h2>
         <div class="productos-grid">
             <div class="producto-card">
                 <div class="producto-img-wrapper"><img src="/static/imagenes/image copy 4.png" alt="Brownie con Helado" class="producto-img" style="cursor: default;"></div>
@@ -1245,28 +1216,6 @@
                 <div class="producto-info">
                     <h3>French Toast</h3>
                     <p>Rebanadas de pan doradas a la perfección, preparadas con una mezcla de huevo, leche y vainilla, servidas con miel de maple.</p>
-                </div>
-            </div>
-            <!-- Nuevos Postres Agregados -->
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400" alt="Cheesecake de Frutos Rojos" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Cheesecake de Frutos Rojos</h3>
-                    <p>Suave y cremoso pastel de queso sobre una base crujiente de galleta, cubierto con una compota artesanal de frutos rojos silvestres.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" alt="Pay de Manzana Casero" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Pay de Manzana Casero</h3>
-                    <p>Tradicional pay horneado con relleno de manzanas frescas sazonadas con canela y mantequilla, con una costra dorada y crujiente.</p>
-                </div>
-            </div>
-            <div class="producto-card">
-                <div class="producto-img-wrapper"><img src="https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400" alt="Tres Leches Tradicional" class="producto-img" style="cursor: default;"></div>
-                <div class="producto-info">
-                    <h3>Tres Leches Tradicional</h3>
-                    <p>Bizcucho esponjoso bañado en una exquisita combinación de tres leches, cubierto con merengue suave y un toque ligero de canela.</p>
                 </div>
             </div>
         </div>
@@ -1425,16 +1374,12 @@
                 <input type="text" id="envio-telefono" required placeholder="Ej. 5512-3456">
             </div>
             <div class="form-group">
-                <label>NIT / Datos de Facturación *</label>
-                <input type="text" id="envio-nit" required placeholder="C/F o número de NIT" oninput="validarNitDireccion()">
-            </div>
-            <div class="form-group" id="grupo-direccion-nit" style="display: none;">
-                <label>Dirección del NIT *</label>
-                <input type="text" id="envio-direccion-nit" placeholder="Dirección fiscal registrada para el NIT">
+                <label>NIT / Datos de Facturación</label>
+                <input type="text" id="envio-nit" value="C/F" placeholder="C/F o número de NIT">
             </div>
             <div class="form-group">
                 <label>Nombre para Factura</label>
-                <input type="text" id="envio-nombre-factura" value="C/F" placeholder="C/F o nombre">
+                <input type="text" id="envio-nombre-factura" value="C/F" placeholder=" C/F o nombre">
             </div>
 
             <div class="form-group">
@@ -1464,7 +1409,7 @@
                 <div class="terminos-grupo">
                     <input type="checkbox" id="terminos-efectivo" required>
                     <label for="terminos-efectivo" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; display: inline; cursor: pointer;">
-                        Acepto los <a href="#" onclick="alert('Términos y condiciones de compra:\n\n1. Garantizamos café fresco de estricta altura y productos elaborados diariamente.\n2. Los pedidos seleccionados para recoger en tienda deben retirarse en horario hábil (Lunes a Domingo de 7:30 AM a 8:00 PM).\n3. Cualquier cambio o cancelación de pedido debe notificarse con al menos 4 horas de anticipación a través de nuestros canales oficiales de contacto.\n4. Don Nicolás Coffee Shop se reserva el derecho de admisión o modificación de citas en caso de fuerza mayor.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
+                        Acepto los <a href="#" onclick="alert('Términos y condiciones: Don Nicolás garantiza café fresco de estricta altura. Los pedidos de tienda se recogen en horario hábil.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
                     </label>
                 </div>
                 <button type="button" class="btn-enviar-mensaje" onclick="procesarPagoEfectivo()">Confirmar Pedido en Efectivo</button>
@@ -1496,20 +1441,21 @@
             <div id="form-transferencia" class="formulario-metodo">
                 <form onsubmit="procesarPagoTransferencia(event)">
                     <div class="cuentas-banco-box">
-                        <img src="WhatsApp Image 2026-08-13 at 3.41.49 PM.jpeg" alt="Cuentas Bancarias BAC y Bi" class="cuentas-banco-img">
-                        <div style="margin-top: 15px; font-size: 0.9rem; color: var(--primary-dark); text-align: left;">
-                            <p style="margin: 4px 0;"><strong>Banco Industrial (BI):</strong> Cuenta Monetaria No. 012-345678-9 a nombre de Don Nicolás</p>
-                            <p style="margin: 4px 0;"><strong>BAC Credomatic:</strong> Cuenta Monetaria No. 987-654321-0 a nombre de Don Nicolás</p>
-                        </div>
+                        <strong>BANCO INDUSTRIAL (Monetaria)</strong><br>
+                        Cuenta: 123-456789-0<br><br>
+                        <strong>BANCO G&T CONTINENTAL (Monetaria)</strong><br>
+                        Cuenta: 987-654321-0<br><br>
+                        <strong>BAC CREDOMATIC (Monetaria)</strong><br>
+                        Cuenta: 456-123789-9
                     </div>
                     <div class="form-group">
                         <label>Banco de Origen</label>
                         <select id="trans-banco" required>
                             <option value="">Selecciona el banco...</option>
                             <option value="BI">Banco Industrial</option>
-                            <option value="BAC">BAC Credomatic</option>
                             <option value="GYT">Banco G&T Continental</option>
                             <option value="BANRURAL">Banrural</option>
+                            <option value="BAC">BAC Credomatic</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1531,7 +1477,7 @@
                     <div class="terminos-grupo">
                         <input type="checkbox" id="terminos-transferencia" required>
                         <label for="terminos-transferencia" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; display: inline; cursor: pointer;">
-                            Acepto los <a href="#" onclick="alert('Términos y condiciones de compra:\n\n1. Don Nicolás procesará su pedido y iniciará su preparación o despacho una vez verificado el comprobante de transferencia y la referencia bancaria.\n2. Los datos de la boleta deben coincidir exactamente con el monto total del pedido.\n3. Envíos a domicilio sujetos a disponibilidad de días martes y miércoles.\n4. Para cualquier aclaración, tenga a la mano su número de orden y comprobante.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
+                            Acepto los <a href="#" onclick="alert('Términos y condiciones: Don Nicolás procesará su pedido una vez verificado el comprobante de transferencia.'); return false;" style="color: var(--accent-gold);">términos y condiciones</a> de compra.
                         </label>
                     </div>
 
@@ -1890,20 +1836,6 @@
             actualizarCarritoUI();
         }
 
-        function validarNitDireccion() {
-            const nitInput = document.getElementById('envio-nit').value.trim().toUpperCase();
-            const grupoDirNit = document.getElementById('grupo-direccion-nit');
-            const inputDirNit = document.getElementById('envio-direccion-nit');
-
-            if (nitInput === '' || nitInput === 'C/F' || nitInput === 'CF') {
-                grupoDirNit.style.display = 'none';
-                inputDirNit.removeAttribute('required');
-            } else {
-                grupoDirNit.style.display = 'block';
-                inputDirNit.setAttribute('required', 'true');
-            }
-        }
-
         function abrirMenuPago() {
             if (carrito.length === 0) {
                 alert('Tu carrito está vacío.');
@@ -1931,8 +1863,6 @@
             });
 
             document.getElementById('tipo-entrega').value = 'tienda';
-            document.getElementById('envio-nit').value = 'C/F';
-            validarNitDireccion();
             actualizarCalculoTotal();
 
             toggleCarrito(); 
@@ -2028,14 +1958,8 @@
             const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
-            const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
-
-            if (nit !== 'C/F' && nit !== 'CF' && nit !== '' && !direccionNit) {
-                alert('Por favor ingrese la dirección del NIT.');
-                return;
-            }
 
             if (!correo || !telefono) {
                 alert('Por favor ingrese su correo electrónico y teléfono de contacto.');
@@ -2050,7 +1974,6 @@
             formData.append("phone", telefono);
             formData.append("email", correo);
             formData.append("invoice_nit", nit);
-            formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
             formData.append("address", "Recoger en Tienda (Esquipulas)");
             formData.append("total", subtotal);
@@ -2083,17 +2006,11 @@
             const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
-            const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
             const direccion = document.getElementById('envio-direccion').value.trim();
             const tarjeta = document.getElementById('qpay-card-number').value.trim();
-
-            if (nit !== 'C/F' && nit !== 'CF' && nit !== '' && !direccionNit) {
-                alert('Por favor ingrese la dirección del NIT.');
-                return;
-            }
 
             if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion)) {
                 alert('Complete los campos obligatorios (Correo, Teléfono y Dirección si aplica).');
@@ -2121,7 +2038,6 @@
                 formData.append("phone", telefono);
                 formData.append("email", correo);
                 formData.append("invoice_nit", nit);
-                formData.append("invoice_nit_address", direccionNit);
                 formData.append("invoice_name", nombreFactura);
                 formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
                 formData.append("total", totalGeneral);
@@ -2158,7 +2074,6 @@
             const correo = document.getElementById('envio-correo').value.trim();
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
-            const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
@@ -2166,11 +2081,6 @@
             const banco = document.getElementById('trans-banco').value;
             const referencia = document.getElementById('trans-referencia').value.trim();
             const archivoInput = document.getElementById('trans-archivo-img');
-
-            if (nit !== 'C/F' && nit !== 'CF' && nit !== '' && !direccionNit) {
-                alert('Por favor ingrese la dirección del NIT.');
-                return;
-            }
 
             if (!correo || !telefono || (tipoEntrega === 'domicilio' && !direccion) || !archivoInput.files[0]) {
                 alert('Complete los campos requeridos (Correo, Teléfono, Dirección si es domicilio) y adjunte su comprobante.');
@@ -2187,7 +2097,6 @@
             formData.append("phone", telefono);
             formData.append("email", correo);
             formData.append("invoice_nit", nit);
-            formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
             formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
             formData.append("total", totalGeneral);
@@ -2218,4 +2127,3 @@
     </script>
 </body>
 </html>
-```[cite: 6]
