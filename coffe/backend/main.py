@@ -303,8 +303,6 @@ def actualizar_estado_pedido(pedido_id: int, data: OrderStatusUpdate):
 def listar_pagos():
     response = supabase.table("payments").select("*").execute()
     
-    # Asegurar que si la tabla de pagos no guarda por defecto la dirección de facturación, 
-    # se complemente consultando la orden asociada para enviarla de forma segura al frontend.
     try:
         orders_response = supabase.table("orders").select("id, address, invoice_address").execute()
         orders_map = {o["id"]: o for o in orders_response.data}
@@ -312,8 +310,9 @@ def listar_pagos():
         for pago in response.data:
             order_id = pago.get("order_id")
             if order_id in orders_map:
+                ord_data = orders_map[order_id]
                 if not pago.get("invoice_address") or pago.get("invoice_address") == "No especificada":
-                    pago["invoice_address"] = orders_map[order_id].get("invoice_address") or orders_map[order_id].get("address") or "No especificada"
+                    pago["invoice_address"] = ord_data.get("invoice_address") or ord_data.get("address") or "No especificada"
     except Exception as e:
         pass
 
