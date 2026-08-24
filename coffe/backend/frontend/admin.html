@@ -569,7 +569,7 @@
             } catch(e) { console.log("Audio bloqueado"); }
         }
 
-      function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
+     function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
             if (!telefonoCliente || telefonoCliente.trim() === '') return;
             let telefonoLimpio = telefonoCliente.replace(/\D/g, '');
             if (telefonoLimpio.length === 8) telefonoLimpio = "502" + telefonoLimpio; 
@@ -587,18 +587,12 @@
                 mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} cambió a: ${estado}.`;
             }
 
-            // Usar wa.me redirige de forma limpia y fluida
+            // Usando wa.me de forma directa
             const urlWhatsapp = `https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
             
-            // Reutiliza la misma pestaña existente o abre una sola vez
-            if (whatsappWindowRef && !whatsappWindowRef.closed) {
-                whatsappWindowRef.location.href = urlWhatsapp;
-                whatsappWindowRef.focus();
-            } else {
-                whatsappWindowRef = window.open(urlWhatsapp, 'whatsapp_chat_window');
-            }
+            // Abre una única vez limpia
+            window.open(urlWhatsapp, '_blank');
         }
-
         async function verificarNuevosPedidosYActualizarPestana() {
             try {
                 const res = await fetch(`${API_URL}/orders`);
