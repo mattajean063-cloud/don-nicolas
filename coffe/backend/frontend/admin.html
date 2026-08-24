@@ -569,7 +569,7 @@
             } catch(e) { console.log("Audio bloqueado"); }
         }
 
-     function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
+    function abrirWhatsAppCliente(telefonoCliente, nombreCliente, pedidoId, estado) {
             if (!telefonoCliente || telefonoCliente.trim() === '') return;
             let telefonoLimpio = telefonoCliente.replace(/\D/g, '');
             if (telefonoLimpio.length === 8) telefonoLimpio = "502" + telefonoLimpio; 
@@ -587,11 +587,11 @@
                 mensaje = `☕ ¡Hola, ${nombreCliente}! El estado de tu pedido #${pedidoId} cambió a: ${estado}.`;
             }
 
-            // Usando wa.me de forma directa
-            const urlWhatsapp = `https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
+            // Intenta abrir directamente la aplicación nativa de escritorio de WhatsApp sin pantallas intermedias
+            const urlProtocolo = `whatsapp://send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensaje)}`;
             
-            // Abre una única vez limpia
-            window.open(urlWhatsapp, '_blank');
+            // Si la app de escritorio no responde, usa wa.me como respaldo en la misma pestaña
+            window.location.href = urlProtocolo;
         }
         async function verificarNuevosPedidosYActualizarPestana() {
             try {
