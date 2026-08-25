@@ -825,6 +825,22 @@
             });
         }
 
+        function formatearFechaHora(fechaValor) {
+            if (!fechaValor) return 'No especificada';
+
+            const fecha = new Date(fechaValor);
+            if (Number.isNaN(fecha.getTime())) return fechaValor;
+
+            return new Intl.DateTimeFormat('es-GT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }).format(fecha);
+        }
+
         async function verDetallePedidoYPago(pedidoId) {
             pedidoIdEnVista = pedidoId;
             let pedido = cachePedidos.find(o => String(o.id).replace('#', '') === String(pedidoId));
@@ -887,7 +903,7 @@
                     document.getElementById('det-pago-metodo').innerText = pago.method || 'Efectivo';
                     document.getElementById('det-pago-monto').innerText = `Q${Number(pago.amount).toFixed(2)}`;
                     document.getElementById('det-pago-estado').innerText = pago.status || 'Completado';
-                    document.getElementById('det-pago-fecha').innerText = pago.created_at || 'No especificada';
+                    document.getElementById('det-pago-fecha').innerText = formatearFechaHora(pago.created_at);
                     document.getElementById('det-factura-nombre').innerText = pago.invoice_name || pedido.invoice_name || pedido.customer || 'C/F';
                     
                     document.getElementById('det-factura-nit').innerText = pago.invoice_nit || pago.nit || pedido.invoice_nit || 'C/F';
