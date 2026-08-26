@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1b120c">
+    <meta name="description" content="Panel administrativo de Don Nicolás">
     <title>Panel Administrativo | Don Nicolás</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -230,7 +234,7 @@
 
         <main>
             <!-- BARRA DE ACTIVACIÓN DE NOTIFICACIONES EN ESCRITORIO -->
-            <div style="background: var(--card-bg); border: 1px solid var(--accent-gold); padding: 12px 20px; border-radius: 8px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(27,18,12,0.03);">
+            <div style="background: var(--card-bg); border: 1px solid var(--accent-gold); padding: 12px 20px; border-radius: 8px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(27,18,12,0.03); flex-wrap: wrap; gap: 12px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.2rem;">🔔</span>
                     <div>
@@ -238,7 +242,10 @@
                         <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">Activa las alertas del sistema para que aparezcan aunque uses otra pestaña.</p>
                     </div>
                 </div>
-                <button id="btn-activar-audio" class="btn-nuevo" style="padding: 8px 16px; font-size: 0.85rem;" onclick="activarNotificacionesEscritorio()">Activar Alertas</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="btn-instalar-pwa" class="btn-nuevo" style="padding: 8px 16px; font-size: 0.85rem; display: none; background: #1f3b2d; color: white;">Instalar Admin</button>
+                    <button id="btn-activar-audio" class="btn-nuevo" style="padding: 8px 16px; font-size: 0.85rem;" onclick="activarNotificacionesEscritorio()">Activar Alertas</button>
+                </div>
             </div>
 
             <!-- 1. ESTADÍSTICAS -->
@@ -442,7 +449,8 @@
                             </div>
                             <div class="info-box">
                                 <h4>Dirección de Envío</h4>
-                                <p><span id="det-direccion"></span></p>
+                                <p><strong>Dirección:</strong> <span id="det-direccion"></span></p>
+                                <p><strong>Especificaciones:</strong> <span id="det-direccion-especificaciones">No especificadas</span></p>
                             </div>
                         </div>
 
@@ -506,6 +514,36 @@
         let whatsappWindowRef = null;
 
         document.addEventListener("DOMContentLoaded", () => {
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("/sw.js").catch((error) => {
+                    console.error("Error al registrar el service worker:", error);
+                });
+            }
+
+            const botonInstalar = document.getElementById('btn-instalar-pwa');
+            let deferredPrompt = null;
+
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredPrompt = event;
+                if (botonInstalar) {
+                    botonInstalar.style.display = 'inline-block';
+                }
+            });
+
+            if (botonInstalar) {
+                botonInstalar.addEventListener('click', async () => {
+                    if (!deferredPrompt) {
+                        alert('La instalación no está disponible todavía. Inténtalo desde el navegador y selecciona “Instalar aplicación”.');
+                        return;
+                    }
+                    deferredPrompt.prompt();
+                    await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    botonInstalar.style.display = 'none';
+                });
+            }
+
             verificarEstadoTarjetaGuardado();
             verificarNuevosPedidosYActualizarPestana();
             setInterval(verificarNuevosPedidosYActualizarPestana, 7000);
@@ -534,6 +572,37 @@
             }
         }
 
+        function mostrarNotificacionFlash(titulo, cuerpo) {
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") {
+                    new Notification(titulo, {
+                        body: cuerpo,
+                        tag: 'don-nicolas-flash',
+                        requireInteraction: true,
+                        silent: false
+                    });
+                } else if (Notification.permission === "default") {
+                    Notification.requestPermission().then((permiso) => {
+                        if (permiso === "granted") {
+                            new Notification(titulo, { body: cuerpo, tag: 'don-nicolas-flash', requireInteraction: true });
+                        }
+                    });
+                }
+            }
+
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'FLASH_NOTIFY',
+                    title: titulo,
+                    body: cuerpo
+                });
+            }
+
+            if ("vibrate" in navigator) {
+                navigator.vibrate([180, 80, 180]);
+            }
+        }
+
         async function activarNotificacionesEscritorio() {
             if (!("Notification" in window)) {
                 alert("Tu navegador no soporta notificaciones de escritorio.");
@@ -548,7 +617,7 @@
                 btn.style.background = "#27ae60";
                 btn.disabled = true;
                 reproducirAlertaSonora();
-                new Notification("Don Nicolás", { body: "¡Notificaciones de esquina activadas con éxito!" });
+                mostrarNotificacionFlash("Don Nicolás", "¡Notificaciones de esquina activadas con éxito!");
             } else {
                 alert("Has denegado los permisos de notificación en el navegador.");
             }
@@ -616,11 +685,14 @@
                 if (conteoPedidosAnterior !== -1 && cantidadPendientes > conteoPedidosAnterior) {
                     reproducirAlertaSonora();
                     const ultimoPedido = pendientes[pendientes.length - 1];
+                    const mensajePedido = `Cliente: ${ultimoPedido.customer || 'General'} - Total: Q${Number(ultimoPedido.total).toFixed(2)}`;
+                    mostrarNotificacionFlash("¡Nuevo Pedido Recibido! ☕", mensajePedido);
                     
                     if (notificacionesEscritorioHabilitadas && Notification.permission === "granted") {
                         const notif = new Notification("¡Nuevo Pedido Recibido! ☕", {
-                            body: `Cliente: ${ultimoPedido.customer || 'General'} - Total: Q${Number(ultimoPedido.total).toFixed(2)}`,
-                            icon: ""
+                            body: mensajePedido,
+                            icon: "",
+                            requireInteraction: true
                         });
                         notif.onclick = () => {
                             window.focus();
@@ -853,15 +925,17 @@
                     abrirWhatsAppCliente(pedido.phone, pedido.customer || 'Cliente', pedido.id, 'recibido');
                 }
 
+                const btnEmpaque = document.getElementById('btn-marcar-empaque');
+                const btnEntregado = document.getElementById('btn-marcar-entregado');
+
                 document.getElementById('det-id-pedido').innerText = `Detalle del Pedido: #${pedido.id}`;
                 document.getElementById('det-cliente').innerText = pedido.customer || 'No especificado';
                 document.getElementById('det-telefono').innerText = pedido.phone || 'No especificado';
                 document.getElementById('det-correo').innerText = pedido.email || 'No especificado';
-                document.getElementById('det-direccion').innerText = pedido.address || 'No especificada';
-
-                const btnEmpaque = document.getElementById('btn-marcar-empaque');
-                const btnEntregado = document.getElementById('btn-marcar-entregado');
-
+                const direccionEntrega = pedido.address || 'No especificada';
+                const detallesEntrega = pedido.address_details || pedido.delivery_details || 'No especificadas';
+                document.getElementById('det-direccion').innerText = (direccionEntrega && direccionEntrega !== 'No especificada') ? `${direccionEntrega}${detallesEntrega && detallesEntrega !== 'No especificadas' ? ` - ${detallesEntrega}` : ''}` : 'No especificada';
+                document.getElementById('det-direccion-especificaciones').innerText = (detallesEntrega && detallesEntrega !== 'No especificadas') ? detallesEntrega : 'No especificadas';
                 if (estadoActual.includes('entregado') || estadoActual.includes('completado')) {
                     btnEmpaque.style.display = 'none';
                     btnEntregado.innerText = '✓ Pedido Entregado';
@@ -909,9 +983,9 @@
                     document.getElementById('det-factura-nit').innerText = pago.invoice_nit || pago.nit || pedido.invoice_nit || 'C/F';
                     document.getElementById('det-factura-numero').innerText = pago.invoice_number || pedido.invoice_number || 'Pendiente';
                     
-                    // Rastreo exhaustivo de la dirección de facturación con respaldo a la dirección de entrega
-                    const direccionFacturaEncontrada = pago.invoice_address || pago.billing_address || pago.direccion_factura || pago.address || pedido.invoice_address || pedido.address;
-                    document.getElementById('det-factura-direccion').innerText = direccionFacturaEncontrada && direccionFacturaEncontrada.trim() !== '' ? direccionFacturaEncontrada : 'No especificada';
+                    const direccionFacturaEncontrada = pago.invoice_address || pago.billing_address || pago.direccion_factura || pago.address || pedido.invoice_address || pedido.address || 'No especificada';
+                    const direccionFacturaFinal = direccionFacturaEncontrada && direccionFacturaEncontrada.trim() !== '' ? direccionFacturaEncontrada : 'No especificada';
+                    document.getElementById('det-factura-direccion').innerText = direccionFacturaFinal;
 
                     const imgElement = document.getElementById('det-pago-imagen');
                     const sinFotoElement = document.getElementById('det-pago-sin-foto');
