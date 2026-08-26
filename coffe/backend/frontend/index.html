@@ -1506,8 +1506,16 @@
             </div>
 
             <div class="form-group" id="grupo-direccion-envio" style="display: none;">
-                <label>Dirección de Envío / Referencias *</label>
+                <label>Dirección de Envío *</label>
                 <textarea id="envio-direccion" placeholder="Calle, número de casa, zona..." style="height: 60px;"></textarea>
+            </div>
+            <div class="form-group" id="grupo-direccion-especificaciones" style="display: none;">
+                <label>Especificaciones de la Dirección (Opcional)</label>
+                <textarea id="envio-direccion-especificaciones" placeholder="Ej. Color de la casa, referencia, ingreso por la lateral, apartamento, etc." style="height: 70px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Dirección Fiscal para la Factura (Opcional)</label>
+                <textarea id="envio-direccion-factura" placeholder="Si deseas factura, escribe la dirección fiscal o deja vacío si no la necesitas." style="height: 65px;"></textarea>
             </div>
 
             <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700;">2. Selecciona tu Método de Pago</h4>
@@ -2065,14 +2073,17 @@
             const tipoEntrega = document.getElementById('tipo-entrega').value;
             let costoEnvio = 0.00;
             const grupoDireccion = document.getElementById('grupo-direccion-envio');
+            const grupoDireccionEspecificaciones = document.getElementById('grupo-direccion-especificaciones');
 
             if (tipoEntrega === 'domicilio') {
                 costoEnvio = 60.00;
                 grupoDireccion.style.display = 'block';
+                grupoDireccionEspecificaciones.style.display = 'block';
                 document.getElementById('envio-direccion').setAttribute('required', 'true');
             } else {
                 costoEnvio = 0.00;
                 grupoDireccion.style.display = 'none';
+                grupoDireccionEspecificaciones.style.display = 'none';
                 document.getElementById('envio-direccion').removeAttribute('required');
             }
 
@@ -2157,6 +2168,8 @@
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
             const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
+            const direccionFactura = document.getElementById('envio-direccion-factura').value.trim();
+            const direccionEspecificaciones = document.getElementById('envio-direccion-especificaciones').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
 
@@ -2180,7 +2193,9 @@
             formData.append("invoice_nit", nit);
             formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
+            formData.append("invoice_address", direccionFactura || direccionNit || "No especificada");
             formData.append("address", "Recoger en Tienda (Esquipulas)");
+            formData.append("address_details", direccionEspecificaciones || "");
             formData.append("total", subtotal);
             formData.append("items", JSON.stringify(carrito));
             formData.append("payment_method_type", "Efectivo (Pago en Tienda)");
@@ -2212,6 +2227,8 @@
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
             const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
+            const direccionFactura = document.getElementById('envio-direccion-factura').value.trim();
+            const direccionEspecificaciones = document.getElementById('envio-direccion-especificaciones').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
@@ -2251,7 +2268,9 @@
                 formData.append("invoice_nit", nit);
                 formData.append("invoice_nit_address", direccionNit);
                 formData.append("invoice_name", nombreFactura);
+                formData.append("invoice_address", direccionFactura || direccionNit || (tipoEntrega === 'domicilio' ? direccion : "No especificada"));
                 formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
+                formData.append("address_details", direccionEspecificaciones || "");
                 formData.append("total", totalGeneral);
                 formData.append("items", JSON.stringify(carrito));
                 formData.append("payment_method_type", "Tarjeta (QPayPro)");
@@ -2287,6 +2306,8 @@
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
             const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
+            const direccionFactura = document.getElementById('envio-direccion-factura').value.trim();
+            const direccionEspecificaciones = document.getElementById('envio-direccion-especificaciones').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
             const tipoEntrega = document.getElementById('tipo-entrega').value;
@@ -2317,7 +2338,9 @@
             formData.append("invoice_nit", nit);
             formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
+            formData.append("invoice_address", direccionFactura || direccionNit || (tipoEntrega === 'domicilio' ? direccion : "No especificada"));
             formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
+            formData.append("address_details", direccionEspecificaciones || "");
             formData.append("total", totalGeneral);
             formData.append("items", JSON.stringify(carrito));
             formData.append("payment_method_type", `Transferencia (${banco} - Ref: ${referencia})`);
