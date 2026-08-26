@@ -46,6 +46,32 @@ class LoginRequest(BaseModel):
 class OrderStatusUpdate(BaseModel):
     status: str
 
+
+def insertar_con_fallback(tabla: str, payload: dict, campos_opcionales: list[str]):
+    """Intenta insertar el payload inicial. Si la tabla no tiene alguna columna opcional,
+    vuelve a intentar sin esos campos para evitar errores 500 por esquema incompleto."""
+
+    version = dict(payload)
+
+    try:
+        return supabase.table(tabla).insert(version).execute()
+    except Exception as exc:
+        mensaje = str(exc).lower()
+        if not campos_opcionales or "column" not in mensaje:
+            raise
+
+        for campo in campos_opcionales:
+            if campo in version:
+                version.pop(campo, None)
+
+        if not version:
+            raise
+
+        try:
+            return supabase.table(tabla).insert(version).execute()
+        except Exception:
+            raise
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -263,14 +289,17 @@ async def crear_pedido_cliente(
             "phone": phone,
             "email": email,
             "address": direccion_envio,
-            "address_details": detalles_envio,
             "status": "pendiente",
             "invoice_name": invoice_name,
             "invoice_nit": nit_final,
             "invoice_number": invoice_number,
             "invoice_address": direccion_factura
         }
-        res_order = supabase.table("orders").insert(nuevo_pedido).execute()
+
+        if detalles_envio:
+            nuevo_pedido["address_details"] = detalles_envio
+
+        res_order = insertar_con_fallback("orders", nuevo_pedido, ["address_details"])
         
         pedido_id = None
         if res_order.data and len(res_order.data) > 0:
@@ -286,10 +315,13 @@ async def crear_pedido_cliente(
             "invoice_name": invoice_name,
             "invoice_nit": nit_final,
             "invoice_number": invoice_number,
-            "invoice_address": direccion_factura,
-            "address_details": detalles_envio
+            "invoice_address": direccion_factura
         }
-        supabase.table("payments").insert(nuevo_pago).execute()
+
+        if detalles_envio:
+            nuevo_pago["address_details"] = detalles_envio
+
+        insertar_con_fallback("payments", nuevo_pago, ["address_details"])
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
