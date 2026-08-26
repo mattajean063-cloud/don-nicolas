@@ -251,7 +251,6 @@ async def crear_pedido_cliente(
     invoice_name: Optional[str] = Form("C/F"),
     invoice_nit: Optional[str] = Form("C/F"),
     nit: Optional[str] = Form(None),
-    invoice_nit_address: Optional[str] = Form(""),
     invoice_number: Optional[str] = Form("Pendiente"),
     invoice_address: Optional[str] = Form("No especificada"),
     receipt: UploadFile = File(None)
@@ -260,7 +259,7 @@ async def crear_pedido_cliente(
     if not nit_final:
         nit_final = "C/F"
 
-    direccion_factura = invoice_address.strip() if invoice_address and invoice_address.strip() else invoice_nit_address.strip() if invoice_nit_address else (address.strip() if address and address.strip() else "No especificada")
+    direccion_factura = invoice_address.strip() if invoice_address and invoice_address.strip() else (address.strip() if address and address.strip() else "No especificada")
     direccion_envio = address.strip() if address and address.strip() else "Recoger en Tienda (Esquipulas)"
     detalles_envio = address_details.strip() if address_details and address_details.strip() else ""
 
