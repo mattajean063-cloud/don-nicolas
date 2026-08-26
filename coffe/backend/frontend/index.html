@@ -1513,11 +1513,6 @@
                 <label>Especificaciones de la Dirección (Opcional)</label>
                 <textarea id="envio-direccion-especificaciones" placeholder="Ej. Color de la casa, referencia, ingreso por la lateral, apartamento, etc." style="height: 70px;"></textarea>
             </div>
-            <div class="form-group">
-                <label>Dirección Fiscal para la Factura (Opcional)</label>
-                <textarea id="envio-direccion-factura" placeholder="Si deseas factura, escribe la dirección fiscal o deja vacío si no la necesitas." style="height: 65px;"></textarea>
-            </div>
-
             <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700;">2. Selecciona tu Método de Pago</h4>
             
             <div class="metodos-pago-selector">
@@ -2168,7 +2163,6 @@
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
             const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
-            const direccionFactura = document.getElementById('envio-direccion-factura').value.trim();
             const direccionEspecificaciones = document.getElementById('envio-direccion-especificaciones').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
@@ -2191,9 +2185,8 @@
             formData.append("phone", telefono);
             formData.append("email", correo);
             formData.append("invoice_nit", nit);
-            formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
-            formData.append("invoice_address", direccionFactura || direccionNit || "No especificada");
+            formData.append("invoice_address", direccionNit || "No especificada");
             formData.append("address", "Recoger en Tienda (Esquipulas)");
             formData.append("address_details", direccionEspecificaciones || "");
             formData.append("total", subtotal);
@@ -2227,7 +2220,6 @@
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
             const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
-            const direccionFactura = document.getElementById('envio-direccion-factura').value.trim();
             const direccionEspecificaciones = document.getElementById('envio-direccion-especificaciones').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
@@ -2266,9 +2258,8 @@
                 formData.append("phone", telefono);
                 formData.append("email", correo);
                 formData.append("invoice_nit", nit);
-                formData.append("invoice_nit_address", direccionNit);
                 formData.append("invoice_name", nombreFactura);
-                formData.append("invoice_address", direccionFactura || direccionNit || (tipoEntrega === 'domicilio' ? direccion : "No especificada"));
+                formData.append("invoice_address", direccionNit || "No especificada");
                 formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
                 formData.append("address_details", direccionEspecificaciones || "");
                 formData.append("total", totalGeneral);
@@ -2306,7 +2297,6 @@
             const telefono = document.getElementById('envio-telefono').value.trim();
             const nit = document.getElementById('envio-nit').value.trim() || "C/F";
             const direccionNit = document.getElementById('envio-direccion-nit').value.trim();
-            const direccionFactura = document.getElementById('envio-direccion-factura').value.trim();
             const direccionEspecificaciones = document.getElementById('envio-direccion-especificaciones').value.trim();
             const nombre = document.getElementById('envio-nombre').value.trim() || "Cliente General";
             const nombreFactura = document.getElementById('envio-nombre-factura').value.trim() || "C/F";
@@ -2336,9 +2326,8 @@
             formData.append("phone", telefono);
             formData.append("email", correo);
             formData.append("invoice_nit", nit);
-            formData.append("invoice_nit_address", direccionNit);
             formData.append("invoice_name", nombreFactura);
-            formData.append("invoice_address", direccionFactura || direccionNit || (tipoEntrega === 'domicilio' ? direccion : "No especificada"));
+            formData.append("invoice_address", direccionNit || "No especificada");
             formData.append("address", tipoEntrega === 'domicilio' ? direccion : "Recoger en Tienda (Esquipulas)");
             formData.append("address_details", direccionEspecificaciones || "");
             formData.append("total", totalGeneral);
