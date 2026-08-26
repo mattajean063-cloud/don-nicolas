@@ -220,10 +220,12 @@ async def crear_pedido_cliente(
     phone: Optional[str] = Form(""),
     email: Optional[str] = Form(""),
     address: Optional[str] = Form(""),
+    address_details: Optional[str] = Form(""),
     payment_method_type: Optional[str] = Form("Transferencia Bancaria"),
     invoice_name: Optional[str] = Form("C/F"),
     invoice_nit: Optional[str] = Form("C/F"),
     nit: Optional[str] = Form(None),
+    invoice_nit_address: Optional[str] = Form(""),
     invoice_number: Optional[str] = Form("Pendiente"),
     invoice_address: Optional[str] = Form("No especificada"),
     receipt: UploadFile = File(None)
@@ -231,6 +233,10 @@ async def crear_pedido_cliente(
     nit_final = nit if nit and nit.strip() != "" else invoice_nit
     if not nit_final:
         nit_final = "C/F"
+
+    direccion_factura = invoice_address.strip() if invoice_address and invoice_address.strip() else invoice_nit_address.strip() if invoice_nit_address else (address.strip() if address and address.strip() else "No especificada")
+    direccion_envio = address.strip() if address and address.strip() else "Recoger en Tienda (Esquipulas)"
+    detalles_envio = address_details.strip() if address_details and address_details.strip() else ""
 
     receipt_url = None
     if receipt and receipt.filename:
@@ -240,7 +246,7 @@ async def crear_pedido_cliente(
             supabase.storage.from_("uploads").upload(
                 file_path, 
                 file_bytes, 
-                file_options={"content-type": image.content_type if hasattr(image, 'content_type') else "image/jpeg", "upsert": "true"}
+                file_options={"content-type": "image/jpeg", "upsert": "true"}
             )
             receipt_url = supabase.storage.from_("uploads").get_public_url(file_path)
         except Exception as e:
@@ -256,12 +262,13 @@ async def crear_pedido_cliente(
             "items": items,
             "phone": phone,
             "email": email,
-            "address": address,
+            "address": direccion_envio,
+            "address_details": detalles_envio,
             "status": "pendiente",
             "invoice_name": invoice_name,
             "invoice_nit": nit_final,
             "invoice_number": invoice_number,
-            "invoice_address": invoice_address
+            "invoice_address": direccion_factura
         }
         res_order = supabase.table("orders").insert(nuevo_pedido).execute()
         
@@ -279,7 +286,8 @@ async def crear_pedido_cliente(
             "invoice_name": invoice_name,
             "invoice_nit": nit_final,
             "invoice_number": invoice_number,
-            "invoice_address": invoice_address
+            "invoice_address": direccion_factura,
+            "address_details": detalles_envio
         }
         supabase.table("payments").insert(nuevo_pago).execute()
 
